@@ -40,7 +40,7 @@ const AboutSection: React.FC = () => {
           >
             <div className="bg-white p-4 rounded-2xl">
               <img
-                src="src/assets/images/desktop-1.svg"
+                src="/assets/images/desktop-1.svg"
                 alt="Médico utilizando tecnologia durante atendimento"
                 className="w-full h-auto"
               />
