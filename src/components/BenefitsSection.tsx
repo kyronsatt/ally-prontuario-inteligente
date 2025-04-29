@@ -8,26 +8,22 @@ const BenefitsSection: React.FC = () => {
     {
       icon: <Clock className="text-ally-blue" size={36} />,
       title: 'Economia de Tempo',
-      description: 'Menos digitação, mais consultas realizadas. Aumente sua produtividade sem sacrificar a qualidade no atendimento.',
-      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65587500cf04f187dd9ec807_shutterstock_2089738891.jpg'
+      description: 'Menos digitação, mais consultas realizadas. Aumente sua produtividade sem sacrificar a qualidade no atendimento.'
     },
     {
       icon: <FileText className="text-ally-blue" size={36} />,
       title: 'Precisão nos Registros',
-      description: 'Prontuários mais completos, estruturados e organizados. Informações claras para acompanhamento e decisões precisas.',
-      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65586dfd527b15cfde912443_shutterstock_2297619133.jpg'
+      description: 'Prontuários mais completos, estruturados e organizados. Informações claras para acompanhamento e decisões precisas.'
     },
     {
       icon: <Eye className="text-ally-blue" size={36} />,
       title: 'Foco no Paciente',
-      description: 'Mais olho no olho, menos tela. Fortaleça a relação médico-paciente com uma presença verdadeiramente atenta.',
-      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65587992a90b2a1785bbc43e_shutterstock_1688812977.jpg'
+      description: 'Mais olho no olho, menos tela. Fortaleça a relação médico-paciente com uma presença verdadeiramente atenta.'
     },
     {
       icon: <Shield className="text-ally-blue" size={36} />,
       title: 'Redução de Burnout',
-      description: 'Menos carga burocrática no final do dia. Diminua o estresse administrativo e recupere o prazer de exercer a medicina.',
-      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65587c7bde2b98c792299d7f_shutterstock_1946831340.jpg'
+      description: 'Menos carga burocrática no final do dia. Diminua o estresse administrativo e recupere o prazer de exercer a medicina.'
     }
   ];
 
@@ -51,13 +47,6 @@ const BenefitsSection: React.FC = () => {
               className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-100 fade-in-section"
               style={{ '--delay': `${200 + index * 100}ms` } as React.CSSProperties}
             >
-              <div className="h-48 overflow-hidden">
-                <img 
-                  src={benefit.image} 
-                  alt={benefit.title} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
               <div className="p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-ally-light p-2 rounded-lg">
