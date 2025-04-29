@@ -8,22 +8,26 @@ const BenefitsSection: React.FC = () => {
     {
       icon: <Clock className="text-ally-blue" size={36} />,
       title: 'Economia de Tempo',
-      description: 'Menos digitação, mais consultas realizadas. Aumente sua produtividade sem sacrificar a qualidade no atendimento.'
+      description: 'Menos digitação, mais consultas realizadas. Aumente sua produtividade sem sacrificar a qualidade no atendimento.',
+      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65587500cf04f187dd9ec807_shutterstock_2089738891.jpg'
     },
     {
       icon: <FileText className="text-ally-blue" size={36} />,
       title: 'Precisão nos Registros',
-      description: 'Prontuários mais completos, estruturados e organizados. Informações claras para acompanhamento e decisões precisas.'
+      description: 'Prontuários mais completos, estruturados e organizados. Informações claras para acompanhamento e decisões precisas.',
+      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65586dfd527b15cfde912443_shutterstock_2297619133.jpg'
     },
     {
       icon: <Eye className="text-ally-blue" size={36} />,
       title: 'Foco no Paciente',
-      description: 'Mais olho no olho, menos tela. Fortaleça a relação médico-paciente com uma presença verdadeiramente atenta.'
+      description: 'Mais olho no olho, menos tela. Fortaleça a relação médico-paciente com uma presença verdadeiramente atenta.',
+      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65587992a90b2a1785bbc43e_shutterstock_1688812977.jpg'
     },
     {
       icon: <Shield className="text-ally-blue" size={36} />,
       title: 'Redução de Burnout',
-      description: 'Menos carga burocrática no final do dia. Diminua o estresse administrativo e recupere o prazer de exercer a medicina.'
+      description: 'Menos carga burocrática no final do dia. Diminua o estresse administrativo e recupere o prazer de exercer a medicina.',
+      image: 'https://assets-global.website-files.com/62dfe3ef9bf94906205d8a0e/65587c7bde2b98c792299d7f_shutterstock_1946831340.jpg'
     }
   ];
 
@@ -44,14 +48,25 @@ const BenefitsSection: React.FC = () => {
           {benefits.map((benefit, index) => (
             <div 
               key={index} 
-              className="bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all border border-gray-100 fade-in-section"
+              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-100 fade-in-section"
               style={{ '--delay': `${200 + index * 100}ms` } as React.CSSProperties}
             >
-              <div className="mb-6">
-                {benefit.icon}
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src={benefit.image} 
+                  alt={benefit.title} 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{benefit.title}</h3>
-              <p className="text-ally-gray">{benefit.description}</p>
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-ally-light p-2 rounded-lg">
+                    {benefit.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold">{benefit.title}</h3>
+                </div>
+                <p className="text-ally-gray">{benefit.description}</p>
+              </div>
             </div>
           ))}
         </div>
