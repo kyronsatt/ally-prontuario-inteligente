@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -14,29 +13,41 @@ const Header: React.FC = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   return (
-    <header 
+    <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+        scrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
       }`}
     >
       <div className="container-ally flex justify-between items-center">
         <a href="#" className="text-ally-dark font-semibold text-xl">
-          <span className="text-ally-blue">Ally</span> Medical
+          <span className="text-ally-blue">Ally</span> Med
         </a>
-        
+
         <nav className="hidden md:flex items-center space-x-6">
-          <a href="#about" className="text-ally-dark hover:text-ally-blue transition-colors">Sobre</a>
-          <a href="#benefits" className="text-ally-dark hover:text-ally-blue transition-colors">Benefícios</a>
-          <a href="#waitlist" className="btn-primary">Lista de espera</a>
+          <a
+            href="#about"
+            className="text-ally-dark hover:text-ally-blue transition-colors"
+          >
+            Sobre
+          </a>
+          <a
+            href="#benefits"
+            className="text-ally-dark hover:text-ally-blue transition-colors"
+          >
+            Benefícios
+          </a>
+          <a href="#waitlist" className="btn-primary">
+            Lista de espera
+          </a>
         </nav>
-        
+
         <button className="md:hidden text-ally-dark">
           {/* Menu mobile (omitido para simplicidade) */}
           <span>≡</span>

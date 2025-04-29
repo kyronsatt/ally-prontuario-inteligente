@@ -1,28 +1,27 @@
-
 import React from "react";
 import { ArrowRight } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   return (
     <section className="pt-24 md:pt-32 pb-16 md:pb-24 overflow-hidden">
-      <div className="container-ally">
-        <div className="flex flex-col-reverse md:flex-row md:items-center gap-8 md:gap-12">
+      <div className="container-ally h-full">
+        <div className="flex flex-col-reverse md:flex-row md:items-center justify-between h-full gap-8 md:gap-12">
           {/* Texto do Hero */}
           <div
             className="md:w-1/2 space-y-6 fade-in-section"
             style={{ "--delay": "100ms" } as React.CSSProperties}
           >
-            <h1 className="heading-xl">
+            <h1 className="heading-xl font-bold">
               <span className="gradient-text">Ally</span> — da voz ao
               prontuário.
             </h1>
 
-            <p className="text-xl md:text-2xl text-ally-gray font-light">
+            <p className="text-xl md:text-2xl text-ally-gray font-extralight">
               Transforme suas consultas faladas em prontuários automáticos,
               estruturados e prontos para uso.
             </p>
 
-            <p className="text-lg text-ally-gray">
+            <p className="text-md font-extralight text-ally-gray">
               A assistente invisível que escuta, organiza e registra seu
               atendimento — para você focar no cuidado humano.
             </p>
@@ -43,16 +42,14 @@ const HeroSection: React.FC = () => {
 
           {/* Imagem/Ilustração do Hero */}
           <div
-            className="md:w-1/2 fade-in-section"
+            className="md:w-1/2 flex justify-end h-full fade-in-section"
             style={{ "--delay": "300ms" } as React.CSSProperties}
           >
-            <div className="bg-gradient-to-br from-blue-50 to-ally-light p-4 rounded-2xl shadow-lg">
-              <img
-                src="https://cdn.prod.website-files.com/62d4f06f9c1357a606c3b7ef/65ddf3cdf19abaf5688af2f8_shutterstock_1933145801%20(1).jpg"
-                alt="Médico usando Ally durante consulta"
-                className="rounded-xl w-full h-auto shadow-md"
-              />
-            </div>
+            <img
+              src="src/assets/images/female-doctor-1.jpg"
+              alt="Médico usando Ally durante consulta"
+              className="rounded-tr-[200px] rounded-b-xl rounded-tl-xl w-full md:w-full xl:w-2/3 h-auto max-h-[60vh] object-cover outline outline-[1px] outline-offset-4 outline-ally-blue/40"
+            />
           </div>
         </div>
       </div>
