@@ -21,7 +21,7 @@ const AppLayout: React.FC = () => {
               onClick={() => navigate("/app")}
               className="text-ally-dark font-semibold text-xl flex items-center"
             >
-              <span className="text-ally-blue">Ally</span> Med
+              <span className="gradient-text">Ally</span>
             </button>
 
             <div className="flex items-center gap-4">

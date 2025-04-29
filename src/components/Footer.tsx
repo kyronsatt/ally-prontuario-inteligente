@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
           <div className="mb-4 md:mb-0">
             <div className="flex items-center">
               <a href="#" className="text-ally-dark font-semibold text-xl">
-                <span className="text-ally-blue">Ally</span> Med
+                <span className="gradient-text">Ally</span>
               </a>
             </div>
             <p className="text-ally-gray text-sm mt-2">
@@ -41,7 +41,10 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-100 mt-6 pt-6 text-center text-ally-gray text-sm">
-          <p>© {currentYear} Ally Med. Todos os direitos reservados.</p>
+          <p>
+            © {currentYear} Ally Medical Technologies. Todos os direitos
+            reservados.
+          </p>
           <p className="mt-1">
             Transformando a prática médica através de tecnologia inteligente.
           </p>

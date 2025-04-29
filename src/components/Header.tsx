@@ -27,7 +27,7 @@ const Header: React.FC = () => {
     >
       <div className="container-ally flex justify-between items-center">
         <a href="#" className="text-ally-dark font-semibold text-xl">
-          <span className="text-ally-blue">Ally</span> Med
+          <span className="gradient-text">Ally</span>
         </a>
 
         <nav className="hidden md:flex items-center space-x-6">
