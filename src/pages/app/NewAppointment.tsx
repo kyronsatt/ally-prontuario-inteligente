@@ -127,7 +127,7 @@ const NewAppointment: React.FC = () => {
           <Button 
             disabled={!patientName || !appointmentType}
             onClick={handleContinue}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto bg-ally-blue hover:bg-ally-blue/90"
             size="lg"
           >
             Iniciar Escuta

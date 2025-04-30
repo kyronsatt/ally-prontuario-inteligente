@@ -1,1 +1,8 @@
+
 project_id = "qvcdczmigjsvrxmiryos"
+
+[functions.get-dashboard-data]
+verify_jwt = true
+
+[functions.get-appointments]
+verify_jwt = true

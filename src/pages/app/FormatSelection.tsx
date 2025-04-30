@@ -1,120 +1,182 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, FileText, ChevronRight, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAppointment } from '@/context/AppointmentContext';
+import { ArrowLeft, CheckCircle2, Clock, HelpCircle, FileText } from 'lucide-react';
 
 const FormatSelection: React.FC = () => {
   const navigate = useNavigate();
-  const { appointment } = useAppointment();
-  const [selectedFormat, setSelectedFormat] = useState('soap');
+  const { appointment, setAppointment } = useAppointment();
   
-  // Redirecionar se não houver prontuário
-  useEffect(() => {
-    if (!appointment.soapNote.subjective) {
-      navigate('/app/novo-atendimento');
-    }
-  }, [appointment, navigate]);
+  const handleFormatSelect = (format: string) => {
+    setAppointment({
+      ...appointment,
+      format
+    });
+    navigate('/app/resumo');
+  };
 
-  const handleViewResult = () => {
-    switch (selectedFormat) {
-      case 'soap':
-        navigate('/app/resumo');
-        break;
-      case 'anamnese':
-        navigate('/app/resumo?format=anamnese');
-        break;
-      default:
-        navigate('/app/resumo');
-    }
+  const isDisabled = (format: string) => {
+    return format !== 'soap' && format !== 'structured';
   };
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="text-center mb-10">
-        <div className="inline-block p-4 bg-green-100 rounded-full mb-6">
-          <CheckCircle className="h-12 w-12 text-green-600" />
-        </div>
-        <h1 className="text-3xl font-bold mb-3">Atendimento processado com sucesso!</h1>
-        <p className="text-lg text-gray-600">Como deseja visualizar o resultado?</p>
+      <Button
+        variant="ghost"
+        className="mb-6"
+        onClick={() => navigate('/app')}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
+      </Button>
+      
+      <Card className="bg-white border-none shadow-sm mb-8">
+        <CardContent className="p-8 text-center">
+          <div className="inline-block p-3 bg-green-100 rounded-full mb-4">
+            <CheckCircle2 className="h-12 w-12 text-green-600" />
+          </div>
+          
+          <h1 className="text-2xl font-bold mb-2">Atendimento processado com sucesso!</h1>
+          <p className="text-gray-600 mb-6">Como deseja visualizar o resultado?</p>
+        </CardContent>
+      </Card>
+      
+      <h2 className="text-lg font-medium mb-4">Formatos disponíveis</h2>
+      
+      {/* Available formats */}
+      <div className="grid gap-4 mb-8">
+        <Button
+          variant="outline"
+          className="h-auto p-4 justify-start gap-4 bg-white border-gray-200 hover:bg-blue-50 hover:border-ally-blue"
+          onClick={() => handleFormatSelect('soap')}
+        >
+          <div className="p-2 bg-blue-50 rounded-md">
+            <FileText className="h-6 w-6 text-ally-blue" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-medium text-left">SOAP (padrão)</h3>
+            <p className="text-sm text-gray-500">
+              Formato padrão de registro médico: Subjetivo, Objetivo, Avaliação e Plano
+            </p>
+          </div>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="h-auto p-4 justify-start gap-4 bg-white border-gray-200 hover:bg-blue-50 hover:border-ally-blue"
+          onClick={() => handleFormatSelect('structured')}
+        >
+          <div className="p-2 bg-blue-50 rounded-md">
+            <FileText className="h-6 w-6 text-ally-blue" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-medium">Anamnese Estruturada</h3>
+            <p className="text-sm text-gray-500">
+              Formato completo com histórico médico, exames e conclusões detalhadas
+            </p>
+          </div>
+        </Button>
       </div>
-
-      <div className="mb-8">
-        <RadioGroup value={selectedFormat} onValueChange={setSelectedFormat} className="space-y-4">
-          {/* Formatos disponíveis */}
-          <Card className={`border-2 ${selectedFormat === 'soap' ? 'border-ally-blue' : 'border-gray-200'} hover:border-ally-blue transition-colors cursor-pointer`}>
-            <label htmlFor="soap" className="cursor-pointer">
-              <CardContent className="flex items-center p-6">
-                <RadioGroupItem value="soap" id="soap" className="mr-4" />
-                <div className="flex-1">
-                  <div className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-ally-blue" />
-                    <h3 className="font-medium text-lg">SOAP (padrão)</h3>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Formato padrão com Subjetivo, Objetivo, Avaliação e Plano
-                  </p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-gray-400" />
-              </CardContent>
-            </label>
-          </Card>
-
-          <Card className={`border-2 ${selectedFormat === 'anamnese' ? 'border-ally-blue' : 'border-gray-200'} hover:border-ally-blue transition-colors cursor-pointer`}>
-            <label htmlFor="anamnese" className="cursor-pointer">
-              <CardContent className="flex items-center p-6">
-                <RadioGroupItem value="anamnese" id="anamnese" className="mr-4" />
-                <div className="flex-1">
-                  <div className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-ally-blue" />
-                    <h3 className="font-medium text-lg">Anamnese Estruturada</h3>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Formato estruturado seguindo o modelo tradicional de anamnese
-                  </p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-gray-400" />
-              </CardContent>
-            </label>
-          </Card>
-        </RadioGroup>
-      </div>
-
-      {/* Formatos em desenvolvimento */}
-      <div className="mb-8">
-        <h3 className="text-lg font-medium mb-3 text-gray-600">Outros formatos (em breve)</h3>
-        <div className="space-y-3">
-          {[
-            'Anamnese Focada',
-            'Anamnese por Especialidade',
-            'Anamnese Ocupacional',
-            'Revisão de Sistemas',
-            'Psicossocial'
-          ].map((format, index) => (
-            <Card key={index} className="bg-gray-50 border-gray-200 opacity-70">
-              <CardContent className="flex items-center p-4">
-                <div className="flex-1">
-                  <div className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-gray-400" />
-                    <h3 className="font-medium text-gray-500">{format}</h3>
-                  </div>
-                </div>
-                <div className="flex items-center text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  Em desenvolvimento
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex justify-center">
-        <Button onClick={handleViewResult} className="px-8 py-6 text-lg">
-          Visualizar prontuário
+      
+      <h2 className="text-lg font-medium mb-4 text-gray-500">Em desenvolvimento</h2>
+      
+      {/* Upcoming formats */}
+      <div className="grid gap-4 opacity-70">
+        <Button
+          variant="outline"
+          className="h-auto p-4 justify-start gap-4 bg-gray-50 border-gray-200 cursor-not-allowed"
+          disabled
+        >
+          <div className="p-2 bg-gray-100 rounded-md">
+            <Clock className="h-6 w-6 text-gray-400" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-medium flex items-center">
+              Anamnese Focada
+              <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Em breve</span>
+            </h3>
+            <p className="text-sm text-gray-500">
+              Formato resumido voltado para a queixa principal
+            </p>
+          </div>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="h-auto p-4 justify-start gap-4 bg-gray-50 border-gray-200 cursor-not-allowed"
+          disabled
+        >
+          <div className="p-2 bg-gray-100 rounded-md">
+            <Clock className="h-6 w-6 text-gray-400" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-medium flex items-center">
+              Anamnese por Especialidade
+              <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Em desenvolvimento</span>
+            </h3>
+            <p className="text-sm text-gray-500">
+              Formato adaptado para cada especialidade médica
+            </p>
+          </div>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="h-auto p-4 justify-start gap-4 bg-gray-50 border-gray-200 cursor-not-allowed"
+          disabled
+        >
+          <div className="p-2 bg-gray-100 rounded-md">
+            <Clock className="h-6 w-6 text-gray-400" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-medium flex items-center">
+              Anamnese Ocupacional
+              <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Em desenvolvimento</span>
+            </h3>
+            <p className="text-sm text-gray-500">
+              Formato específico para medicina do trabalho
+            </p>
+          </div>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="h-auto p-4 justify-start gap-4 bg-gray-50 border-gray-200 cursor-not-allowed"
+          disabled
+        >
+          <div className="p-2 bg-gray-100 rounded-md">
+            <Clock className="h-6 w-6 text-gray-400" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-medium flex items-center">
+              Revisão de Sistemas
+              <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Em desenvolvimento</span>
+            </h3>
+            <p className="text-sm text-gray-500">
+              Análise detalhada de cada sistema corporal
+            </p>
+          </div>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="h-auto p-4 justify-start gap-4 bg-gray-50 border-gray-200 cursor-not-allowed"
+          disabled
+        >
+          <div className="p-2 bg-gray-100 rounded-md">
+            <Clock className="h-6 w-6 text-gray-400" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-medium flex items-center">
+              Psicossocial
+              <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Em desenvolvimento</span>
+            </h3>
+            <p className="text-sm text-gray-500">
+              Formato voltado para avaliação de aspectos psicológicos e sociais
+            </p>
+          </div>
         </Button>
       </div>
     </div>

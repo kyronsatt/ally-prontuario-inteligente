@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      appointment_stats: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          new_patients: number
+          time_saved_minutes: number
+          total_appointments: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          new_patients?: number
+          time_saved_minutes?: number
+          total_appointments?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          new_patients?: number
+          time_saved_minutes?: number
+          total_appointments?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           created_at: string
@@ -80,19 +110,40 @@ export type Database = {
       }
       profiles: {
         Row: {
+          birth_date: string | null
+          city: string | null
           created_at: string
+          crm: string | null
+          first_name: string | null
           id: string
+          last_name: string | null
           name: string
+          specialty: string | null
+          state: string | null
         }
         Insert: {
+          birth_date?: string | null
+          city?: string | null
           created_at?: string
+          crm?: string | null
+          first_name?: string | null
           id: string
+          last_name?: string | null
           name: string
+          specialty?: string | null
+          state?: string | null
         }
         Update: {
+          birth_date?: string | null
+          city?: string | null
           created_at?: string
+          crm?: string | null
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           name?: string
+          specialty?: string | null
+          state?: string | null
         }
         Relationships: []
       }

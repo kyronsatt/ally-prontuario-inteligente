@@ -1,62 +1,89 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Search, Calendar } from 'lucide-react';
+import { ArrowLeft, Search, Calendar, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/sonner';
 
-// Dados fictícios para demonstração
-const mockAppointments = [
-  {
-    id: '1',
-    patientName: 'Maria Silva',
-    date: new Date(2025, 3, 28),
-    type: 'new',
-    symptoms: 'Dor de cabeça, náusea'
-  },
-  {
-    id: '2',
-    patientName: 'João Santos',
-    date: new Date(2025, 3, 28),
-    type: 'return',
-    symptoms: 'Acompanhamento pós-cirúrgico'
-  },
-  {
-    id: '3',
-    patientName: 'Ana Oliveira',
-    date: new Date(2025, 3, 27),
-    type: 'new',
-    symptoms: 'Dor abdominal, vômitos'
-  },
-  {
-    id: '4',
-    patientName: 'Pedro Costa',
-    date: new Date(2025, 3, 26),
-    type: 'return',
-    symptoms: 'Controle de medicação'
-  },
-  {
-    id: '5',
-    patientName: 'Carla Mendes',
-    date: new Date(2025, 3, 25),
-    type: 'new',
-    symptoms: 'Tontura, pressão alta'
-  }
-];
+interface Patient {
+  id: string;
+  name: string;
+  gender: string | null;
+  age: number | null;
+  is_new: boolean;
+}
+
+interface Appointment {
+  id: string;
+  date: string;
+  type: string;
+  soap_subjective: string | null;
+  soap_objective: string | null;
+  soap_assessment: string | null;
+  soap_plan: string | null;
+  patients: Patient;
+}
 
 const AppointmentHistory: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  const filteredAppointments = mockAppointments.filter(app =>
-    app.patientName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Get selected appointment ID from URL query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const selectedAppointmentId = queryParams.get('id');
+  
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase.functions.invoke('get-appointments', {
+          body: { search: searchTerm }
+        });
+        
+        if (error) {
+          throw new Error(`Error invoking function: ${error.message}`);
+        }
+        
+        setAppointments(data.appointments || []);
+        setError(null);
+      } catch (err: any) {
+        console.error('Error fetching appointments:', err);
+        setError(err.message);
+        toast.error('Erro ao carregar histórico de atendimentos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAppointments();
+  }, [searchTerm]);
+  
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
   
   const handleViewDetails = (id: string) => {
-    console.log(`Ver detalhes do atendimento ${id}`);
-    // Em uma aplicação real, navegaríamos para a página de detalhes
+    // In a real app, navigate to appointment details 
+    console.log(`Viewing details for appointment ${id}`);
+    navigate(`/app/historico?id=${id}`);
   };
+  
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+  };
+  
+  // Filter appointments based on search term
+  const filteredAppointments = appointments.filter(app =>
+    app.patients.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -80,28 +107,49 @@ const AppointmentHistory: React.FC = () => {
               placeholder="Buscar paciente por nome..."
               className="pl-10"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearch}
             />
           </div>
           
           <div className="space-y-4 mt-6">
-            {filteredAppointments.length > 0 ? (
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-ally-blue" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-500">
+                <p>Erro ao carregar os atendimentos.</p>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  variant="outline" 
+                  className="mt-2"
+                >
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : filteredAppointments.length > 0 ? (
               filteredAppointments.map((appointment) => (
                 <div 
                   key={appointment.id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  className={`p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${
+                    selectedAppointmentId === appointment.id ? 'border-ally-blue bg-blue-50' : ''
+                  }`}
                   onClick={() => handleViewDetails(appointment.id)}
                 >
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="font-medium">{appointment.patientName}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{appointment.symptoms}</p>
+                      <h3 className="font-medium">{appointment.patients.name}</h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {appointment.soap_subjective 
+                          ? appointment.soap_subjective.substring(0, 100) + (appointment.soap_subjective.length > 100 ? '...' : '') 
+                          : 'Sem queixa registrada'}
+                      </p>
                     </div>
                     
                     <div className="text-right">
                       <div className="flex items-center justify-end text-sm text-gray-600 mb-1">
                         <Calendar className="h-3.5 w-3.5 mr-1" />
-                        {appointment.date.toLocaleDateString()}
+                        {formatDate(appointment.date)}
                       </div>
                       
                       <span className={`text-xs px-2 py-1 rounded-full ${
