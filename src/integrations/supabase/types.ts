@@ -9,7 +9,93 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          created_at: string
+          date: string
+          doctor_id: string
+          id: string
+          patient_id: string
+          soap_assessment: string | null
+          soap_objective: string | null
+          soap_plan: string | null
+          soap_subjective: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          doctor_id: string
+          id?: string
+          patient_id: string
+          soap_assessment?: string | null
+          soap_objective?: string | null
+          soap_plan?: string | null
+          soap_subjective?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          doctor_id?: string
+          id?: string
+          patient_id?: string
+          soap_assessment?: string | null
+          soap_objective?: string | null
+          soap_plan?: string | null
+          soap_subjective?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      patients: {
+        Row: {
+          age: number | null
+          created_at: string
+          created_by: string
+          gender: string | null
+          id: string
+          is_new: boolean
+          name: string
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          created_by: string
+          gender?: string | null
+          id?: string
+          is_new?: boolean
+          name: string
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          created_by?: string
+          gender?: string | null
+          id?: string
+          is_new?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

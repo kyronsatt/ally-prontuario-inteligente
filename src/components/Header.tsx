@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 
 const Header: React.FC = () => {
@@ -43,8 +44,11 @@ const Header: React.FC = () => {
           >
             Benefícios
           </a>
-          <a href="#waitlist" className="btn-primary">
+          <a href="#waitlist" className="text-ally-dark hover:text-ally-blue transition-colors">
             Lista de espera
+          </a>
+          <a href="/login" className="btn-primary">
+            Entrar
           </a>
         </nav>
 
