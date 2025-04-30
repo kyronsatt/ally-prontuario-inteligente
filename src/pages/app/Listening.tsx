@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Mic, MicOff, Clock, PauseCircle } from 'lucide-react';
 import { useAppointment } from '@/context/AppointmentContext';
 import { toast } from '@/components/ui/sonner';
@@ -48,7 +48,7 @@ const Listening: React.FC = () => {
   
   const handleFinish = () => {
     stopListening();
-    navigate('/app/resumo');
+    navigate('/app/formato');
   };
 
   const togglePause = () => {

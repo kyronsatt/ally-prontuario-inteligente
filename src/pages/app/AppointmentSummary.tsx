@@ -1,128 +1,211 @@
 
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { FileText, Printer, Check } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText } from 'lucide-react';
 import { useAppointment } from '@/context/AppointmentContext';
-import { toast } from '@/components/ui/sonner';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
-  const { appointment, resetAppointment } = useAppointment();
-  
-  // Redirecionar se não houver dados do SOAP
+  const { appointment } = useAppointment();
+  const [searchParams] = useSearchParams();
+  const [viewFormat, setViewFormat] = useState<string>('soap');
+
+  // Recuperar formato selecionado da URL ou do contexto
   useEffect(() => {
-    if (!appointment.patient || !appointment.soapNote.subjective) {
+    const formatParam = searchParams.get('format');
+    if (formatParam) {
+      setViewFormat(formatParam);
+    } else if (appointment.selectedFormat) {
+      setViewFormat(appointment.selectedFormat);
+    }
+  }, [searchParams, appointment.selectedFormat]);
+
+  // Redirecionar se não houver prontuário
+  useEffect(() => {
+    if (!appointment.soapNote.subjective) {
       navigate('/app/novo-atendimento');
     }
   }, [appointment, navigate]);
-  
-  const handleExportPDF = () => {
-    toast.success('PDF gerado com sucesso', {
-      description: 'O documento foi preparado para download.'
-    });
-    // Em uma aplicação real, aqui teríamos a lógica de exportar para PDF
-  };
-  
-  const handlePrint = () => {
-    window.print();
-  };
-  
-  const handleFinish = () => {
-    toast.success('Atendimento registrado com sucesso');
-    resetAppointment();
-    navigate('/app');
-  };
 
-  if (!appointment.patient) {
-    return null; // Evita renderização antes do redirecionamento
-  }
+  // Formatação da data
+  const formattedDate = appointment.date
+    ? format(appointment.date, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })
+    : '';
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Card className="bg-white border-none shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Resumo do Atendimento</CardTitle>
-        </CardHeader>
-        
-        <CardContent className="space-y-6">
-          <div>
-            <h3 className="text-lg font-medium">Informações do Paciente</h3>
-            <div className="mt-2 p-4 bg-gray-50 rounded-md">
-              <p><span className="font-medium">Nome:</span> {appointment.patient.name}</p>
-              {appointment.patient.age && (
-                <p><span className="font-medium">Idade:</span> {appointment.patient.age} anos</p>
-              )}
-              <p>
-                <span className="font-medium">Tipo:</span> {appointment.type === 'new' ? 'Primeiro atendimento' : 'Retorno'}
-              </p>
-              <p>
-                <span className="font-medium">Data:</span> {appointment.date?.toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-          
-          <Separator />
-          
-          <div>
-            <h3 className="text-lg font-medium mb-4">Prontuário SOAP</h3>
-            
-            <div className="space-y-5">
-              <div>
-                <h4 className="font-medium text-ally-blue mb-1">S: Subjetivo</h4>
-                <p className="bg-gray-50 p-3 rounded-md">{appointment.soapNote.subjective}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-ally-blue mb-1">O: Objetivo</h4>
-                <p className="bg-gray-50 p-3 rounded-md">{appointment.soapNote.objective}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-ally-blue mb-1">A: Avaliação</h4>
-                <p className="bg-gray-50 p-3 rounded-md">{appointment.soapNote.assessment}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-ally-blue mb-1">P: Plano</h4>
-                <p className="bg-gray-50 p-3 rounded-md">{appointment.soapNote.plan}</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-        
-        <CardFooter className="justify-between flex-wrap gap-3 pt-4">
-          <div className="flex gap-3">
-            <Button 
-              variant="outline" 
-              onClick={handleExportPDF}
-              className="flex items-center gap-2"
-            >
-              <FileText className="h-4 w-4" />
-              Exportar PDF
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={handlePrint}
-              className="flex items-center gap-2"
-            >
-              <Printer className="h-4 w-4" />
-              Imprimir
-            </Button>
-          </div>
-          
-          <Button 
-            onClick={handleFinish}
-            className="flex items-center gap-2"
-          >
-            <Check className="h-4 w-4" />
-            Salvar e Concluir
+    <div className="max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Resumo do Atendimento</h1>
+        <div className="flex gap-3">
+          <Button onClick={() => navigate('/app/historico')} variant="outline">
+            Ver histórico
           </Button>
-        </CardFooter>
+          <Button onClick={() => navigate('/app/novo-atendimento')}>
+            Novo atendimento
+          </Button>
+        </div>
+      </div>
+
+      <Card className="mb-8">
+        <CardHeader className="bg-gray-50 border-b">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Paciente</p>
+              <h2 className="text-2xl font-semibold">{appointment.patient?.name}</h2>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500 mb-1">Data do atendimento</p>
+              <p className="font-medium">{formattedDate}</p>
+            </div>
+          </div>
+        </CardHeader>
       </Card>
+
+      <div className="mb-6 flex gap-3">
+        <Button 
+          variant={viewFormat === 'soap' ? "default" : "outline"} 
+          onClick={() => setViewFormat('soap')}
+          className={viewFormat === 'soap' ? '' : 'border-gray-300'}
+        >
+          <FileText className="mr-2 h-4 w-4" />
+          SOAP
+        </Button>
+        <Button 
+          variant={viewFormat === 'anamnese' ? "default" : "outline"} 
+          onClick={() => setViewFormat('anamnese')}
+          className={viewFormat === 'anamnese' ? '' : 'border-gray-300'}
+        >
+          <FileText className="mr-2 h-4 w-4" />
+          Anamnese Estruturada
+        </Button>
+      </div>
+
+      {viewFormat === 'soap' ? (
+        <div className="space-y-6 animate-fade-in">
+          <Card>
+            <CardHeader>
+              <CardTitle>S - Subjetivo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.soapNote.subjective}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>O - Objetivo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.soapNote.objective}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>A - Avaliação</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.soapNote.assessment}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>P - Plano</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.soapNote.plan}</p>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <div className="space-y-6 animate-fade-in">
+          <Card>
+            <CardHeader>
+              <CardTitle>Queixa Principal</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.queixaPrincipal}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>História da Doença Atual</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.historiaDoencaAtual}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Antecedentes Patológicos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.antecedentesPatologicos}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Medicações em Uso</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.medicacoesEmUso}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Hábitos de Vida</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.habitosDeVida}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Exames Físicos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.examesFisicos}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Exames Complementares</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.examesComplementares}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Diagnóstico</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.diagnostico}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Conduta</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{appointment.anamneseNote?.conduta}</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AppointmentProvider } from "@/context/AppointmentContext";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/components/ui/sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const AppLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -41,23 +42,35 @@ const AppLayout: React.FC = () => {
                 </span>
               )}
               
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Configurações"
-                onClick={() => console.log("Abrir configurações")}
-              >
-                <Settings className="h-5 w-5" />
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Sair"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Configurações"
+                  >
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-0" align="end">
+                  <div className="py-1">
+                    <button
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      onClick={() => navigate('/app/configuracoes')}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configurações
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sair
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </header>
