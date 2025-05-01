@@ -42,48 +42,41 @@ export type Database = {
       appointments: {
         Row: {
           created_at: string
-          date: string
           doctor_id: string
           id: string
           patient_id: string
-          soap_assessment: string | null
-          soap_objective: string | null
-          soap_plan: string | null
-          soap_subjective: string | null
-          type: string
+          type: Database["public"]["Enums"]["appointment_type"]
         }
         Insert: {
           created_at?: string
-          date?: string
           doctor_id: string
           id?: string
           patient_id: string
-          soap_assessment?: string | null
-          soap_objective?: string | null
-          soap_plan?: string | null
-          soap_subjective?: string | null
-          type: string
+          type: Database["public"]["Enums"]["appointment_type"]
         }
         Update: {
           created_at?: string
-          date?: string
           doctor_id?: string
           id?: string
           patient_id?: string
-          soap_assessment?: string | null
-          soap_objective?: string | null
-          soap_plan?: string | null
-          soap_subjective?: string | null
-          type?: string
+          type?: Database["public"]["Enums"]["appointment_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       patients: {
         Row: {
           age: number | null
           created_at: string
           created_by: string
-          gender: string | null
+          gender: Database["public"]["Enums"]["patient_gender"] | null
           id: string
           is_new: boolean
           name: string
@@ -92,7 +85,7 @@ export type Database = {
           age?: number | null
           created_at?: string
           created_by: string
-          gender?: string | null
+          gender?: Database["public"]["Enums"]["patient_gender"] | null
           id?: string
           is_new?: boolean
           name: string
@@ -101,7 +94,7 @@ export type Database = {
           age?: number | null
           created_at?: string
           created_by?: string
-          gender?: string | null
+          gender?: Database["public"]["Enums"]["patient_gender"] | null
           id?: string
           is_new?: boolean
           name?: string
@@ -155,7 +148,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      appointment_type: "NEW" | "RETURN"
+      patient_gender: "MALE" | "FEMALE" | "OTHER"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -270,6 +264,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      appointment_type: ["NEW", "RETURN"],
+      patient_gender: ["MALE", "FEMALE", "OTHER"],
+    },
   },
 } as const

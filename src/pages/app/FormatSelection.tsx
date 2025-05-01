@@ -1,25 +1,28 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAppointment } from '@/context/AppointmentContext';
-import { ArrowLeft, CheckCircle2, Clock, HelpCircle, FileText } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, FileText } from 'lucide-react';
 
 const FormatSelection: React.FC = () => {
   const navigate = useNavigate();
-  const { appointment, setAppointment } = useAppointment();
+  const { appointment, setAppointment, isProcessing } = useAppointment();
+  
+  // Redirect if no transcription is available
+  useEffect(() => {
+    if (!appointment.transcription && !isProcessing) {
+      navigate("/app/escuta");
+    }
+  }, [appointment.transcription, isProcessing, navigate]);
   
   const handleFormatSelect = (format: string) => {
-    setAppointment({
-      ...appointment,
-      format
-    });
-    navigate('/app/resumo');
-  };
-
-  const isDisabled = (format: string) => {
-    return format !== 'soap' && format !== 'structured';
+    setAppointment(prev => ({
+      ...prev,
+      selectedFormat: format
+    }));
+    navigate('/app/resumo?format=' + format);
   };
 
   return (
@@ -66,7 +69,7 @@ const FormatSelection: React.FC = () => {
         <Button
           variant="outline"
           className="h-auto p-4 justify-start gap-4 bg-white border-gray-200 hover:bg-blue-50 hover:border-ally-blue"
-          onClick={() => handleFormatSelect('structured')}
+          onClick={() => handleFormatSelect('anamnese')}
         >
           <div className="p-2 bg-blue-50 rounded-md">
             <FileText className="h-6 w-6 text-ally-blue" />

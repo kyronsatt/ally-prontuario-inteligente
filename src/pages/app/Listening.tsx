@@ -1,33 +1,36 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mic, MicOff, Clock, PauseCircle } from "lucide-react";
+import { Mic, MicOff, Clock, PauseCircle, Loader2 } from "lucide-react";
 import { useAppointment } from "@/context/AppointmentContext";
 import { toast } from "@/components/ui/sonner";
 import { usePatient } from "@/context/PatientContext";
 
 const Listening: React.FC = () => {
   const navigate = useNavigate();
-  const { appointment, startListening, stopListening, isListening } =
+  const { appointment, startListening, stopListening, isListening, isProcessing } =
     useAppointment();
   const { patient } = usePatient();
   const [duration, setDuration] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Redirecionar se não houver paciente selecionado
+  // Redirect if no patient selected
   useEffect(() => {
     if (!patient) {
       navigate("/app/novo-atendimento");
-    } else {
-      startListening();
-      toast("Escuta iniciada", {
-        description: "A Ally está ouvindo sua consulta com segurança.",
-      });
     }
-  }, [patient, navigate, startListening]);
+  }, [patient, navigate]);
 
-  // Simular um cronômetro para a duração da consulta
+  // Start listening when component mounts
+  useEffect(() => {
+    if (patient && !isListening && !isProcessing) {
+      startListening();
+    }
+  }, [patient, isListening, isProcessing, startListening]);
+
+  // Timer for consultation duration
   useEffect(() => {
     let timer: ReturnType<typeof setInterval>;
 
@@ -50,8 +53,11 @@ const Listening: React.FC = () => {
       .padStart(2, "0")}`;
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     stopListening();
+    
+    // Navigate to format selection once processing is complete
+    // The navigation will be handled by the processAudio function in the AppointmentContext
     navigate("/app/formato");
   };
 
@@ -67,6 +73,23 @@ const Listening: React.FC = () => {
       });
     }
   };
+
+  if (isProcessing) {
+    return (
+      <div className="max-w-2xl mx-auto text-center py-16">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <Loader2 className="h-16 w-16 text-ally-blue animate-spin" />
+          <h2 className="text-2xl font-bold">Processando áudio...</h2>
+          <p className="text-gray-600">
+            Estamos transcrevendo e analisando o áudio da consulta.
+          </p>
+          <p className="text-gray-500 text-sm">
+            Isso pode levar alguns instantes. Por favor, aguarde.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -154,7 +177,7 @@ const Listening: React.FC = () => {
           </div>
         </div>
 
-        {/* Formas decorativas */}
+        {/* Decorative shapes */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-2xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-700/30 rounded-full -ml-32 -mb-32 blur-2xl"></div>
       </div>
