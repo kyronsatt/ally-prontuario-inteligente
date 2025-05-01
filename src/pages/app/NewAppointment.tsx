@@ -40,47 +40,49 @@ const NewAppointment: React.FC = () => {
     }
   }, []);
 
-  const startAppointment = async () => {
+  const validateAppointmentType = (): boolean => {
     if (!appointmentType) {
       toast({ description: "Por favor, selecione o tipo de atendimento." });
-      return;
+      return false;
     }
+    return true;
+  };
 
+  const validateNewPatientData = (): boolean => {
+    if (!patientName || !patientAge) {
+      toast({
+        description: "Por favor, preencha todas as informações do paciente.",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const createNewPatient = async (): Promise<string | null> => {
     try {
-      let patientId = selectedPatientId;
-      if (appointmentType === "NEW") {
-        if (!patientName || !patientAge) {
-          toast({
-            description:
-              "Por favor, preencha todas as informações do paciente.",
-          });
-          return;
-        }
+      const createdPatient = await createPatient({
+        gender: patientGender,
+        age: parseInt(patientAge, 10),
+        name: patientName,
+        is_new: true,
+        created_by: user.id,
+      });
 
-        const createdPatient = await createPatient({
-          gender: patientGender,
-          age: parseInt(patientAge, 10),
-          name: patientName,
-          is_new: true,
-          created_by: user.id,
-        });
-
-        if (!createdPatient) {
-          toast({ description: "Erro ao criar o paciente. Tente novamente." });
-          return;
-        }
-
-        patientId = createdPatient.id;
+      if (!createdPatient) {
+        toast({ description: "Erro ao criar o paciente. Tente novamente." });
+        return null;
       }
 
-      if (!patientId) {
-        toast({
-          description:
-            "Paciente não encontrado. Por favor, selecione ou crie um paciente.",
-        });
-        return;
-      }
+      return createdPatient.id;
+    } catch (error) {
+      console.error("Erro ao criar o paciente:", error);
+      toast({ description: "Erro ao criar o paciente. Tente novamente." });
+      return null;
+    }
+  };
 
+  const createNewAppointment = async (patientId: string): Promise<boolean> => {
+    try {
       const { appointment, patient } = await createAppointment({
         doctor_id: user.id,
         patient_id: patientId,
@@ -89,19 +91,45 @@ const NewAppointment: React.FC = () => {
 
       if (!appointment || !patient) {
         toast({ description: "Erro ao criar o atendimento. Tente novamente." });
-        return;
+        return false;
       }
 
       setPatient(patient);
       toast({ description: "Atendimento iniciado com sucesso!" });
       navigate("/app/escuta");
+      return true;
     } catch (error) {
-      console.error("Erro ao iniciar o atendimento:", error);
+      console.error("Erro ao criar o atendimento:", error);
+      toast({
+        description: "Ocorreu um erro ao criar o atendimento. Tente novamente.",
+      });
+      return false;
+    }
+  };
+
+  const startAppointment = async () => {
+    if (!validateAppointmentType()) return;
+
+    let patientId = selectedPatientId;
+
+    if (appointmentType === "NEW") {
+      if (!validateNewPatientData()) return;
+
+      const newPatientId = await createNewPatient();
+      if (!newPatientId) return;
+
+      patientId = newPatientId;
+    }
+
+    if (!patientId) {
       toast({
         description:
-          "Ocorreu um erro ao iniciar o atendimento. Tente novamente.",
+          "Paciente não encontrado. Por favor, selecione ou crie um paciente.",
       });
+      return;
     }
+
+    await createNewAppointment(patientId);
   };
 
   return (
