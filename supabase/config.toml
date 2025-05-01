@@ -46,9 +46,6 @@ port = 54327
 vector_port = 54328
 backend = "postgres"
 
-[experimental]
-ai_timeouts_ms = 15000
-
 [functions]
 [functions.transcribe-audio]
 verify_jwt = true
