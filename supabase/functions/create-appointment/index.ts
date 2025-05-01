@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
     console.log("Inserting appointment into database");
-    const { data, error } = await supabaseClient
+    const { data: appointmentData, error } = await supabaseClient
       .from("appointments")
       .insert([{ patient_id, doctor_id, type }])
       .select()
@@ -51,11 +51,29 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log("Appointment inserted successfully:", data);
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 201,
-    });
+    console.log("Fetching patient data");
+    const { data: patientData, error: patientError } = await supabaseClient
+      .from("patients")
+      .select("*")
+      .eq("id", patient_id)
+      .single();
+
+    if (patientError) {
+      console.error("Error fetching patient data:", patientError.message);
+      return new Response(JSON.stringify({ error: patientError.message }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    console.log("Appointment and patient data retrieved successfully");
+    return new Response(
+      JSON.stringify({ appointment: appointmentData, patient: patientData }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 201,
+      }
+    );
   } catch (err) {
     console.error("Unexpected error:", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
