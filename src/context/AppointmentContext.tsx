@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { PatientData } from "./PatientContext";
 import { toast } from "@/components/ui/sonner";
@@ -78,64 +77,82 @@ const defaultAppointment: AppointmentData = {
 export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [appointment, setAppointment] = useState<AppointmentData>(defaultAppointment);
+  const [appointment, setAppointment] =
+    useState<AppointmentData>(defaultAppointment);
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { session } = useAuth();
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const startListening = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log("Microphone access granted:", stream); // Debug log for microphone acces
       const recorder = new MediaRecorder(stream);
-      
-      setAudioChunks([]);
-      
+
+      audioChunksRef.current = [];
+
       recorder.ondataavailable = (e) => {
-        setAudioChunks((prev) => [...prev, e.data]);
+        if (e.data && e.data.size > 0) {
+          console.log("Audio chunk received:", e.data);
+          audioChunksRef.current.push(e.data);
+        }
       };
-      
+
       recorder.start();
       setMediaRecorder(recorder);
       setIsListening(true);
-      
+
       toast("Escuta iniciada", {
         description: "A Ally está ouvindo sua consulta com segurança.",
       });
     } catch (error) {
       console.error("Erro ao iniciar gravação:", error);
       toast("Erro ao iniciar gravação", {
-        description: "Verifique se o microfone está disponível e tente novamente.",
+        description:
+          "Verifique se o microfone está disponível e tente novamente.",
       });
     }
   };
 
   const stopListening = () => {
     if (mediaRecorder && isListening) {
-      mediaRecorder.stop();
-      
-      // Get all tracks from stream and stop them
-      mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      
-      // Finalize recording when data is available
+      // Set the handler BEFORE stopping
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        
-        setAppointment(prev => ({
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+        console.log("Final audioBlob size:", audioBlob.size);
+
+        // Test blob download (optional)
+        const url = URL.createObjectURL(audioBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "recorded-audio.webm";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        setAppointment((prev) => ({
           ...prev,
           audioBlob,
           date: new Date(),
         }));
-        
+
         setIsListening(false);
+
         toast("Gravação finalizada", {
           description: "Áudio capturado com sucesso.",
         });
-        
-        // Process the audio automatically
+
         await processAudio(audioBlob);
       };
+
+      mediaRecorder.requestData();
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach((track) => track.stop());
     }
   };
 
@@ -144,21 +161,26 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
     toast("Processando áudio", {
       description: "Convertendo áudio para texto...",
     });
-    
+
     try {
-      // Convert audio to base64
+      // Convert audio to Base64
       const reader = new FileReader();
       reader.readAsDataURL(audioBlob);
-      
-      const base64Audio = await new Promise<string>((resolve) => {
+
+      const base64Audio = await new Promise<string>((resolve, reject) => {
         reader.onloadend = () => {
-          const base64 = reader.result as string;
-          // Remove data URL prefix (data:audio/webm;base64,)
-          const base64Data = base64.split(',')[1];
-          resolve(base64Data);
+          if (reader.result) {
+            const base64 = reader.result as string;
+            const base64Data = base64.split(",")[1];
+            console.log("Base64 Audio Data:", base64Data); // Debug log for Base64 data
+            resolve(base64Data);
+          } else {
+            reject("Erro ao converter áudio para Base64");
+          }
         };
+        reader.onerror = () => reject("Erro ao ler o arquivo de áudio");
       });
-      
+
       // Step 1: Transcribe Audio
       const transcriptionResponse = await fetch(
         "https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/transcribe-audio",
@@ -168,28 +190,28 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
             Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ audio: base64Audio }),
+          body: JSON.stringify({ audio: base64Audio }), // Ensure the audio is included here
         }
       );
-      
+
       if (!transcriptionResponse.ok) {
         const errorData = await transcriptionResponse.json();
         throw new Error(errorData.error || "Erro na transcrição do áudio");
       }
-      
+
       const transcriptionResult = await transcriptionResponse.json();
       const transcription = transcriptionResult.text;
-      
+
       // Update appointment with transcription
-      setAppointment(prev => ({
+      setAppointment((prev) => ({
         ...prev,
         transcription,
       }));
-      
+
       toast("Áudio transcrito", {
         description: "Gerando relatório médico...",
       });
-      
+
       // Step 2: Generate Medical Report
       const reportResponse = await fetch(
         "https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/generate-medical-report",
@@ -199,37 +221,39 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
             Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             transcription,
             patientName: appointment.patient?.name,
             appointmentType: appointment.type,
           }),
         }
       );
-      
+
       if (!reportResponse.ok) {
         const errorData = await reportResponse.json();
-        throw new Error(errorData.error || "Erro na geração do relatório médico");
+        throw new Error(
+          errorData.error || "Erro na geração do relatório médico"
+        );
       }
-      
+
       const reportResult = await reportResponse.json();
-      
+
       // Update appointment with SOAP and Anamnese notes
-      setAppointment(prev => ({
+      setAppointment((prev) => ({
         ...prev,
         transcription,
         soapNote: reportResult.soapNote,
         anamneseNote: reportResult.anamneseNote,
       }));
-      
+
       toast("Relatório gerado", {
         description: "Relatório médico gerado com sucesso!",
       });
-      
     } catch (error) {
       console.error("Erro no processamento:", error);
       toast("Erro no processamento", {
-        description: "Ocorreu um erro ao processar o áudio. Por favor, tente novamente.",
+        description:
+          "Ocorreu um erro ao processar o áudio. Por favor, tente novamente.",
       });
     } finally {
       setIsProcessing(false);
@@ -241,10 +265,11 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsListening(false);
     setIsProcessing(false);
     if (mediaRecorder) {
-      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      mediaRecorder.stream.getTracks().forEach((track) => track.stop());
       setMediaRecorder(null);
     }
-    setAudioChunks([]);
+
+    audioChunksRef.current = [];
   };
 
   const createAppointment = async (
