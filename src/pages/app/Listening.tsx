@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,8 +9,13 @@ import { usePatient } from "@/context/PatientContext";
 
 const Listening: React.FC = () => {
   const navigate = useNavigate();
-  const { appointment, startListening, stopListening, isListening, isProcessing } =
-    useAppointment();
+  const {
+    appointment,
+    startListening,
+    stopListening,
+    isListening,
+    isProcessing,
+  } = useAppointment();
   const { patient } = usePatient();
   const [duration, setDuration] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -55,10 +59,6 @@ const Listening: React.FC = () => {
 
   const handleFinish = async () => {
     stopListening();
-    
-    // Navigate to format selection once processing is complete
-    // The navigation will be handled by the processAudio function in the AppointmentContext
-    navigate("/app/formato");
   };
 
   const togglePause = () => {

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { PatientData } from "./PatientContext";
 import { toast } from "@/components/ui/sonner";
@@ -81,10 +82,11 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
     useState<AppointmentData>(defaultAppointment);
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { session } = useAuth();
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
+  const { session } = useAuth();
+  const navigate = useNavigate();
   const audioChunksRef = useRef<Blob[]>([]);
 
   const startListening = async () => {
@@ -190,7 +192,7 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
             Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ audio: base64Audio }), // Ensure the audio is included here
+          body: JSON.stringify({ audio: base64Audio }),
         }
       );
 
@@ -249,6 +251,9 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       toast("Relatório gerado", {
         description: "Relatório médico gerado com sucesso!",
       });
+
+      // Navigation after the audio is processed and report is generated
+      navigate("/app/formato");
     } catch (error) {
       console.error("Erro no processamento:", error);
       toast("Erro no processamento", {
