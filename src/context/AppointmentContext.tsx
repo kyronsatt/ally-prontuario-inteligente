@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import { useAuth } from "./AuthContext";
+import { PatientData } from "./PatientContext";
 
 export type AppointmentType = "NEW" | "RETURN";
 
@@ -13,6 +14,11 @@ interface AppointmentData extends IAppointmentCreationPayload {
   created_at: Date;
 }
 
+interface IAppointmentCreationResponse {
+  appointment: AppointmentData;
+  patient: PatientData;
+}
+
 interface AppointmentContextType {
   appointment: AppointmentData;
   setAppointment: React.Dispatch<React.SetStateAction<AppointmentData>>;
@@ -22,7 +28,7 @@ interface AppointmentContextType {
   resetAppointment: () => void;
   createAppointment: (
     appointmentCreationPayload: IAppointmentCreationPayload
-  ) => Promise<AppointmentData>;
+  ) => Promise<IAppointmentCreationResponse>;
 }
 
 const AppointmentContext = createContext<AppointmentContextType | undefined>(
@@ -73,11 +79,11 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       const errorData = await response.json();
       console.error("Error creating appointment:", errorData.error);
     } else {
-      const appointmentData = (await response.json()) as AppointmentData;
-      console.log("Appointment created successfully:", appointmentData);
-      setAppointment(appointmentData);
+      const result = (await response.json()) as IAppointmentCreationResponse;
+      console.log("Appointment created successfully:", result);
+      setAppointment(result.appointment);
 
-      return appointmentData;
+      return result;
     }
   };
 

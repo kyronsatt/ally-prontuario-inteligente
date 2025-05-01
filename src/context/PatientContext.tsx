@@ -11,7 +11,7 @@ interface PatientCreationPayload {
   created_by: string;
 }
 
-interface PatientData extends PatientCreationPayload {
+export interface PatientData extends PatientCreationPayload {
   id: string;
   created_at: Date;
 }
@@ -19,9 +19,11 @@ interface PatientData extends PatientCreationPayload {
 // Define the context value type
 interface PatientContextType {
   patient?: PatientData;
+  patients?: PatientData[];
   setPatient: (patient: PatientData) => void;
   clearPatient: () => void;
   createPatient: (payload: PatientCreationPayload) => Promise<PatientData>;
+  getPatientsByUser: (userId: string) => Promise<PatientData[]>;
 }
 
 // Create the context with a default value
@@ -36,6 +38,7 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
   children,
 }) => {
   const [patient, setPatient] = useState<PatientData>();
+  const [patients, setPatients] = useState<PatientData[]>([]); // State to store the list of patients
   const { user, session } = useAuth();
 
   const clearPatient = () => {
@@ -75,9 +78,46 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
     }
   };
 
+  const getPatientsByUser = async (userId: string): Promise<PatientData[]> => {
+    try {
+      const response = await fetch(
+        `https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/get-patients-by-user?user_id=${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error fetching patients:", errorData.error);
+        throw new Error(errorData.error);
+      }
+
+      const patientsData = (await response.json()) as PatientData[];
+      console.log("Patients retrieved successfully:", patientsData);
+      setPatients(patientsData);
+
+      return patientsData;
+    } catch (error) {
+      console.error("Failed to fetch patients:", error);
+      return [];
+    }
+  };
+
   return (
     <PatientContext.Provider
-      value={{ patient, setPatient, clearPatient, createPatient }}
+      value={{
+        patient,
+        patients,
+        setPatient,
+        clearPatient,
+        createPatient,
+        getPatientsByUser,
+      }}
     >
       {children}
     </PatientContext.Provider>
