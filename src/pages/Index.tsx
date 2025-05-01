@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
@@ -5,6 +6,7 @@ import AboutSection from "@/components/AboutSection";
 import BenefitsSection from "@/components/BenefitsSection";
 import WaitlistForm from "@/components/WaitlistForm";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
   useEffect(() => {
@@ -48,6 +50,7 @@ const Index = () => {
       </main>
 
       <Footer />
+      <Toaster />
     </div>
   );
 };

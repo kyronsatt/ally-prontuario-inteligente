@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const WaitlistForm: React.FC = () => {
   const { toast } = useToast();
@@ -13,19 +14,33 @@ const WaitlistForm: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Limpar erro quando o usuário começa a digitar novamente
+    if (error) setError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     
-    // Simulando envio para API
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Inserindo dados na tabela waitlist do Supabase
+      const { error: supabaseError } = await supabase
+        .from('waitlist')
+        .insert([{
+          name: formData.name,
+          email: formData.email,
+          specialty: formData.specialty || null,
+          crm: formData.crm || null
+        }]);
+      
+      if (supabaseError) throw supabaseError;
+      
       setSubmitted(true);
       
       toast({
@@ -39,7 +54,18 @@ const WaitlistForm: React.FC = () => {
         specialty: '',
         crm: ''
       });
-    }, 1000);
+    } catch (err) {
+      console.error('Erro ao cadastrar na lista de espera:', err);
+      setError(err instanceof Error ? err.message : 'Ocorreu um erro ao processar seu cadastro.');
+      
+      toast({
+        title: "Erro no cadastro",
+        description: "Não foi possível completar seu cadastro. Por favor, tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -122,13 +148,19 @@ const WaitlistForm: React.FC = () => {
                   />
                 </div>
                 
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
+                
                 <button
                   type="submit"
                   className="w-full btn-primary flex items-center justify-center h-12 mt-4"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <span className="inline-block animate-spin mr-2">◌</span>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   ) : (
                     <UserPlus className="mr-2" size={20} />
                   )}
