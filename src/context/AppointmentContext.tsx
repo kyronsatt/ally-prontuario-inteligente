@@ -107,8 +107,7 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Erro ao iniciar gravação:", error);
       toast("Erro ao iniciar gravação", {
         description: "Verifique se o microfone está disponível e tente novamente.",
-        // Change from variant to type
-        type: "destructive",
+        status: "error",
       });
     }
   };
@@ -175,7 +174,8 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       
       if (!transcriptionResponse.ok) {
-        throw new Error("Erro na transcrição do áudio");
+        const errorData = await transcriptionResponse.json();
+        throw new Error(errorData.error || "Erro na transcrição do áudio");
       }
       
       const transcriptionResult = await transcriptionResponse.json();
@@ -209,7 +209,8 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       
       if (!reportResponse.ok) {
-        throw new Error("Erro na geração do relatório médico");
+        const errorData = await reportResponse.json();
+        throw new Error(errorData.error || "Erro na geração do relatório médico");
       }
       
       const reportResult = await reportResponse.json();
@@ -230,8 +231,7 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Erro no processamento:", error);
       toast("Erro no processamento", {
         description: "Ocorreu um erro ao processar o áudio. Por favor, tente novamente.",
-        // Change from variant to type
-        type: "destructive",
+        status: "error",
       });
     } finally {
       setIsProcessing(false);
