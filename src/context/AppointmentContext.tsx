@@ -107,7 +107,8 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Erro ao iniciar gravação:", error);
       toast("Erro ao iniciar gravação", {
         description: "Verifique se o microfone está disponível e tente novamente.",
-        variant: "destructive",
+        // Change from variant to type
+        type: "destructive",
       });
     }
   };
@@ -229,7 +230,8 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Erro no processamento:", error);
       toast("Erro no processamento", {
         description: "Ocorreu um erro ao processar o áudio. Por favor, tente novamente.",
-        variant: "destructive",
+        // Change from variant to type
+        type: "destructive",
       });
     } finally {
       setIsProcessing(false);
