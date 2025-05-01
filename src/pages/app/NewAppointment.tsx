@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
@@ -10,26 +11,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import RadioGroupItem from "@/components/molecules/radio-group-item";
+import PatientForm from "@/components/molecules/patient-form";
+import PatientSelect from "@/components/molecules/patient-select";
+
+import { useToast } from "@/hooks/use-toast";
 import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
 import { useAuth } from "@/context/AuthContext";
-import { usePatient, PatientData } from "@/context/PatientContext";
-
-import { PatientGender } from "@/context/PatientContext";
+import { PatientGender, usePatient } from "@/context/PatientContext";
 
 const NewAppointment: React.FC = () => {
+  const { toast } = useToast();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { createAppointment } = useAppointment();
   const { createPatient, getPatientsByUser, patients, setPatient } =
     usePatient();
 
-  const { user } = useAuth();
-
   const [appointmentType, setAppointmentType] = useState<AppointmentType>();
-  const [patientName, setPatientName] = useState("");
-  const [patientAge, setPatientAge] = useState("");
+  const [patientName, setPatientName] = useState<string>("");
+  const [patientAge, setPatientAge] = useState<string>("");
   const [patientGender, setPatientGender] = useState<PatientGender>("MALE");
   const [selectedPatientId, setSelectedPatientId] = useState<string>("");
 
@@ -39,13 +40,23 @@ const NewAppointment: React.FC = () => {
     }
   }, []);
 
-  const handleContinue = async () => {
-    if (!appointmentType) return;
+  const startAppointment = async () => {
+    if (!appointmentType) {
+      toast({ description: "Por favor, selecione o tipo de atendimento." });
+      return;
+    }
 
     try {
       let patientId = selectedPatientId;
-
       if (appointmentType === "NEW") {
+        if (!patientName || !patientAge) {
+          toast({
+            description:
+              "Por favor, preencha todas as informações do paciente.",
+          });
+          return;
+        }
+
         const createdPatient = await createPatient({
           gender: patientGender,
           age: parseInt(patientAge, 10),
@@ -55,7 +66,7 @@ const NewAppointment: React.FC = () => {
         });
 
         if (!createdPatient) {
-          console.error("Failed to create patient");
+          toast({ description: "Erro ao criar o paciente. Tente novamente." });
           return;
         }
 
@@ -63,7 +74,10 @@ const NewAppointment: React.FC = () => {
       }
 
       if (!patientId) {
-        console.error("Patient ID not found");
+        toast({
+          description:
+            "Paciente não encontrado. Por favor, selecione ou crie um paciente.",
+        });
         return;
       }
 
@@ -74,17 +88,19 @@ const NewAppointment: React.FC = () => {
       });
 
       if (!appointment || !patient) {
-        console.error("Failed to create appointment");
+        toast({ description: "Erro ao criar o atendimento. Tente novamente." });
         return;
       }
 
-      console.log("Appointment created successfully:", appointment);
       setPatient(patient);
-
-      console.log("Redirecting to appointment page...");
+      toast({ description: "Atendimento iniciado com sucesso!" });
       navigate("/app/escuta");
     } catch (error) {
-      console.error("Error handling appointment creation:", error);
+      console.error("Erro ao iniciar o atendimento:", error);
+      toast({
+        description:
+          "Ocorreu um erro ao iniciar o atendimento. Tente novamente.",
+      });
     }
   };
 
@@ -103,28 +119,26 @@ const NewAppointment: React.FC = () => {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Qual o tipo de atendimento?</h3>
-
-            <RadioGroup
-              value={appointmentType || ""}
-              onValueChange={(value: AppointmentType) =>
-                setAppointmentType(value)
-              }
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
-              <div className="flex items-center space-x-2 border p-4 rounded-md cursor-pointer hover:bg-gray-50">
-                <RadioGroupItem value="NEW" id="NEW" />
-                <Label htmlFor="NEW" className="cursor-pointer flex-1">
-                  Paciente Novo
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2 border p-4 rounded-md cursor-pointer hover:bg-gray-50">
-                <RadioGroupItem value="RETURN" id="RETURN" />
-                <Label htmlFor="RETURN" className="cursor-pointer flex-1">
-                  Retorno de Paciente
-                </Label>
-              </div>
-            </RadioGroup>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <RadioGroupItem
+                id="NEW"
+                value="NEW"
+                label="Paciente Novo"
+                onChange={(value) =>
+                  setAppointmentType(value as AppointmentType)
+                }
+                selectedValue={appointmentType || ""}
+              />
+              <RadioGroupItem
+                id="RETURN"
+                value="RETURN"
+                label="Retorno de Paciente"
+                onChange={(value) =>
+                  setAppointmentType(value as AppointmentType)
+                }
+                selectedValue={appointmentType || ""}
+              />
+            </div>
           </div>
 
           {appointmentType && (
@@ -134,74 +148,27 @@ const NewAppointment: React.FC = () => {
                   ? "Informações do novo paciente"
                   : "Buscar paciente"}
               </h3>
-
-              <div className="space-y-3">
-                {appointmentType === "NEW" && (
-                  <>
-                    <div className="space-y-1">
-                      <Label htmlFor="name">Nome do paciente</Label>
-                      <Input
-                        id="name"
-                        value={patientName}
-                        onChange={(e) => setPatientName(e.target.value)}
-                        placeholder="Nome completo"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <Label htmlFor="age">Idade</Label>
-                        <Input
-                          id="age"
-                          type="number"
-                          value={patientAge}
-                          onChange={(e) => setPatientAge(e.target.value)}
-                          placeholder="Idade"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <Label htmlFor="gender">Gênero</Label>
-                        <select
-                          id="gender"
-                          value={patientGender}
-                          onChange={(e) =>
-                            setPatientGender(e.target.value as PatientGender)
-                          }
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <option value="MALE">Masculino</option>
-                          <option value="FEMALE">Feminino</option>
-                          <option value="OTHER">Outro</option>
-                        </select>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {appointmentType === "RETURN" && (
-                  <div className="space-y-1">
-                    <Label htmlFor="patient">Selecione o paciente</Label>
-                    <select
-                      id="patient"
-                      value={selectedPatientId}
-                      onChange={(e) => setSelectedPatientId(e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="">Selecione um paciente</option>
-                      {patients?.map((patient: PatientData) => (
-                        <option key={patient.id} value={patient.id}>
-                          {patient.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
+              {appointmentType === "NEW" ? (
+                <PatientForm
+                  patientName={patientName}
+                  patientAge={patientAge}
+                  patientGender={patientGender}
+                  onNameChange={(e) => setPatientName(e.target.value)}
+                  onAgeChange={(e) => setPatientAge(e.target.value)}
+                  onGenderChange={(e) =>
+                    setPatientGender(e.target.value as PatientGender)
+                  }
+                />
+              ) : (
+                <PatientSelect
+                  patients={patients}
+                  selectedPatientId={selectedPatientId}
+                  onPatientChange={(e) => setSelectedPatientId(e.target.value)}
+                />
+              )}
             </div>
           )}
         </CardContent>
-
         <CardFooter className="justify-end pt-4">
           <Button
             disabled={
@@ -209,7 +176,7 @@ const NewAppointment: React.FC = () => {
               (appointmentType === "NEW" && !patientName) ||
               (appointmentType === "RETURN" && !selectedPatientId)
             }
-            onClick={handleContinue}
+            onClick={startAppointment}
             className="w-full sm:w-auto bg-ally-blue hover:bg-ally-blue/90"
             size="lg"
           >
