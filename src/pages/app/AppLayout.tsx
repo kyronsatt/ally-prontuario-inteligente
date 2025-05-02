@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Settings, LogOut, User, Home, Plus, Clock } from "lucide-react";
@@ -6,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { AppointmentProvider } from "@/context/AppointmentContext";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/components/ui/sonner";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -23,35 +26,35 @@ const AppLayout: React.FC = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) return;
-      
+
       try {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("first_name, last_name")
+          .eq("id", user.id)
           .single();
-          
+
         if (error) {
           throw error;
         }
-        
+
         setProfile(data);
       } catch (error) {
-        console.error('Erro ao buscar perfil do usuário:', error);
+        console.error("Erro ao buscar perfil do usuário:", error);
       }
     };
-    
+
     fetchUserProfile();
   }, [user]);
 
   const handleLogout = async () => {
     try {
       await signOut();
-      toast.success('Logout realizado com sucesso');
-      navigate('/login');
+      toast.success("Logout realizado com sucesso");
+      navigate("/login");
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-      toast.error('Erro ao fazer logout');
+      console.error("Erro ao fazer logout:", error);
+      toast.error("Erro ao fazer logout");
     }
   };
 
@@ -59,20 +62,20 @@ const AppLayout: React.FC = () => {
     if (profile?.first_name && profile?.last_name) {
       return `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase();
     }
-    return user?.email?.[0].toUpperCase() || 'U';
+    return user?.email?.[0].toUpperCase() || "U";
   };
 
   const getDisplayName = () => {
     if (profile?.first_name) {
-      return `Dr(a). ${profile.first_name} ${profile.last_name || ''}`;
+      return `Dr(a). ${profile.first_name} ${profile.last_name || ""}`;
     }
-    return user?.email || 'Usuário';
+    return user?.email || "Usuário";
   };
 
   return (
     <AppointmentProvider>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <header className="bg-white shadow-sm border-b border-gray-100">
+        <header className="bg-white border-b border-gray-200">
           <div className="container-ally py-3">
             <div className="flex justify-between items-center">
               {/* Logo and navigation */}
@@ -83,10 +86,10 @@ const AppLayout: React.FC = () => {
                 >
                   <span className="gradient-text">Ally</span>
                 </button>
-                
+
                 <nav className="hidden md:flex items-center space-x-1">
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={() => navigate("/app")}
                     className="text-gray-600 hover:text-ally-blue"
@@ -94,9 +97,9 @@ const AppLayout: React.FC = () => {
                     <Home className="h-4 w-4 mr-1" />
                     Dashboard
                   </Button>
-                  
-                  <Button 
-                    variant="ghost" 
+
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={() => navigate("/app/novo-atendimento")}
                     className="text-gray-600 hover:text-ally-blue"
@@ -104,9 +107,9 @@ const AppLayout: React.FC = () => {
                     <Plus className="h-4 w-4 mr-1" />
                     Novo Atendimento
                   </Button>
-                  
-                  <Button 
-                    variant="ghost" 
+
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={() => navigate("/app/historico")}
                     className="text-gray-600 hover:text-ally-blue"
@@ -122,7 +125,7 @@ const AppLayout: React.FC = () => {
                 <span className="hidden md:block text-sm text-ally-gray">
                   {getDisplayName()}
                 </span>
-                
+
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -141,12 +144,14 @@ const AppLayout: React.FC = () => {
                   <PopoverContent className="w-56 p-0" align="end">
                     <div className="border-b border-gray-100 px-4 py-3">
                       <p className="text-sm font-medium">{getDisplayName()}</p>
-                      <p className="text-xs text-gray-500 mt-1 truncate">{user?.email}</p>
+                      <p className="text-xs text-gray-500 mt-1 truncate">
+                        {user?.email}
+                      </p>
                     </div>
                     <div className="py-1">
                       <button
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                        onClick={() => navigate('/app/configuracoes')}
+                        onClick={() => navigate("/app/configuracoes")}
                       >
                         <Settings className="h-4 w-4 mr-2" />
                         Configurações

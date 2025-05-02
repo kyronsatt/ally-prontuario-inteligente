@@ -7,7 +7,7 @@ interface PatientInfoProps {
 
 const PatientInfo: React.FC<PatientInfoProps> = ({ name, type }) => {
   return (
-    <div className="text-white">
+    <div className="text-white w-full px-24">
       <p className="text-lg font-medium">Paciente:</p>
       <p className="text-2xl font-bold">{name}</p>
       <p className="text-sm mt-1 opacity-75">
