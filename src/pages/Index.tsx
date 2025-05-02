@@ -35,7 +35,7 @@ const Index = () => {
 
   useEffect(() => {
     // Título personalizado para a página
-    document.title = "Ally — Da voz ao prontuário";
+    document.title = "Ally — Anamnese estruturada em segundos";
   }, []);
 
   return (

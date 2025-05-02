@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { UserPlus, Loader2 } from "lucide-react";
+import { CalendarClock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,13 +11,14 @@ const WaitlistForm: React.FC = () => {
     email: "",
     specialty: "",
     crm: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -37,6 +39,7 @@ const WaitlistForm: React.FC = () => {
           email: formData.email,
           specialty: formData.specialty || null,
           crm: formData.crm || null,
+          message: formData.message || null,
         },
       ]);
 
@@ -45,8 +48,8 @@ const WaitlistForm: React.FC = () => {
       setSubmitted(true);
 
       toast({
-        title: "Cadastro realizado com sucesso!",
-        description: "Em breve entraremos em contato com você.",
+        title: "Demonstração agendada com sucesso!",
+        description: "Em breve entraremos em contato para confirmar sua demonstração.",
       });
 
       setFormData({
@@ -54,19 +57,20 @@ const WaitlistForm: React.FC = () => {
         email: "",
         specialty: "",
         crm: "",
+        message: "",
       });
     } catch (err) {
-      console.error("Erro ao cadastrar na lista de espera:", err);
+      console.error("Erro ao agendar demonstração:", err);
       setError(
         err instanceof Error
           ? err.message
-          : "Ocorreu um erro ao processar seu cadastro."
+          : "Ocorreu um erro ao processar seu agendamento."
       );
 
       toast({
-        title: "Erro no cadastro",
+        title: "Erro no agendamento",
         description:
-          "Não foi possível completar seu cadastro. Por favor, tente novamente.",
+          "Não foi possível completar seu agendamento. Por favor, tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -86,11 +90,11 @@ const WaitlistForm: React.FC = () => {
             style={{ "--delay": "100ms" } as React.CSSProperties}
           >
             <h2 className="heading-lg mb-4">
-              Junte-se à revolução{" "}
-              <span className="gradient-text">na prática médica</span>
+              Transforme sua prática clínica{" "}
+              <span className="gradient-text">hoje mesmo</span>
             </h2>
             <p className="text-lg text-ally-gray">
-              Deixe seus dados e seja um dos primeiros a conhecer a Ally.
+              Agende uma demonstração exclusiva e descubra como a Ally pode revolucionar suas consultas.
             </p>
           </div>
 
@@ -162,6 +166,7 @@ const WaitlistForm: React.FC = () => {
                     <option value="Neurologia">Neurologia</option>
                     <option value="Pediatria">Pediatria</option>
                     <option value="Psiquiatria">Psiquiatria</option>
+                    <option value="Ginecologia">Ginecologia</option>
                     <option value="Outra">Outra</option>
                   </select>
                 </div>
@@ -183,6 +188,24 @@ const WaitlistForm: React.FC = () => {
                     placeholder="Ex: 12345/UF"
                   />
                 </div>
+                
+                <div>
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-ally-dark mb-1"
+                  >
+                    Mensagem (opcional)
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={3}
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-ally-blue focus:border-ally-blue"
+                    placeholder="Conte-nos como podemos ajudar na sua prática clínica"
+                  />
+                </div>
 
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
@@ -198,9 +221,9 @@ const WaitlistForm: React.FC = () => {
                   {isSubmitting ? (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   ) : (
-                    <UserPlus className="mr-2" size={20} />
+                    <CalendarClock className="mr-2" size={20} />
                   )}
-                  Quero fazer parte da lista de espera
+                  Agendar demonstração
                 </button>
               </form>
             ) : (
@@ -221,10 +244,9 @@ const WaitlistForm: React.FC = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Obrigado!</h3>
+                <h3 className="text-xl font-medium mb-2">Demonstração agendada!</h3>
                 <p className="text-ally-gray mb-6">
-                  Em breve, entraremos em contato para você experimentar a Ally
-                  em primeira mão.
+                  Em breve, entraremos em contato para confirmar os detalhes da sua demonstração exclusiva da Ally.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
