@@ -17,21 +17,21 @@ const HeroSection: React.FC = () => {
             </h1>
 
             <p className="text-xl md:text-2xl text-ally-gray font-extralight">
-              Transforme suas consultas faladas em prontuários automáticos,
-              estruturados e prontos para uso.
+              Registre consultas automaticamente, sem digitar uma linha.
+              Anamneses completas e estruturadas em segundos.
             </p>
 
             <p className="text-md font-extralight text-ally-gray">
-              A assistente invisível que escuta, organiza e registra seu
-              atendimento — para você focar no cuidado humano.
+              Reduza até 40% do tempo gasto com o prontuário e aumente sua
+              presença com o paciente. Menos distrações, mais performance.
             </p>
 
             <div className="pt-4">
               <a
-                href="#waitlist"
+                href="#about"
                 className="btn-primary inline-flex items-center group"
               >
-                Quero entrar na lista de espera
+                Ver como funciona na prática
                 <ArrowRight
                   className="ml-2 group-hover:translate-x-1 transition-transform"
                   size={20}
