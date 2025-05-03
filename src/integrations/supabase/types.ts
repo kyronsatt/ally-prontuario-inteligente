@@ -9,6 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      anamnese: {
+        Row: {
+          appointment_id: string | null
+          complementary_exams: string | null
+          created_at: string | null
+          created_by: string
+          current_illness_history: string | null
+          family_history: string | null
+          id: string
+          identification: string | null
+          main_complaint: string | null
+          past_medical_history: string | null
+          physical_exams: string | null
+          social_history: string | null
+          transcription_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          complementary_exams?: string | null
+          created_at?: string | null
+          created_by: string
+          current_illness_history?: string | null
+          family_history?: string | null
+          id?: string
+          identification?: string | null
+          main_complaint?: string | null
+          past_medical_history?: string | null
+          physical_exams?: string | null
+          social_history?: string | null
+          transcription_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          complementary_exams?: string | null
+          created_at?: string | null
+          created_by?: string
+          current_illness_history?: string | null
+          family_history?: string | null
+          id?: string
+          identification?: string | null
+          main_complaint?: string | null
+          past_medical_history?: string | null
+          physical_exams?: string | null
+          social_history?: string | null
+          transcription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_appointment"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_transcription"
+            columns: ["transcription_id"]
+            isOneToOne: false
+            referencedRelation: "transcriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointment_stats: {
         Row: {
           created_at: string | null
@@ -139,6 +202,44 @@ export type Database = {
           state?: string | null
         }
         Relationships: []
+      }
+      transcriptions: {
+        Row: {
+          appointment_id: string
+          created_at: string
+          errors: Json | null
+          id: string
+          metadata: Json | null
+          raw_text: string | null
+          segments: Json
+        }
+        Insert: {
+          appointment_id: string
+          created_at?: string
+          errors?: Json | null
+          id?: string
+          metadata?: Json | null
+          raw_text?: string | null
+          segments: Json
+        }
+        Update: {
+          appointment_id?: string
+          created_at?: string
+          errors?: Json | null
+          id?: string
+          metadata?: Json | null
+          raw_text?: string | null
+          segments?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transcriptions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waitlist: {
         Row: {

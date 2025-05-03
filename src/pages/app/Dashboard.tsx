@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Plus, History, Clock, Users, BarChart, Loader2 } from 'lucide-react';
+import { Plus, History, Clock, Users, FileText, TrendingUp, ChartBar, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -88,26 +88,17 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  const stats = data?.stats ? [
-    { 
-      label: 'Atendimentos hoje', 
-      value: data.stats.total_appointments, 
-      icon: <Clock className="h-6 w-6 text-ally-blue" />,
-      description: 'Consultas realizadas'
-    },
-    { 
-      label: 'Pacientes novos', 
-      value: data.stats.new_patients, 
-      icon: <Users className="h-6 w-6 text-ally-blue" />,
-      description: 'Primeiras consultas'
-    },
-    { 
-      label: 'Tempo economizado', 
-      value: `${data.stats.time_saved_minutes}min`, 
-      icon: <BarChart className="h-6 w-6 text-ally-blue" />,
-      description: 'Na documentação'
-    },
-  ] : [];
+  // Calculate productivity metrics
+  const timeSaved = data?.stats?.time_saved_minutes || 0;
+  const appointments = data?.stats?.total_appointments || 0;
+  const newPatients = data?.stats?.new_patients || 0;
+  
+  // Calculate average time saved per appointment (if there are any appointments)
+  const avgTimeSavedPerAppointment = appointments > 0 ? Math.round(timeSaved / appointments) : 0;
+  
+  // Calculate productivity improvement (assuming 15 min saved per appointment is ~25% improvement)
+  const productivityImprovement = avgTimeSavedPerAppointment > 0 ? 
+    Math.min(Math.round((avgTimeSavedPerAppointment / 15) * 25), 50) : 0;
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
@@ -117,6 +108,70 @@ const Dashboard: React.FC = () => {
           Bem-vindo(a), <span className="text-ally-blue">Dr(a).</span>
         </h1>
         <p className="text-ally-gray">O que você deseja fazer hoje?</p>
+      </div>
+      
+      {/* Métricas de produtividade em destaque */}
+      <div>
+        <h2 className="text-2xl font-medium mb-6">Ganhos de produtividade</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <Card className="bg-white border-none shadow-md overflow-hidden">
+            <CardContent className="p-0">
+              <div className="bg-green-50 p-4 border-b border-green-100">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-green-800">Tempo economizado</h3>
+                  <Clock className="h-5 w-5 text-green-600" />
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-bold text-green-700">{timeSaved}</p>
+                  <p className="text-lg text-green-600 mb-1">min</p>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  Em média {avgTimeSavedPerAppointment} min por consulta
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white border-none shadow-md overflow-hidden">
+            <CardContent className="p-0">
+              <div className="bg-blue-50 p-4 border-b border-blue-100">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-blue-800">Produtividade</h3>
+                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-bold text-blue-700">+{productivityImprovement}%</p>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  Aumento na eficiência do atendimento
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white border-none shadow-md overflow-hidden">
+            <CardContent className="p-0">
+              <div className="bg-purple-50 p-4 border-b border-purple-100">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-purple-800">Consultas realizadas</h3>
+                  <ChartBar className="h-5 w-5 text-purple-600" />
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-bold text-purple-700">{appointments}</p>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  {newPatients} novos pacientes
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
       
       {/* Botões de ação principais */}
@@ -143,93 +198,48 @@ const Dashboard: React.FC = () => {
       
       <Separator className="my-8" />
       
-      <div>
-        <h2 className="text-2xl font-medium mb-6">Resumo de atividades</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {stats.map((stat, index) => (
-            <Card 
-              key={index} 
-              className="bg-white border-none shadow-sm hover:shadow-md transition-all overflow-hidden"
-            >
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-ally-gray text-sm">{stat.label}</p>
-                    <p className="text-3xl font-semibold text-ally-dark mt-1">{stat.value}</p>
-                  </div>
-                  <div className="bg-ally-light p-3 rounded-lg">
-                    {stat.icon}
-                  </div>
-                </div>
-                <p className="text-xs text-ally-gray mt-2">{stat.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
       {/* Recent appointments */}
       {data?.recentAppointments && data.recentAppointments.length > 0 && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-50 mt-8">
-          <h2 className="text-lg font-medium mb-4">Atendimentos recentes</h2>
-          <div className="space-y-3">
-            {data.recentAppointments.map(appointment => (
-              <div 
-                key={appointment.id}
-                className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => navigate(`/app/historico?id=${appointment.id}`)}
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-medium">{appointment.patients.name}</h3>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {appointment.patients.gender && `${appointment.patients.gender === 'M' ? 'Masculino' : appointment.patients.gender === 'F' ? 'Feminino' : 'Outro'} • `}
-                      {appointment.patients.age && `${appointment.patients.age} anos • `}
-                      {appointment.patients.is_new ? 'Primeira consulta' : 'Retorno'}
-                    </p>
-                  </div>
-                  
-                  <div className="text-right">
-                    <span className="text-xs text-gray-500">{formatDate(appointment.date)}</span>
-                    <div className="mt-1">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        appointment.type === 'new' 
-                          ? 'bg-blue-50 text-blue-700' 
-                          : 'bg-green-50 text-green-700'
-                      }`}>
-                        {appointment.type === 'new' ? 'Novo' : 'Retorno'}
-                      </span>
+        <div>
+          <h2 className="text-2xl font-medium mb-6">Resumo de atividades</h2>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-50">
+            <h3 className="text-lg font-medium mb-4">Atendimentos recentes</h3>
+            <div className="space-y-3">
+              {data.recentAppointments.map(appointment => (
+                <div 
+                  key={appointment.id}
+                  className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => navigate(`/app/historico?id=${appointment.id}`)}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">{appointment.patients.name}</h3>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {appointment.patients.gender && `${appointment.patients.gender === 'M' ? 'Masculino' : appointment.patients.gender === 'F' ? 'Feminino' : 'Outro'} • `}
+                        {appointment.patients.age && `${appointment.patients.age} anos • `}
+                        {appointment.patients.is_new ? 'Primeira consulta' : 'Retorno'}
+                      </p>
+                    </div>
+                    
+                    <div className="text-right">
+                      <span className="text-xs text-gray-500">{formatDate(appointment.date)}</span>
+                      <div className="mt-1">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          appointment.type === 'new' 
+                            ? 'bg-blue-50 text-blue-700' 
+                            : 'bg-green-50 text-green-700'
+                        }`}>
+                          {appointment.type === 'new' ? 'Novo' : 'Retorno'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
-
-      {/* Seção de acesso rápido */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-50 mt-8">
-        <h2 className="text-lg font-medium mb-4">Acesso rápido</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <Button
-            variant="outline"
-            className="h-20 flex flex-col gap-2 items-center justify-center hover:bg-ally-light/50 hover:border-ally-blue/20"
-            onClick={() => console.log('Documentos')}
-          >
-            <FileText className="h-5 w-5 text-ally-blue" />
-            <span className="text-sm">Documentos</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-20 flex flex-col gap-2 items-center justify-center hover:bg-ally-light/50 hover:border-ally-blue/20"
-            onClick={() => console.log('Prontuários')}
-          >
-            <FileText className="h-5 w-5 text-ally-blue" />
-            <span className="text-sm">Prontuários</span>
-          </Button>
-        </div>
-      </div>
     </div>
   );
 };

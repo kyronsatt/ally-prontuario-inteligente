@@ -1,98 +1,82 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
-import { AnamneseNote, SoapNote } from "@/context/AppointmentContext";
+import { AnamneseNote } from "@/context/AppointmentContext";
 import { twMerge } from "tailwind-merge";
 
 interface AppointmentReportProps {
-  viewFormat: string;
-  soapNote?: SoapNote;
   anamneseNote?: AnamneseNote;
+  isEditable?: boolean;
+  onUpdateSection?: (section: string, content: string) => void;
 }
 
 const AppointmentReport: React.FC<AppointmentReportProps> = ({
-  viewFormat,
-  soapNote,
   anamneseNote,
+  isEditable = false,
+  onUpdateSection,
 }) => {
-  if (viewFormat === "soap" && soapNote) {
-    const soapSections = [
-      { title: "S - Subjetivo", content: soapNote.subjective, color: "blue" },
-      { title: "O - Objetivo", content: soapNote.objective, color: "green" },
-      { title: "A - Avaliação", content: soapNote.assessment, color: "amber" },
-      { title: "P - Plano", content: soapNote.plan, color: "purple" },
-    ];
-
-    return (
-      <div className="space-y-6 animate-fade-in print:space-y-4">
-        {soapSections.map(({ title, content, color }) => (
-          <Card
-            key={title}
-            className={twMerge(
-              "shadow-sm hover:shadow transition-shadow border-l-4 overflow-hidden",
-              `border-l-${color}-400`
-            )}
-          >
-            <CardHeader
-              className={twMerge(
-                "bg-gradient-to-r to-transparent pb-3",
-                `from-slate-50`
-              )}
-            >
-              <CardTitle className="text-xl text-gray-800">{title}</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <p className="text-gray-700 whitespace-pre-line">{content}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
-  if (viewFormat === "anamnese" && anamneseNote) {
+  if (anamneseNote) {
     const sections = [
       {
         title: "Queixa Principal",
         content: anamneseNote.queixaPrincipal,
+        id: "queixaPrincipal"
       },
       {
         title: "História da Doença Atual",
         content: anamneseNote.historiaDoencaAtual,
+        id: "historiaDoencaAtual"
       },
       {
         title: "Antecedentes Patológicos",
         content: anamneseNote.antecedentesPatologicos,
+        id: "antecedentesPatologicos"
       },
       {
         title: "Medicações em Uso",
         content: anamneseNote.medicacoesEmUso,
+        id: "medicacoesEmUso"
       },
       {
         title: "Hábitos de Vida",
         content: anamneseNote.habitosDeVida,
+        id: "habitosDeVida"
       },
       {
         title: "Exames Físicos",
         content: anamneseNote.examesFisicos,
+        id: "examesFisicos"
       },
       {
         title: "Exames Complementares",
         content: anamneseNote.examesComplementares,
+        id: "examesComplementares"
       },
       {
         title: "Diagnóstico",
         content: anamneseNote.diagnostico,
+        id: "diagnostico"
       },
-      { title: "Conduta", content: anamneseNote.conduta },
+      { 
+        title: "Conduta", 
+        content: anamneseNote.conduta,
+        id: "conduta" 
+      },
     ];
+
+    const handleContentChange = (sectionId: string, newContent: string) => {
+      if (onUpdateSection) {
+        onUpdateSection(sectionId, newContent);
+      }
+    };
 
     return (
       <div className="space-y-6 animate-fade-in print:space-y-4">
-        {sections.map(({ title, content }) => (
+        {sections.map(({ title, content, id }) => (
           <Card
-            key={title}
+            key={id}
             className={`shadow-sm hover:shadow transition-shadow border-l-4 border-l-teal-400 overflow-hidden`}
           >
             <CardHeader
@@ -101,7 +85,15 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
               <CardTitle className="text-xl text-gray-800">{title}</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
-              <p className="text-gray-700 whitespace-pre-line">{content}</p>
+              {isEditable ? (
+                <textarea
+                  className="w-full p-2 border rounded-md min-h-[100px] focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent"
+                  value={content}
+                  onChange={(e) => handleContentChange(id, e.target.value)}
+                />
+              ) : (
+                <p className="text-gray-700 whitespace-pre-line">{content}</p>
+              )}
             </CardContent>
           </Card>
         ))}

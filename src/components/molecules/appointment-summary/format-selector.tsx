@@ -1,3 +1,4 @@
+
 import React from "react";
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,27 +13,11 @@ const FormatSelector: React.FC<FormatSelectorProps> = ({
   onSelectFormat,
 }) => {
   return (
-    <div className="flex gap-3">
+    <div className="flex">
       <Button
-        variant={viewFormat === "soap" ? "default" : "outline"}
-        onClick={() => onSelectFormat("soap")}
-        className={
-          viewFormat === "soap"
-            ? "bg-ally-blue hover:bg-ally-blue/90"
-            : "border-gray-300"
-        }
-      >
-        <FileText className="mr-2 h-4 w-4" />
-        SOAP
-      </Button>
-      <Button
-        variant={viewFormat === "anamnese" ? "default" : "outline"}
+        variant="default"
+        className="bg-ally-blue hover:bg-ally-blue/90"
         onClick={() => onSelectFormat("anamnese")}
-        className={
-          viewFormat === "anamnese"
-            ? "bg-ally-blue hover:bg-ally-blue/90"
-            : "border-gray-300"
-        }
       >
         <FileText className="mr-2 h-4 w-4" />
         Anamnese Estruturada

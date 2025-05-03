@@ -13,7 +13,6 @@ import AppLayout from "./pages/app/AppLayout";
 import Dashboard from "./pages/app/Dashboard";
 import NewAppointment from "./pages/app/NewAppointment";
 import Listening from "./pages/app/Listening";
-import FormatSelection from "./pages/app/FormatSelection";
 import AppointmentSummary from "./pages/app/AppointmentSummary";
 import AppointmentHistory from "./pages/app/AppointmentHistory";
 import Settings from "./pages/app/Settings";
@@ -45,7 +44,6 @@ const App = () => (
                   <Route index element={<Dashboard />} />
                   <Route path="novo-atendimento" element={<NewAppointment />} />
                   <Route path="escuta" element={<Listening />} />
-                  <Route path="formato" element={<FormatSelection />} />
                   <Route path="resumo" element={<AppointmentSummary />} />
                   <Route path="historico" element={<AppointmentHistory />} />
                   <Route path="configuracoes" element={<Settings />} />

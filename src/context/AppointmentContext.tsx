@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
@@ -248,20 +249,20 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const reportResult = await reportResponse.json();
 
-      // Update appointment with SOAP and Anamnese notes
+      // Update appointment with Anamnese notes
       setAppointment((prev) => ({
         ...prev,
         transcription: transcriptionRawText,
-        soapNote: reportResult.soapNote,
         anamneseNote: reportResult.anamneseNote,
+        selectedFormat: "anamnese", // Force anamnese format
       }));
 
       toast("Relatório gerado", {
         description: "Relatório médico gerado com sucesso!",
       });
 
-      // Navigation after the audio is processed and report is generated
-      navigate("/app/formato");
+      // Navigate directly to the anamnese view instead of format selection
+      navigate("/app/resumo?format=anamnese");
     } catch (error) {
       console.error("Erro no processamento:", error);
       toast("Erro no processamento", {
