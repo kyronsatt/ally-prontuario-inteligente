@@ -99,7 +99,7 @@
   }
 
   body {
-    @apply bg-white text-ally-dark font-sans;
+    @apply bg-white text-ally-dark font-sans overflow-x-clip;
     font-family: 'DM Sans', sans-serif; /* Apply DM Sans globally */
   }
 
