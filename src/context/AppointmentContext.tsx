@@ -129,14 +129,6 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         console.log("Final audioBlob size:", audioBlob.size);
 
-        // Test blob download (optional)
-        const url = URL.createObjectURL(audioBlob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "recorded-audio.webm";
-        a.click();
-        URL.revokeObjectURL(url);
-
         setAppointment((prev) => ({
           ...prev,
           audioBlob,
@@ -192,7 +184,10 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
             Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ audio: base64Audio }),
+          body: JSON.stringify({
+            audio: base64Audio,
+            appointmentId: appointment.id,
+          }),
         }
       );
 
@@ -202,7 +197,7 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const transcriptionResult = await transcriptionResponse.json();
-      const transcription = transcriptionResult.text;
+      const transcription = transcriptionResult.data.raw_test;
 
       // Update appointment with transcription
       setAppointment((prev) => ({
@@ -227,6 +222,7 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
             transcription,
             patientName: appointment.patient?.name,
             appointmentType: appointment.type,
+            appointmentId: appointment.id,
           }),
         }
       );
