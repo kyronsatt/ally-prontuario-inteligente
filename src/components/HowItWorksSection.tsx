@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Mic, FileText, Lightbulb, History } from "lucide-react";
 
@@ -11,7 +10,7 @@ interface StepProps {
 
 const Step: React.FC<StepProps> = ({ icon, title, description, number }) => {
   return (
-    <div 
+    <div
       className="bg-white p-6 rounded-xl shadow-md mb-4 relative fade-in-section"
       style={{ "--delay": `${number * 100}ms` } as React.CSSProperties}
     >
@@ -31,9 +30,6 @@ const Step: React.FC<StepProps> = ({ icon, title, description, number }) => {
   );
 };
 
-// "Na página inicial do app você deve usar um layout que destaque a proposta de valor do App, que é poupar o tempo do médico. Para isso, mostre dados como quantos minutos estimados foram salvos no dia e na semana, ou quantos pacientes a mais foram atendidos, ou qual o percentual de melhora na produtividade. Você pode usar gráficos ou gauges para mostrar esses dados. Além disso, coloque isso em destaque, antes mesmo do Resumo de atividades. Remova a parte de acesso rápido.
-
-// Além disso, na tela de demonstração da anamnese, melhore a UI, mantendo todas as funcionalidades existentes, com exceção das de "compartilhar" e "ver histórico".  Além disso, o usuário deve ter a opção de editar cada campo da anamnese e isso deve ser persistido no banco de dados. "
 const HowItWorksSection: React.FC = () => {
   const steps = [
     {
@@ -59,13 +55,13 @@ const HowItWorksSection: React.FC = () => {
       title: "Acesso ao histórico de atendimentos",
       description:
         "Consulte facilmente anamneses anteriores do paciente para uma visão completa de sua trajetória clínica.",
-    }
+    },
   ];
 
   return (
     <section
       id="how-it-works"
-      className="section-spacing bg-gray-50 relative overflow-hidden"
+      className="section-spacing bg-gradient-to-b from-ally-light/30 to-white relative overflow-hidden"
     >
       <div className="container-ally">
         <div
@@ -73,7 +69,8 @@ const HowItWorksSection: React.FC = () => {
           style={{ "--delay": "100ms" } as React.CSSProperties}
         >
           <h2 className="heading-lg mb-4">
-            <span className="gradient-text">O que você pode fazer</span> com a Ally
+            <span className="gradient-text">O que você pode fazer</span> com a
+            Ally
           </h2>
           <p className="text-md md:text-xl text-ally-gray">
             A inteligência da Ally escuta, organiza e gera insights com base na
