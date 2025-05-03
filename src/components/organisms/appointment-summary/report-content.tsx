@@ -1,68 +1,62 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
-import { AnamneseNote } from "@/context/AppointmentContext";
+import { Anamnese } from "@/context/AppointmentContext";
 import { twMerge } from "tailwind-merge";
 
 interface AppointmentReportProps {
-  anamneseNote?: AnamneseNote;
+  anamnese?: Anamnese;
   isEditable?: boolean;
   onUpdateSection?: (section: string, content: string) => void;
 }
 
 const AppointmentReport: React.FC<AppointmentReportProps> = ({
-  anamneseNote,
+  anamnese,
   isEditable = false,
   onUpdateSection,
 }) => {
-  if (anamneseNote) {
+  if (anamnese) {
     const sections = [
       {
+        title: "Identificação",
+        content: anamnese.identification,
+        id: "queixaPrincipal",
+      },
+      {
         title: "Queixa Principal",
-        content: anamneseNote.queixaPrincipal,
-        id: "queixaPrincipal"
+        content: anamnese.main_complaint,
+        id: "queixaPrincipal",
       },
       {
         title: "História da Doença Atual",
-        content: anamneseNote.historiaDoencaAtual,
-        id: "historiaDoencaAtual"
+        content: anamnese.current_illness_history,
+        id: "historiaDoencaAtual",
       },
       {
-        title: "Antecedentes Patológicos",
-        content: anamneseNote.antecedentesPatologicos,
-        id: "antecedentesPatologicos"
+        title: "História Patológica Pregressa",
+        content: anamnese.past_medical_history,
+        id: "antecedentesPatologicos",
       },
       {
-        title: "Medicações em Uso",
-        content: anamneseNote.medicacoesEmUso,
-        id: "medicacoesEmUso"
+        title: "Histórico Social",
+        content: anamnese.social_history,
+        id: "habitosDeVida",
       },
       {
-        title: "Hábitos de Vida",
-        content: anamneseNote.habitosDeVida,
-        id: "habitosDeVida"
+        title: "Histórico Familiar",
+        content: anamnese.family_history,
+        id: "habitosDeVida",
       },
       {
         title: "Exames Físicos",
-        content: anamneseNote.examesFisicos,
-        id: "examesFisicos"
+        content: anamnese.physical_exams,
+        id: "examesFisicos",
       },
       {
         title: "Exames Complementares",
-        content: anamneseNote.examesComplementares,
-        id: "examesComplementares"
-      },
-      {
-        title: "Diagnóstico",
-        content: anamneseNote.diagnostico,
-        id: "diagnostico"
-      },
-      { 
-        title: "Conduta", 
-        content: anamneseNote.conduta,
-        id: "conduta" 
+        content: anamnese.complementary_exams,
+        id: "examesComplementares",
       },
     ];
 
@@ -77,10 +71,10 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
         {sections.map(({ title, content, id }) => (
           <Card
             key={id}
-            className={`shadow-sm hover:shadow transition-shadow border-l-4 border-l-teal-400 overflow-hidden`}
+            className={`shadow-sm hover:shadow transition-shadow border-l-4 border-l-ally-blue overflow-hidden`}
           >
             <CardHeader
-              className={`bg-gradient-to-r from-teal-50 to-transparent pb-3`}
+              className={`bg-gradient-to-r from-ally-blue/5 to-transparent pb-3`}
             >
               <CardTitle className="text-xl text-gray-800">{title}</CardTitle>
             </CardHeader>

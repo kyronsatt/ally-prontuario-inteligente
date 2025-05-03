@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, Save } from "lucide-react";
 
 import { useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
@@ -14,30 +13,39 @@ import ActionButtons from "@/components/molecules/appointment-summary/action-but
 import PatientInfoCard from "@/components/organisms/appointment-summary/patient-info-card";
 import AppointmentReport from "@/components/organisms/appointment-summary/report-content";
 import { supabase } from "@/integrations/supabase/client";
-import { AnamneseNote } from "@/context/AppointmentContext";
+import { Anamnese } from "@/context/AppointmentContext";
 
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
   const { appointment, setAppointment, isProcessing } = useAppointment();
   const { patient } = usePatient();
-  const [searchParams] = useSearchParams();
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editedAnamneseNote, setEditedAnamneseNote] = useState<AnamneseNote | undefined>(
-    appointment.anamneseNote
+  const [editedAnamnese, setEditedAnamnese] = useState<Anamnese | undefined>(
+    appointment.anamnese
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    if (!isProcessing && !appointment.anamneseNote) {
-      navigate("/app/novo-atendimento");
-    }
-  }, [appointment, isProcessing, navigate]);
+  const [searchParams] = useSearchParams();
+  const appointmentId = searchParams.get("appointment_id");
 
   useEffect(() => {
-    if (appointment.anamneseNote && !editedAnamneseNote) {
-      setEditedAnamneseNote({...appointment.anamneseNote});
+    if (!appointment.anamnese) {
+      if (!appointmentId) {
+        toast.error("ID de atendimento não encontrado.");
+        navigate("/app/novo-atendimento");
+        return;
+      }
+
+      // TODO -> Fetch the appointment data from Supabase
     }
-  }, [appointment.anamneseNote, editedAnamneseNote]);
+  }, [appointment, isProcessing, navigate, appointmentId]);
+
+  useEffect(() => {
+    if (appointment.anamnese && !editedAnamnese) {
+      setEditedAnamnese({ ...appointment.anamnese });
+    }
+  }, [appointment.anamnese, editedAnamnese]);
 
   const formattedDate = appointment.date
     ? format(appointment.date, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
@@ -59,42 +67,37 @@ const AppointmentSummary: React.FC = () => {
   };
 
   const handleUpdateSection = (section: string, content: string) => {
-    if (editedAnamneseNote) {
-      setEditedAnamneseNote({
-        ...editedAnamneseNote,
+    if (editedAnamnese) {
+      setEditedAnamnese({
+        ...editedAnamnese,
         [section]: content,
       });
     }
   };
 
   const handleSaveChanges = async () => {
-    if (!editedAnamneseNote || !appointment.id) return;
-    
+    if (!editedAnamnese || !appointment.id) return;
+
     setIsSaving(true);
-    
+
     try {
       // Update the anamnese in the database
       const { error } = await supabase
-        .from('anamnese')
+        .from("anamnese")
         .update({
-          main_complaint: editedAnamneseNote.queixaPrincipal,
-          current_illness_history: editedAnamneseNote.historiaDoencaAtual,
-          past_medical_history: editedAnamneseNote.antecedentesPatologicos,
-          social_history: editedAnamneseNote.habitosDeVida,
-          physical_exams: editedAnamneseNote.examesFisicos,
-          complementary_exams: editedAnamneseNote.examesComplementares,
-          // Add other fields as needed
+          ...editedAnamnese,
+          created_at: editedAnamnese.created_at.toString(),
         })
-        .eq('appointment_id', appointment.id);
-      
+        .eq("appointment_id", appointment.id);
+
       if (error) throw error;
-      
+
       // Update the local state
-      setAppointment(prev => ({
+      setAppointment((prev) => ({
         ...prev,
-        anamneseNote: editedAnamneseNote
+        anamnese: editedAnamnese,
       }));
-      
+
       setIsEditing(false);
       toast.success("Alterações salvas com sucesso!");
     } catch (error) {
@@ -140,7 +143,10 @@ const AppointmentSummary: React.FC = () => {
           Anamnese Estruturada
         </h1>
         <div className="flex gap-3">
-          <Button onClick={() => navigate("/app/novo-atendimento")} className="bg-ally-blue hover:bg-ally-blue/90">
+          <Button
+            onClick={() => navigate("/app/novo-atendimento")}
+            className="bg-ally-blue hover:bg-ally-blue/90"
+          >
             Novo atendimento
           </Button>
         </div>
@@ -155,23 +161,27 @@ const AppointmentSummary: React.FC = () => {
         appointmentDate={formattedDate}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-14">
         <div>
           {isEditing ? (
             <div className="flex gap-2">
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 className="bg-green-600 hover:bg-green-700"
                 onClick={handleSaveChanges}
                 disabled={isSaving}
               >
-                {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
                 Salvar alterações
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
-                  setEditedAnamneseNote(appointment.anamneseNote);
+                  setEditedAnamnese(appointment.anamnese);
                   setIsEditing(false);
                 }}
               >
@@ -179,22 +189,17 @@ const AppointmentSummary: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <Button 
-              variant="outline" 
-              onClick={() => setIsEditing(true)}
-            >
+            <Button variant="outline" onClick={() => setIsEditing(true)}>
+              <Pencil className="h-4 w-4 mr-2" />
               Editar anamnese
             </Button>
           )}
         </div>
-        <ActionButtons
-          onPrint={handlePrint}
-          onDownload={handleDownload}
-        />
+        <ActionButtons onPrint={handlePrint} onDownload={handleDownload} />
       </div>
 
       <AppointmentReport
-        anamneseNote={isEditing ? editedAnamneseNote : appointment.anamneseNote}
+        anamnese={isEditing ? editedAnamnese : appointment.anamnese}
         isEditable={isEditing}
         onUpdateSection={handleUpdateSection}
       />

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
@@ -13,23 +12,20 @@ interface IAppointmentCreationPayload {
   type: AppointmentType;
 }
 
-export interface SoapNote {
-  subjective: string;
-  objective: string;
-  assessment: string;
-  plan: string;
-}
-
-export interface AnamneseNote {
-  queixaPrincipal: string;
-  historiaDoencaAtual: string;
-  antecedentesPatologicos: string;
-  medicacoesEmUso: string;
-  habitosDeVida: string;
-  examesFisicos: string;
-  examesComplementares: string;
-  diagnostico: string;
-  conduta: string;
+export interface Anamnese {
+  id: string;
+  appointment_id: string;
+  transcription_id: string;
+  identification: string;
+  main_complaint: string;
+  current_illness_history: string;
+  past_medical_history: string;
+  social_history: string;
+  family_history: string;
+  physical_exams: string;
+  complementary_exams: string;
+  created_by: string;
+  created_at: Date;
 }
 
 export interface AppointmentData extends IAppointmentCreationPayload {
@@ -39,9 +35,7 @@ export interface AppointmentData extends IAppointmentCreationPayload {
   patient?: PatientData;
   audioBlob?: Blob;
   transcription?: string;
-  soapNote?: SoapNote;
-  anamneseNote?: AnamneseNote;
-  selectedFormat?: string;
+  anamnese?: Anamnese;
 }
 
 interface IAppointmentCreationResponse {
@@ -222,7 +216,7 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       // Step 2: Generate Medical Report
-      const reportResponse = await fetch(
+      const anamneseResponse = await fetch(
         "https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/generate-medical-report",
         {
           method: "POST",
@@ -240,21 +234,19 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       );
 
-      if (!reportResponse.ok) {
-        const errorData = await reportResponse.json();
+      const anamnese = await anamneseResponse.json();
+
+      if (!anamnese) {
         throw new Error(
-          errorData.error || "Erro na geração do relatório médico"
+          "Houve um erro na geração do relatório médico. Contate o suporte."
         );
       }
-
-      const reportResult = await reportResponse.json();
 
       // Update appointment with Anamnese notes
       setAppointment((prev) => ({
         ...prev,
         transcription: transcriptionRawText,
-        anamneseNote: reportResult.anamneseNote,
-        selectedFormat: "anamnese", // Force anamnese format
+        anamnese,
       }));
 
       toast("Relatório gerado", {

@@ -5,13 +5,11 @@ import { Button } from "@/components/ui/button";
 interface ActionButtonsProps {
   onPrint: () => void;
   onDownload: () => void;
-  onShare: () => void;
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({
   onPrint,
   onDownload,
-  onShare,
 }) => {
   return (
     <div className="flex gap-2">
@@ -20,9 +18,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       </Button>
       <Button variant="outline" onClick={onDownload}>
         <Download className="h-4 w-4 mr-1" /> Download
-      </Button>
-      <Button variant="outline" onClick={onShare}>
-        <Share2 className="h-4 w-4 mr-1" /> Compartilhar
       </Button>
     </div>
   );
