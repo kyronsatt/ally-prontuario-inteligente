@@ -107,6 +107,27 @@ const Dashboard: React.FC = () => {
         <p className="text-ally-gray">O que você deseja fazer hoje?</p>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Button
+          onClick={() => navigate("/app/novo-atendimento")}
+          size="lg"
+          className="h-24 text-xl flex items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all bg-ally-blue hover:bg-ally-blue/90"
+        >
+          <Plus className="h-6 w-6" />
+          Novo Atendimento
+        </Button>
+
+        <Button
+          onClick={() => navigate("/app/historico")}
+          variant="secondary"
+          size="lg"
+          className="h-24 text-xl flex items-center justify-center gap-3 border border-gray-100 shadow-md hover:shadow-lg transition-all"
+        >
+          <History className="h-6 w-6" />
+          Histórico de Atendimentos
+        </Button>
+      </div>
+      <Separator className="my-8" />
       <div>
         <h2 className="text-2xl font-medium mb-6">Ganhos de produtividade</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -179,42 +200,6 @@ const Dashboard: React.FC = () => {
           </Card>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button
-          onClick={() => navigate("/app/novo-atendimento")}
-          size="lg"
-          className="h-24 text-xl flex items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all bg-ally-blue hover:bg-ally-blue/90"
-        >
-          <Plus className="h-6 w-6" />
-          Novo Atendimento
-        </Button>
-
-        <Button
-          onClick={() => navigate("/app/historico")}
-          variant="secondary"
-          size="lg"
-          className="h-24 text-xl flex items-center justify-center gap-3 border border-gray-100 shadow-md hover:shadow-lg transition-all"
-        >
-          <History className="h-6 w-6" />
-          Histórico de Atendimentos
-        </Button>
-      </div>
-
-      <Separator className="my-8" />
-
-      {data?.recentAppointments && data.recentAppointments.length > 0 && (
-        <AppointmentHistory
-          searchTerm={searchTerm}
-          onSearchChange={(e) => setSearchTerm(e.target.value)}
-          appointments={data.recentAppointments}
-          loading={false}
-          error={null}
-          selectedAppointmentId={null}
-          onRetry={() => window.location.reload()}
-          onViewDetails={(id) => navigate(`/app/historico?id=${id}`)}
-        />
-      )}
     </div>
   );
 };
