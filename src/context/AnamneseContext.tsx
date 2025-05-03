@@ -11,7 +11,9 @@ import { useTranscription } from "./TranscriptionContext";
 interface AnamneseContextType {
   anamnese: IAnamnese | null;
   isGeneratingAnamnese: boolean;
+  isRetrievingAnamnese: boolean;
   generateAnamnese: (transcription: string) => Promise<void>;
+  retrieveAnamnese: (appointmentId: string) => Promise<void>;
 }
 
 export interface IAnamnese {
@@ -45,6 +47,7 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
   const { transcription } = useTranscription();
 
   const [isGeneratingAnamnese, setIsGeneratingAnamnese] = useState(false);
+  const [isRetrievingAnamnese, setIsRetrievingAnamnese] = useState(false);
   const [anamnese, setAnamnese] = useState<IAnamnese | null>(null);
 
   const generateAnamnese = async () => {
@@ -62,13 +65,14 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
             transcription: transcription.raw_text,
             transcriptionId: transcription.id,
             patientName: appointment.patient?.name,
+            patientId: appointment.patient?.id,
             appointmentType: appointment.type,
             appointmentId: appointment.id,
           }),
         }
       );
 
-      if (!response) {
+      if (!response.ok) {
         throw new Error("Erro ao gerar anamnese");
       }
 
@@ -85,9 +89,47 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const retrieveAnamnese = async (appointmentId: string) => {
+    setIsRetrievingAnamnese(true);
+    try {
+      const response = await fetch(
+        `${envs.SUPABASE_HOST}/functions/v1/retrieve-anamnese`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ appointmentId }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao recuperar anamnese");
+      }
+
+      const retrievedAnamnese = await response.json();
+      setAnamnese(retrievedAnamnese);
+
+      toast("Anamnese recuperada!", {
+        description: "Relatório carregado com sucesso.",
+      });
+    } catch (e) {
+      toast("Erro ao recuperar anamnese", { description: String(e) });
+    } finally {
+      setIsRetrievingAnamnese(false);
+    }
+  };
+
   return (
     <AnamneseContext.Provider
-      value={{ anamnese, isGeneratingAnamnese, generateAnamnese }}
+      value={{
+        anamnese,
+        isGeneratingAnamnese,
+        isRetrievingAnamnese,
+        generateAnamnese,
+        retrieveAnamnese,
+      }}
     >
       {children}
     </AnamneseContext.Provider>

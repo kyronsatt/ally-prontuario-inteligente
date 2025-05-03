@@ -119,18 +119,18 @@ const NewAppointment: React.FC = () => {
 
   const createNewAppointment = async (patientId: string): Promise<boolean> => {
     try {
-      const { appointment, patient } = await createAppointment({
+      const appointment = await createAppointment({
         doctor_id: user.id,
         patient_id: patientId,
         type: appointmentType,
       });
 
-      if (!appointment || !patient) {
+      if (!appointment || !appointment.patient) {
         toast({ description: "Erro ao criar o atendimento. Tente novamente." });
         return false;
       }
 
-      setPatient(patient);
+      setPatient(appointment.patient);
     } catch (error) {
       console.error("Erro ao criar o atendimento:", error);
       toast({

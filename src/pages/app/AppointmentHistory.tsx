@@ -63,7 +63,6 @@ const AppointmentHistoryPage: React.FC = () => {
         error={error}
         selectedAppointmentId={selectedAppointmentId}
         onRetry={() => window.location.reload()}
-        onViewDetails={(id) => navigate(`/app/historico?id=${id}`)}
       />
     </div>
   );

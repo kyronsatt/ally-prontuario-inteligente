@@ -25,11 +25,18 @@ Deno.serve(async (req) => {
         },
       }
     );
+
     const { data, error } = await supabaseClient
       .from("anamnese")
-      .select("*")
+      .select(
+        `
+        *,
+        patient:patients (*)
+      `
+      )
       .eq("appointment_id", appointmentId)
       .single();
+
     if (error) throw error;
     return new Response(JSON.stringify(data), {
       headers: {

@@ -67,13 +67,14 @@ Deno.serve(async (req) => {
     }
 
     console.log("Appointment and patient data retrieved successfully");
-    return new Response(
-      JSON.stringify({ appointment: appointmentData, patient: patientData }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 201,
-      }
-    );
+    const appointmentWithPatientInfo = {
+      ...appointmentData,
+      patient: patientData,
+    };
+    return new Response(JSON.stringify(appointmentWithPatientInfo), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 201,
+    });
   } catch (err) {
     console.error("Unexpected error:", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {

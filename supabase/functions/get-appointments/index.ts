@@ -54,7 +54,12 @@ serve(async (req) => {
     // Get all appointments for the user
     let query = supabaseClient
       .from("appointments")
-      .select("*, patients!inner(*)") // TODO -> FIX ME
+      .select(
+        `
+          *,
+          patient:patients (*)
+        `
+      )
       .eq("doctor_id", user.id)
       .order("created_at", { ascending: false });
 

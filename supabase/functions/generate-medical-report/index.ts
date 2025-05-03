@@ -85,6 +85,7 @@ function validateRequestData(requestData: Record<string, string>) {
     "transcriptionId",
     "appointmentType",
     "appointmentId",
+    "patientId",
   ];
   requiredFields.forEach((field) => {
     if (!requestData[field]) {
@@ -155,6 +156,7 @@ async function insertAnamneseIntoDb(
       {
         appointment_id: requestData.appointmentId,
         transcription_id: requestData.transcriptionId,
+        patient_id: requestData.patientId,
         identification: anamneseData.identification,
         main_complaint: anamneseData.main_complaint,
         current_illness_history: anamneseData.current_illness_history,

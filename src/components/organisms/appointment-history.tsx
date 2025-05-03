@@ -6,6 +6,7 @@ import { AppointmentData } from "@/context/AppointmentContext";
 import { Button } from "../ui/button";
 import SearchBar from "../molecules/appointment-history/search-bar";
 import AppointmentCard from "../molecules/appointment-history/appointment-card";
+import { useNavigate } from "react-router-dom";
 
 interface AppointmentHistoryProps {
   searchTerm: string;
@@ -15,7 +16,6 @@ interface AppointmentHistoryProps {
   error: string | null;
   selectedAppointmentId: string | null;
   onRetry: () => void;
-  onViewDetails: (id: string) => void;
 }
 
 export const AppointmentHistory: React.FC<AppointmentHistoryProps> = ({
@@ -26,8 +26,13 @@ export const AppointmentHistory: React.FC<AppointmentHistoryProps> = ({
   error,
   selectedAppointmentId,
   onRetry,
-  onViewDetails,
 }) => {
+  const navigate = useNavigate();
+  const onViewDetails = (appointmentId: string) => {
+    const anamnesePageUrl = `/app/resumo?appointmentId=${appointmentId}`;
+    navigate(anamnesePageUrl);
+  };
+
   return (
     <div>
       <div>
@@ -59,7 +64,7 @@ export const AppointmentHistory: React.FC<AppointmentHistoryProps> = ({
                 <AppointmentCard
                   key={appointment.id}
                   id={appointment.id}
-                  name={appointment.patients?.name} // TODO -> FIXME
+                  name={appointment.patient?.name}
                   date={appointment.created_at}
                   type={appointment.type}
                   isSelected={selectedAppointmentId === appointment.id}

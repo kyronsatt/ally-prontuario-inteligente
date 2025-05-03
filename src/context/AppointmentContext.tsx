@@ -20,11 +20,6 @@ export interface AppointmentData extends IAppointmentCreationPayload {
   patients?: Array<PatientData>;
 }
 
-interface IAppointmentCreationResponse {
-  appointment: AppointmentData;
-  patient: PatientData;
-}
-
 interface AppointmentContextType {
   appointment?: AppointmentData;
   isProcessing: boolean;
@@ -33,7 +28,7 @@ interface AppointmentContextType {
   >;
   createAppointment: (
     payload: IAppointmentCreationPayload
-  ) => Promise<IAppointmentCreationResponse>;
+  ) => Promise<AppointmentData>;
 }
 
 const AppointmentContext = createContext<AppointmentContextType | undefined>(
@@ -67,10 +62,10 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error(errorData.error || "Error creating appointment");
       }
 
-      const result = (await response.json()) as IAppointmentCreationResponse;
-      setAppointment(result.appointment);
+      const appointment = (await response.json()) as AppointmentData;
+      setAppointment(appointment);
 
-      return result;
+      return appointment;
     } catch (error) {
       console.error("Error creating appointment:", error);
       throw error;

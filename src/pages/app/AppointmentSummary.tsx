@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import moment from "moment";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Pencil, Save } from "lucide-react";
 
@@ -19,7 +18,13 @@ import { useTranscription } from "@/context/TranscriptionContext";
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
   const { appointment, setAppointment } = useAppointment();
-  const { anamnese, isGeneratingAnamnese, generateAnamnese } = useAnamnese();
+  const {
+    anamnese,
+    isGeneratingAnamnese,
+    generateAnamnese,
+    retrieveAnamnese,
+    isRetrievingAnamnese,
+  } = useAnamnese();
   const { transcription } = useTranscription();
   const { patient } = usePatient();
 
@@ -30,15 +35,15 @@ const AppointmentSummary: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const [searchParams] = useSearchParams();
-  const appointmentId = searchParams.get("appointment_id");
+  const appointmentId = searchParams.get("appointmentId");
 
   useEffect(() => {
-    if (!anamnese && transcription) {
+    if (!anamnese && appointmentId) {
+      retrieveAnamnese(appointmentId);
+    } else if (!anamnese && transcription) {
       generateAnamnese(transcription.raw_text);
     }
-
-    // TODO -> Fetch the appointment data from Supabase
-  }, [anamnese, transcription]);
+  }, [anamnese, appointmentId, transcription]);
 
   useEffect(() => {
     if (anamnese && !editedAnamnese) {
@@ -46,11 +51,7 @@ const AppointmentSummary: React.FC = () => {
     }
   }, [anamnese, editedAnamnese]);
 
-  const formattedDate = appointment.date
-    ? format(appointment.date, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
-        locale: ptBR,
-      })
-    : "";
+  const formattedDate = moment(appointment?.date).format("DD/MM/YY [às] HH:mm");
 
   const handlePrint = () => {
     window.print();
@@ -107,18 +108,19 @@ const AppointmentSummary: React.FC = () => {
     }
   };
 
-  if (isGeneratingAnamnese) {
+  if (isGeneratingAnamnese || isRetrievingAnamnese) {
+    const action = isGeneratingAnamnese ? "Finalizando" : "Acessando";
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="rounded-full bg-blue-50 p-4">
             <Loader2 className="h-12 w-12 text-ally-blue animate-spin" />
           </div>
-          <h2 className="text-2xl font-bold">
-            Finalizando relatório médico...
-          </h2>
+          <h2 className="text-2xl font-bold">{action} anamnese...</h2>
           <p className="text-gray-600">
-            Quase pronto! Estamos finalizando o relatório da sua consulta.
+            {isGeneratingAnamnese
+              ? "Quase pronto! Estamos finalizando a anamnese da sua consulta."
+              : "Aguarde um instante! Estamos obtendo a anamnese."}
           </p>
         </div>
       </div>
@@ -153,7 +155,7 @@ const AppointmentSummary: React.FC = () => {
 
       <PatientInfoCard
         patientName={
-          appointment.patient?.name ??
+          appointment?.patient?.name ??
           patient?.name ??
           "Paciente não identificado"
         }
