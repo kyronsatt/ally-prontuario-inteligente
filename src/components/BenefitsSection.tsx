@@ -66,7 +66,7 @@ const BenefitsSection: React.FC = () => {
     <section id="benefits" className="section-spacing bg-white">
       <div className="container-ally">
         <div
-          className="text-center max-w-3xl mx-auto mb-16 fade-in-section"
+          className="text-center max-w-3xl mx-auto mb-12 md:mb-16 fade-in-section"
           style={{ "--delay": "100ms" } as React.CSSProperties}
         >
           <h2 className="heading-lg mb-4">
@@ -85,7 +85,7 @@ const BenefitsSection: React.FC = () => {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 bg-transparent">
+            <TabsList className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-32 md:mb-8 bg-transparent">
               {Object.entries(tabContent).map(([key, tab]) => (
                 <TabsTrigger value={key} className={getTabClassName(key)}>
                   <tab.icon

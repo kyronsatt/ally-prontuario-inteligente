@@ -48,7 +48,7 @@ const HeroSection: React.FC = () => {
             <img
               src="/assets/images/female-doctor-1.jpg"
               alt="Médico usando Ally durante consulta"
-              className="rounded-tr-[200px] rounded-b-xl rounded-tl-xl w-full md:w-full xl:w-2/3 h-auto max-h-[60vh] object-cover outline outline-[1px] outline-offset-4 outline-ally-blue/40"
+              className="rounded-tr-[200px] rounded-b-xl rounded-tl-xl w-full md:w-full xl:w-2/3 h-80 md:h-auto max-h-[60vh] object-cover outline outline-[1px] outline-offset-4 outline-ally-blue/40"
             />
           </div>
         </div>

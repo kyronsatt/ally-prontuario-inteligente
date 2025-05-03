@@ -11,18 +11,16 @@ interface StepProps {
 const Step: React.FC<StepProps> = ({ icon, title, description, number }) => {
   return (
     <div
-      className="bg-white p-6 rounded-xl shadow-md mb-4 relative fade-in-section"
+      className="bg-gradient-to-r from-ally-blue/20 to-ally-blue/5 p-6 rounded-xl overflow-clip border-ally-blue/20 border-[1px] mb-4 relative fade-in-section"
       style={{ "--delay": `${number * 100}ms` } as React.CSSProperties}
     >
-      <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-ally-blue text-white flex items-center justify-center font-bold">
-        {number}
-      </div>
       <div className="flex flex-col md:flex-row items-start gap-4">
-        <div className="bg-ally-light p-4 rounded-full text-ally-blue mb-4 md:mb-0">
+        {/* <div className="bg-ally-blue/10 p-3 rounded-xl text-ally-blue mb-4 md:mb-0"> */}
+        <div className="rounded-full p-2 text-ally-blue/30 absolute top-3 -left-10 md:mb-0">
           {icon}
         </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-2">{title}</h3>
+        <div className="pl-16">
+          <h3 className="text-xl font-semibold mb-2 text-ally-blue">{title}</h3>
           <p className="text-ally-gray">{description}</p>
         </div>
       </div>
@@ -33,25 +31,25 @@ const Step: React.FC<StepProps> = ({ icon, title, description, number }) => {
 const HowItWorksSection: React.FC = () => {
   const steps = [
     {
-      icon: <Mic size={28} />,
+      icon: <Mic size={90} />,
       title: "Escuta clínica em tempo real",
       description:
         "A Ally ouve a conversa entre médico e paciente, entendendo o contexto com precisão médica.",
     },
     {
-      icon: <FileText size={28} />,
+      icon: <FileText size={90} />,
       title: "Geração automática da anamnese estruturada",
       description:
         "O atendimento é transformado em um texto clínico organizado no formato do prontuário.",
     },
     {
-      icon: <Lightbulb size={28} />,
+      icon: <Lightbulb size={90} />,
       title: "Entrega de insights inteligentes",
       description:
         "A Ally identifica riscos, sintomas relevantes e oportunidades de conduta — considerando também o histórico do paciente.",
     },
     {
-      icon: <History size={28} />,
+      icon: <History size={90} />,
       title: "Acesso ao histórico de atendimentos",
       description:
         "Consulte facilmente anamneses anteriores do paciente para uma visão completa de sua trajetória clínica.",
@@ -78,9 +76,8 @@ const HowItWorksSection: React.FC = () => {
             anteriores do paciente.
           </p>
         </div>
-
         {/* Stacked Step Blocks */}
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto flex flex-col gap-2">
           {steps.map((step, index) => (
             <Step
               key={index}
@@ -90,20 +87,6 @@ const HowItWorksSection: React.FC = () => {
               number={index + 1}
             />
           ))}
-        </div>
-
-        {/* Extra information */}
-        <div
-          className="mt-8 p-5 border border-gray-200 rounded-lg bg-white flex items-start gap-3 max-w-3xl mx-auto fade-in-section"
-          style={{ "--delay": "500ms" } as React.CSSProperties}
-        >
-          <History className="text-ally-blue mt-1 flex-shrink-0" />
-          <p className="text-ally-gray">
-            <span className="font-semibold">
-              Consulta atual + histórico do paciente ={" "}
-            </span>
-            recomendações mais completas e personalizadas para cada paciente.
-          </p>
         </div>
       </div>
     </section>
