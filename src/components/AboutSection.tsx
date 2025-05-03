@@ -27,13 +27,9 @@ const AboutSection: React.FC = () => {
   ];
 
   return (
-    <section
-      id="about"
-      className="section-spacing bg-gradient-to-b from-white to-ally-light/30"
-    >
+    <section id="about" className="section-spacing bg-white">
       <div className="container-ally">
         <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-          {/* Nova imagem para a seção Sobre */}
           <div
             className="fade-in-section"
             style={{ "--delay": "100ms" } as React.CSSProperties}

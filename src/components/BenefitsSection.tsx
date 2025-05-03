@@ -1,55 +1,65 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Check } from "lucide-react";
+import {
+  Brain,
+  Check,
+  PaperclipIcon,
+  Shield,
+  ShieldCheck,
+  Activity,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const BenefitsSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState("tab1");
 
   const tabContent = {
     tab1: {
+      icon: Activity,
+      tabTitle: "Anamnese estruturada",
       title: "Anamnese estruturada em segundos",
       description:
-        "A Ally ouve a conversa da consulta e gera automaticamente uma anamnese clínica completa em até 30 segundos, organizada por tópicos (queixa, HDA, antecedentes, exames e conduta).",
+        "A Ally ouve a conversa da consulta e gera automaticamente uma anamnese clínica completa em até 30 segundos, organizada de acordo com a sua especialidade.",
       benefits: [
         "Mantenha contato visual com o paciente",
         "Reduza em até 40% o tempo gasto com prontuário",
         "Cuide mais e digite menos",
       ],
-      image: "/lovable-uploads/241b2acf-b875-44a4-ac4e-cb5ead00764d.png",
+      image: "/assets/images/female-doctor-5.jpg",
     },
     tab2: {
-      title: "Segurança e privacidade reais",
-      description:
-        "A Ally garante um ambiente de máxima segurança. Todos os dados são anonimizados, criptografados e operam em conformidade com a Lei Geral de Proteção de Dados (LGPD).",
-      benefits: [
-        "Nenhum áudio é armazenado — descarte automático",
-        "Não requer consentimento do paciente",
-        "Nenhuma informação pessoal é registrada",
-      ],
-      image: "/lovable-uploads/241b2acf-b875-44a4-ac4e-cb5ead00764d.png",
-    },
-    tab3: {
-      title: "Uso imediato, sem fricção",
-      description:
-        "Esqueça integrações, configurações e tutoriais. A Ally funciona do jeito que o médico precisa: é só abrir o app e começar a consulta.",
-      benefits: [
-        "Comece a usar em menos de 30 segundos",
-        "Gere documentos com inteligência artificial",
-        "Sem perder tempo com tecnologia",
-      ],
-      image: "/lovable-uploads/241b2acf-b875-44a4-ac4e-cb5ead00764d.png",
-    },
-    tab4: {
+      icon: Brain,
+      tabTitle: "Inteligência clínica",
       title: "Mais que registros: inteligência clínica",
       description:
-        "A Ally gera automaticamente documentos como anamnese, receituário e atestados, além de oferecer relatórios de produtividade e benchmarking.",
+        "Além de gerar automaticamente documentos como anamnese, Ally oferece relatórios de produtividade e insights inteligentes.",
       benefits: [
         "Acompanhe sua performance e melhore sua prática",
         "Compartilhe resumos clínicos com o paciente",
         "Amplie a confiança e a experiência do atendimento",
       ],
-      image: "/lovable-uploads/241b2acf-b875-44a4-ac4e-cb5ead00764d.png",
+      image: "/assets/images/female-doctor-4.jpg",
     },
+    tab3: {
+      icon: ShieldCheck,
+      tabTitle: "Fácil e segura",
+      title: "Segurança e simplicidade",
+      description:
+        "A Ally funciona do jeito que o médico precisa: é só abrir o app e começar a consulta, em um ambiente de máxima segurança. Todos os dados são anonimizados, criptografados e operam em conformidade com a Lei Geral de Proteção de Dados (LGPD).",
+      benefits: [
+        "Nenhum áudio é armazenado — descarte automático",
+        "Comece a usar em menos de 30 segundos",
+        "Gere documentos com inteligência artificial",
+      ],
+      image: "/assets/images/female-doctor-2.jpg",
+    },
+  };
+
+  const getTabClassName = (tab: string) => {
+    const baseClass = "py-3 px-4 rounded-lg text-center transition-all text-sm";
+    return activeTab === tab
+      ? `${baseClass} bg-ally-blue/5 text-ally-blue border-[1px] border-ally-blue/70`
+      : `${baseClass} bg-ally-light/50 text-ally-gray hover:bg-ally-light border-[1px] border-gray-200`;
   };
 
   return (
@@ -69,72 +79,43 @@ const BenefitsSection: React.FC = () => {
           </p>
         </div>
 
-        <div
-          className="max-w-5xl mx-auto fade-in-section"
-          style={{ "--delay": "200ms" } as React.CSSProperties}
-        >
+        <div className="max-w-5xl mx-auto fade-in-section">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-8 bg-transparent">
-              <TabsTrigger
-                value="tab1"
-                className={`py-3 px-4 rounded-md text-center transition-all ${
-                  activeTab === "tab1"
-                    ? "bg-ally-blue text-white border-b-2 border-ally-blue"
-                    : "bg-ally-light/50 text-ally-gray hover:bg-ally-light"
-                }`}
-              >
-                Anamnese estruturada
-              </TabsTrigger>
-              <TabsTrigger
-                value="tab2"
-                className={`py-3 px-4 rounded-md text-center transition-all ${
-                  activeTab === "tab2"
-                    ? "bg-ally-blue text-white border-b-2 border-ally-blue"
-                    : "bg-ally-light/50 text-ally-gray hover:bg-ally-light"
-                }`}
-              >
-                Uso imediato
-              </TabsTrigger>
-              <TabsTrigger
-                value="tab3"
-                className={`py-3 px-4 rounded-md text-center transition-all ${
-                  activeTab === "tab3"
-                    ? "bg-ally-blue text-white border-b-2 border-ally-blue"
-                    : "bg-ally-light/50 text-ally-gray hover:bg-ally-light"
-                }`}
-              >
-                Segurança total
-              </TabsTrigger>
-              <TabsTrigger
-                value="tab4"
-                className={`py-3 px-4 rounded-md text-center transition-all ${
-                  activeTab === "tab4"
-                    ? "bg-ally-blue text-white border-b-2 border-ally-blue"
-                    : "bg-ally-light/50 text-ally-gray hover:bg-ally-light"
-                }`}
-              >
-                Inteligência clínica
-              </TabsTrigger>
+            <TabsList className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 bg-transparent">
+              {Object.entries(tabContent).map(([key, tab]) => (
+                <TabsTrigger value={key} className={getTabClassName(key)}>
+                  <tab.icon
+                    className={cn(
+                      "inline mr-0 p-1",
+                      activeTab === key ? "text-ally-blue" : "text-ally-gray"
+                    )}
+                  />
+                  {tab.tabTitle}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
             {Object.entries(tabContent).map(([key, tab]) => (
               <TabsContent
                 key={key}
                 value={key}
-                className="mt-2 focus:outline-none"
+                className="pt-4 focus:outline-none"
               >
-                <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-50">
+                <div className="p-6">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
-                      <h3 className="text-2xl font-semibold mb-4">
+                      <h3 className="text-2xl font-semibold mb-4 flex items-center">
+                        <tab.icon className="text-ally-blue inline mr-2" />
                         {tab.title}
                       </h3>
-                      <p className="text-ally-gray mb-6">{tab.description}</p>
-                      <ul className="space-y-3">
+                      <p className="mb-6 text-md font-light">
+                        {tab.description}
+                      </p>
+                      <ul className="space-y-3 text-ally-gray">
                         {tab.benefits.map((benefit, index) => (
                           <li key={index} className="flex items-start gap-2">
                             <Check
@@ -146,11 +127,11 @@ const BenefitsSection: React.FC = () => {
                         ))}
                       </ul>
                     </div>
-                    <div className="order-first md:order-last">
+                    <div className="order-first md:order-last transition-all fade-in-10">
                       <img
                         src={tab.image}
                         alt={`Ilustração de ${tab.title}`}
-                        className="w-full h-auto rounded-lg shadow-md"
+                        className="w-full aspect-video object-cover rounded-2xl outline outline-1 outline-ally-blue/30 outline-offset-4"
                       />
                     </div>
                   </div>
