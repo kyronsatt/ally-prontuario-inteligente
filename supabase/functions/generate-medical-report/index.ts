@@ -1,6 +1,11 @@
+// @ts-expect-error :: deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// @ts-expect-error :: deno
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
+// @ts-expect-error :: deno
 import OpenAI from "https://esm.sh/openai@4.20.1";
+// @ts-expect-error :: deno
+import { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -54,6 +59,7 @@ async function validateAuthHeader(authHeader: string | null) {
   }
 
   const jwt = authHeader.replace("Bearer ", "").trim();
+
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
@@ -73,7 +79,7 @@ async function validateAuthHeader(authHeader: string | null) {
   return { supabaseClient, jwt };
 }
 
-function validateRequestData(requestData: any) {
+function validateRequestData(requestData: Record<string, string>) {
   const requiredFields = [
     "transcription",
     "transcriptionId",
@@ -87,7 +93,10 @@ function validateRequestData(requestData: any) {
   });
 }
 
-async function generateAnamneseData(openai: OpenAI, requestData: any) {
+async function generateAnamneseData(
+  openai: OpenAI,
+  requestData: Record<string, string>
+) {
   const systemPrompt = createSystemPrompt(
     requestData.patientName,
     requestData.appointmentType
@@ -123,7 +132,7 @@ async function generateAnamneseData(openai: OpenAI, requestData: any) {
   }
 }
 
-async function getUserData(supabaseClient: any, jwt: string) {
+async function getUserData(supabaseClient: SupabaseClient, jwt: string) {
   const { data: userData, error: userError } =
     await supabaseClient.auth.getUser(jwt);
 
@@ -135,10 +144,10 @@ async function getUserData(supabaseClient: any, jwt: string) {
 }
 
 async function insertAnamneseIntoDb(
-  supabaseClient: any,
-  anamneseData: any,
-  requestData: any,
-  userData: any
+  supabaseClient: SupabaseClient,
+  anamneseData: Record<string, unknown>,
+  requestData: Record<string, unknown>,
+  userData: Record<string, Record<string, unknown>>
 ) {
   const { data: insertData, error: insertError } = await supabaseClient
     .from("anamnese")
@@ -154,6 +163,8 @@ async function insertAnamneseIntoDb(
         family_history: anamneseData.family_history,
         physical_exams: anamneseData.physical_exams,
         complementary_exams: anamneseData.complementary_exams,
+        therapeutic_approach: anamneseData.therapeutic_approach,
+        diagnostic_hypotheses: anamneseData.diagnostic_hypotheses,
         created_by: userData.user.id,
       },
     ])
@@ -190,6 +201,8 @@ Retorne os seguintes campos em formato JSON:
 - family_history
 - physical_exams
 - complementary_exams
+- therapeutic_approach
+- diagnostic_hypotheses
 
 Se alguma informação não estiver presente na transcrição, indique claramente com "Informação não fornecida na consulta".
 
@@ -222,6 +235,14 @@ const anamneseSchema = {
       type: "string",
       description: "Exames complementares",
     },
+    therapeutic_approach: {
+      type: "string",
+      description: "Abordagem terapêutica",
+    },
+    diagnostic_hypotheses: {
+      type: "string",
+      description: "Hipóteses diagnósticas",
+    },
   },
   required: [
     "identification",
@@ -232,6 +253,8 @@ const anamneseSchema = {
     "family_history",
     "physical_exams",
     "complementary_exams",
+    "therapeutic_approach",
+    "diagnostic_hypotheses",
   ],
   additionalProperties: false,
 };

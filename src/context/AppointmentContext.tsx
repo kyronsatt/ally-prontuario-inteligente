@@ -24,6 +24,8 @@ export interface Anamnese {
   family_history: string;
   physical_exams: string;
   complementary_exams: string;
+  therapeutic_approach: string;
+  diagnostic_hypotheses: string;
   created_by: string;
   created_at: Date;
 }
@@ -49,7 +51,7 @@ interface Transcription {
   segments: Record<string, string>;
   appointment_id: string;
   errors: Record<string, string> | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: Date;
 }
 

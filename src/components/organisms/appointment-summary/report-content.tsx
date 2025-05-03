@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
 import { Anamnese } from "@/context/AppointmentContext";
-import { twMerge } from "tailwind-merge";
 
 interface AppointmentReportProps {
   anamnese?: Anamnese;
@@ -21,7 +20,7 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
       {
         title: "Identificação",
         content: anamnese.identification,
-        id: "queixaPrincipal",
+        id: "identificacao",
       },
       {
         title: "Queixa Principal",
@@ -57,6 +56,16 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
         title: "Exames Complementares",
         content: anamnese.complementary_exams,
         id: "examesComplementares",
+      },
+      {
+        title: "Abordagem Terapêutica",
+        content: anamnese.therapeutic_approach,
+        id: "abordagemTerapeutica",
+      },
+      {
+        title: "Hipóteses Diagnósticas",
+        content: anamnese.diagnostic_hypotheses,
+        id: "hipotesesDiagnosticas",
       },
     ];
 
