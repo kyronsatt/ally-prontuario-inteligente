@@ -14,9 +14,10 @@ interface IAppointmentCreationPayload {
 
 export interface AppointmentData extends IAppointmentCreationPayload {
   id: string;
-  created_at: Date;
+  created_at: string;
   date?: Date;
   patient?: PatientData;
+  patients?: Array<PatientData>;
 }
 
 interface IAppointmentCreationResponse {
