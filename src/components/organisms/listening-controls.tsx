@@ -1,20 +1,22 @@
 import React from "react";
-import { Mic, MicOff, PauseCircle } from "lucide-react";
+import { Mic, PauseCircle } from "lucide-react";
+
+import { RecordingStatus } from "@/context/TranscriptionContext";
+
 import { Button } from "../ui/button";
 
 interface ListeningControlsProps {
-  isListening: boolean;
-  isPaused: boolean;
+  recordingStatus: RecordingStatus;
   onTogglePause: () => void;
   onFinish: () => void;
 }
 
 const ListeningControls: React.FC<ListeningControlsProps> = ({
-  isListening,
-  isPaused,
+  recordingStatus,
   onTogglePause,
   onFinish,
 }) => {
+  const isPaused = recordingStatus === "PAUSED";
   return (
     <div className="flex space-x-4">
       <Button

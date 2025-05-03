@@ -45,8 +45,24 @@ const App = () => (
             >
               <Route index element={<Dashboard />} />
               <Route path="novo-atendimento" element={<NewAppointment />} />
-              <Route path="escuta" element={<Listening />} />
-              <Route path="resumo" element={<AppointmentSummary />} />
+              <Route
+                path="escuta"
+                element={
+                  <TranscriptionProvider>
+                    <Listening />
+                  </TranscriptionProvider>
+                }
+              />
+              <Route
+                path="resumo"
+                element={
+                  <TranscriptionProvider>
+                    <AnamneseProvider>
+                      <AppointmentSummary />
+                    </AnamneseProvider>
+                  </TranscriptionProvider>
+                }
+              />
               <Route path="historico" element={<AppointmentHistory />} />
               <Route path="configuracoes" element={<Settings />} />
             </Route>
@@ -64,11 +80,7 @@ export default App;
 export const AppPrivateRoute = ({ children }) => (
   <ProtectedRoute>
     <PatientProvider>
-      <AppointmentProvider>
-        <TranscriptionProvider>
-          <AnamneseProvider>{children}</AnamneseProvider>
-        </TranscriptionProvider>
-      </AppointmentProvider>
+      <AppointmentProvider>{children}</AppointmentProvider>
     </PatientProvider>
   </ProtectedRoute>
 );

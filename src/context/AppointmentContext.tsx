@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useContext, useState } from "react";
+import { envs } from "@/envs";
+
 import { useAuth } from "./AuthContext";
 import { PatientData } from "./PatientContext";
-import { toast } from "@/components/ui/sonner";
 
 export type AppointmentType = "NEW" | "RETURN";
 
@@ -12,32 +12,11 @@ interface IAppointmentCreationPayload {
   type: AppointmentType;
 }
 
-export interface Anamnese {
-  id: string;
-  appointment_id: string;
-  transcription_id: string;
-  identification: string;
-  main_complaint: string;
-  current_illness_history: string;
-  past_medical_history: string;
-  social_history: string;
-  family_history: string;
-  physical_exams: string;
-  complementary_exams: string;
-  therapeutic_approach: string;
-  diagnostic_hypotheses: string;
-  created_by: string;
-  created_at: Date;
-}
-
 export interface AppointmentData extends IAppointmentCreationPayload {
   id: string;
   created_at: Date;
   date?: Date;
   patient?: PatientData;
-  audioBlob?: Blob;
-  transcription?: string;
-  anamnese?: Anamnese;
 }
 
 interface IAppointmentCreationResponse {
@@ -45,266 +24,57 @@ interface IAppointmentCreationResponse {
   patient: PatientData;
 }
 
-interface Transcription {
-  id: string;
-  raw_text: string;
-  segments: Record<string, string>;
-  appointment_id: string;
-  errors: Record<string, string> | null;
-  metadata: Record<string, unknown>;
-  created_at: Date;
-}
-
 interface AppointmentContextType {
-  appointment: AppointmentData;
-  setAppointment: React.Dispatch<React.SetStateAction<AppointmentData>>;
-  isListening: boolean;
-  startListening: () => void;
-  stopListening: () => void;
-  resetAppointment: () => void;
-  createAppointment: (
-    appointmentCreationPayload: IAppointmentCreationPayload
-  ) => Promise<IAppointmentCreationResponse>;
-  processAudio: (audioBlob: Blob) => Promise<void>;
+  appointment?: AppointmentData;
   isProcessing: boolean;
+  setAppointment: React.Dispatch<
+    React.SetStateAction<AppointmentData | undefined>
+  >;
+  createAppointment: (
+    payload: IAppointmentCreationPayload
+  ) => Promise<IAppointmentCreationResponse>;
 }
 
 const AppointmentContext = createContext<AppointmentContextType | undefined>(
   undefined
 );
 
-// Default empty appointment for resetting
-const defaultAppointment: AppointmentData = {
-  id: "",
-  patient_id: "",
-  doctor_id: "",
-  type: "NEW",
-  created_at: new Date(),
-};
-
 export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [appointment, setAppointment] =
-    useState<AppointmentData>(defaultAppointment);
-  const [isListening, setIsListening] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  const [appointment, setAppointment] = useState<AppointmentData>();
   const { session } = useAuth();
-  const navigate = useNavigate();
-  const audioChunksRef = useRef<Blob[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const startListening = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log("Microphone access granted:", stream); // Debug log for microphone acces
-      const recorder = new MediaRecorder(stream);
-
-      audioChunksRef.current = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          console.log("Audio chunk received:", e.data);
-          audioChunksRef.current.push(e.data);
-        }
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
-      setIsListening(true);
-
-      toast("Escuta iniciada", {
-        description: "A Ally está ouvindo sua consulta com segurança.",
-      });
-    } catch (error) {
-      console.error("Erro ao iniciar gravação:", error);
-      toast("Erro ao iniciar gravação", {
-        description:
-          "Verifique se o microfone está disponível e tente novamente.",
-      });
-    }
-  };
-
-  const stopListening = () => {
-    if (mediaRecorder && isListening) {
-      // Set the handler BEFORE stopping
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
-        });
-        console.log("Final audioBlob size:", audioBlob.size);
-
-        setAppointment((prev) => ({
-          ...prev,
-          audioBlob,
-          date: new Date(),
-        }));
-
-        setIsListening(false);
-
-        toast("Gravação finalizada", {
-          description: "Áudio capturado com sucesso.",
-        });
-
-        await processAudio(audioBlob);
-      };
-
-      mediaRecorder.requestData();
-      mediaRecorder.stop();
-      mediaRecorder.stream.getTracks().forEach((track) => track.stop());
-    }
-  };
-
-  const processAudio = async (audioBlob: Blob) => {
+  const createAppointment = async (payload: IAppointmentCreationPayload) => {
     setIsProcessing(true);
-    toast("Processando áudio", {
-      description: "Convertendo áudio para texto...",
-    });
-
     try {
-      // Convert audio to Base64
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
-
-      const base64Audio = await new Promise<string>((resolve, reject) => {
-        reader.onloadend = () => {
-          if (reader.result) {
-            const base64 = reader.result as string;
-            const base64Data = base64.split(",")[1];
-            console.log("Base64 Audio Data:", base64Data); // Debug log for Base64 data
-            resolve(base64Data);
-          } else {
-            reject("Erro ao converter áudio para Base64");
-          }
-        };
-        reader.onerror = () => reject("Erro ao ler o arquivo de áudio");
-      });
-
-      // Step 1: Transcribe Audio
-      const transcriptionResponse = await fetch(
-        "https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/transcribe-audio",
+      const response = await fetch(
+        `${envs.SUPABASE_HOST}/functions/v1/create-appointment`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            audio: base64Audio,
-            appointmentId: appointment.id,
-          }),
+          body: JSON.stringify(payload),
         }
       );
 
-      if (!transcriptionResponse.ok) {
-        const errorData = await transcriptionResponse.json();
-        throw new Error(errorData.error || "Erro na transcrição do áudio");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error creating appointment");
       }
 
-      const transcriptionResult = await transcriptionResponse.json();
-      const transcriptionEntity: Transcription = transcriptionResult.data;
-      const transcriptionRawText = transcriptionEntity.raw_text;
-
-      // Update appointment with transcription
-      setAppointment((prev) => ({
-        ...prev,
-        transcription: transcriptionRawText,
-      }));
-
-      toast("Áudio transcrito", {
-        description: "Gerando relatório médico...",
-      });
-
-      // Step 2: Generate Medical Report
-      const anamneseResponse = await fetch(
-        "https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/generate-medical-report",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            transcription: transcriptionRawText,
-            transcriptionId: transcriptionEntity.id,
-            patientName: appointment.patient?.name,
-            appointmentType: appointment.type,
-            appointmentId: appointment.id,
-          }),
-        }
-      );
-
-      const anamnese = await anamneseResponse.json();
-
-      if (!anamnese) {
-        throw new Error(
-          "Houve um erro na geração do relatório médico. Contate o suporte."
-        );
-      }
-
-      // Update appointment with Anamnese notes
-      setAppointment((prev) => ({
-        ...prev,
-        transcription: transcriptionRawText,
-        anamnese,
-      }));
-
-      toast("Relatório gerado", {
-        description: "Relatório médico gerado com sucesso!",
-      });
-
-      // Navigate directly to the anamnese view instead of format selection
-      navigate("/app/resumo?format=anamnese");
-    } catch (error) {
-      console.error("Erro no processamento:", error);
-      toast("Erro no processamento", {
-        description:
-          "Ocorreu um erro ao processar o áudio. Por favor, tente novamente.",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const resetAppointment = () => {
-    setAppointment(defaultAppointment);
-    setIsListening(false);
-    setIsProcessing(false);
-    if (mediaRecorder) {
-      mediaRecorder.stream.getTracks().forEach((track) => track.stop());
-      setMediaRecorder(null);
-    }
-
-    audioChunksRef.current = [];
-  };
-
-  const createAppointment = async (
-    appointmentCreationPayload: IAppointmentCreationPayload
-  ) => {
-    const response = await fetch(
-      "https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/create-appointment",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(appointmentCreationPayload),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error creating appointment:", errorData.error);
-      throw new Error(errorData.error || "Error creating appointment");
-    } else {
       const result = (await response.json()) as IAppointmentCreationResponse;
-      console.log("Appointment created successfully:", result);
       setAppointment(result.appointment);
 
       return result;
+    } catch (error) {
+      console.error("Error creating appointment:", error);
+      throw error;
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -312,14 +82,9 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
     <AppointmentContext.Provider
       value={{
         appointment,
-        setAppointment,
-        isListening,
-        startListening,
-        stopListening,
-        resetAppointment,
-        createAppointment,
-        processAudio,
         isProcessing,
+        setAppointment,
+        createAppointment,
       }}
     >
       {children}
@@ -327,12 +92,9 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useAppointment = (): AppointmentContextType => {
-  const context = useContext(AppointmentContext);
-  if (context === undefined) {
-    throw new Error(
-      "useAppointment must be used within an AppointmentProvider"
-    );
-  }
-  return context;
+export const useAppointment = () => {
+  const ctx = useContext(AppointmentContext);
+  if (!ctx)
+    throw new Error("useAppointment must be used within AppointmentProvider");
+  return ctx;
 };

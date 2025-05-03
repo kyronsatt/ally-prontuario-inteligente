@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { useAuth } from "./AuthContext"; // Assuming you have an AuthContext to get the user ID
+
+import { envs } from "@/envs";
+
+import { useAuth } from "./AuthContext";
 
 export type PatientGender = "MALE" | "FEMALE" | "OTHER";
-// Define the payload for creating a patient
+
 interface PatientCreationPayload {
   gender: PatientGender;
   age: number;
@@ -16,7 +19,6 @@ export interface PatientData extends PatientCreationPayload {
   created_at: Date;
 }
 
-// Define the context value type
 interface PatientContextType {
   patient?: PatientData;
   patients?: PatientData[];
@@ -26,10 +28,8 @@ interface PatientContextType {
   getPatientsByUser: (userId: string) => Promise<PatientData[]>;
 }
 
-// Create the context with a default value
 const PatientContext = createContext<PatientContextType | undefined>(undefined);
 
-// Create a provider component
 interface PatientProviderProps {
   children: ReactNode;
 }
@@ -38,7 +38,7 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
   children,
 }) => {
   const [patient, setPatient] = useState<PatientData>();
-  const [patients, setPatients] = useState<PatientData[]>([]); // State to store the list of patients
+  const [patients, setPatients] = useState<PatientData[]>([]);
   const { user, session } = useAuth();
 
   const clearPatient = () => {
@@ -81,7 +81,7 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
   const getPatientsByUser = async (userId: string): Promise<PatientData[]> => {
     try {
       const response = await fetch(
-        `https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/get-patients-by-user?user_id=${userId}`,
+        `${envs.SUPABASE_HOST}/functions/v1/get-patients-by-user?user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -124,7 +124,6 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
   );
 };
 
-// Custom hook to use the PatientContext
 export const usePatient = (): PatientContextType => {
   const context = useContext(PatientContext);
   if (!context) {

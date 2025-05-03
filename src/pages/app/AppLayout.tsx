@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Outlet, useNavigate, Link } from "react-router-dom";
-import { Settings, LogOut, User, Home, Plus, Clock } from "lucide-react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Settings, LogOut, Home, Plus, Clock } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { AppointmentProvider } from "@/context/AppointmentContext";
-import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/components/ui/sonner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+import { AppointmentProvider } from "@/context/AppointmentContext";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserProfile {
   first_name: string | null;

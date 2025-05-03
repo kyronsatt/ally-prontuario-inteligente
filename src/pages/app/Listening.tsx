@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ShieldIcon } from "lucide-react";
+import {
+  Loader,
+  Loader2,
+  Loader2Icon,
+  LoaderPinwheel,
+  LucideLoader2,
+  ShieldIcon,
+} from "lucide-react";
 
 import { useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
@@ -9,68 +16,38 @@ import PatientInfo from "@/components/organisms/patient-info";
 import Timer from "@/components/molecules/timer";
 import ListeningControls from "@/components/organisms/listening-controls";
 import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { useTranscription } from "@/context/TranscriptionContext";
 
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
+
+  const { appointment } = useAppointment();
   const {
-    appointment,
-    startListening,
-    stopListening,
-    isListening,
-    isProcessing,
-  } = useAppointment();
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    duration,
+    recordingStatus,
+    isTranscribing,
+    transcription,
+  } = useTranscription();
   const { patient } = usePatient();
-  const [duration, setDuration] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
-    if (!patient) {
+    if (!appointment || !patient) {
       navigate("/app/novo-atendimento");
     }
-  }, [patient, navigate]);
+  }, [patient, appointment, navigate]);
 
   useEffect(() => {
-    if (patient && !isListening && !isProcessing) {
-      startListening();
+    if (recordingStatus === "NOT_STARTED" && !isTranscribing) {
+      startRecording();
+    } else if (recordingStatus === "STOPPED" && transcription) {
+      navigate("/app/resumo");
     }
-  }, [patient, isListening, isProcessing, startListening]);
+  }, [recordingStatus, transcription, isTranscribing, startRecording]);
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setInterval>;
-
-    if (isListening && !isPaused) {
-      timer = setInterval(() => {
-        setDuration((prev) => prev + 1);
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [isListening, isPaused]);
-
-  const togglePause = () => {
-    setIsPaused(!isPaused);
-    if (isPaused) {
-      toast({
-        title: "Escuta retomada",
-        description: "A Ally voltou a registrar sua consulta.",
-      });
-    } else {
-      toast({
-        title: "Escuta pausada",
-        description: "A Ally pausou o registro da consulta temporariamente.",
-      });
-    }
-  };
-
-  const handleFinish = () => {
-    stopListening();
-  };
-
-  if (isProcessing) {
+  if (isTranscribing) {
     return (
       <div className="max-w-2xl mx-auto text-center py-16">
         <div className="flex flex-col items-center justify-center space-y-4">
@@ -96,15 +73,16 @@ const ListeningPage: React.FC = () => {
               Atendimento em Andamento
             </h1>
           </div>
-
           <div className="flex flex-col items-center space-y-10">
             <PatientInfo name={patient?.name || ""} type={appointment.type} />
-            <Timer duration={duration} isPaused={isPaused} />
+            <Timer
+              duration={duration}
+              isPaused={recordingStatus === "PAUSED"}
+            />
             <ListeningControls
-              isListening={isListening}
-              isPaused={isPaused}
-              onTogglePause={togglePause}
-              onFinish={handleFinish}
+              recordingStatus={recordingStatus}
+              onTogglePause={pauseRecording}
+              onFinish={stopRecording}
             />
           </div>
         </div>

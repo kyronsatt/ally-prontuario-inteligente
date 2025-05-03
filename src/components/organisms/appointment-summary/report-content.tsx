@@ -2,10 +2,10 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
-import { Anamnese } from "@/context/AppointmentContext";
+import { IAnamnese } from "@/context/AnamneseContext";
 
 interface AppointmentReportProps {
-  anamnese?: Anamnese;
+  anamnese?: IAnamnese;
   isEditable?: boolean;
   onUpdateSection?: (section: string, content: string) => void;
 }
@@ -20,52 +20,52 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
       {
         title: "Identificação",
         content: anamnese.identification,
-        id: "identificacao",
+        id: "anamnese.identification",
       },
       {
         title: "Queixa Principal",
         content: anamnese.main_complaint,
-        id: "queixaPrincipal",
+        id: "anamnese.main_complaint",
       },
       {
         title: "História da Doença Atual",
         content: anamnese.current_illness_history,
-        id: "historiaDoencaAtual",
+        id: "anamnese.current_illness_history",
       },
       {
         title: "História Patológica Pregressa",
         content: anamnese.past_medical_history,
-        id: "antecedentesPatologicos",
+        id: "anamnese.past_medical_history",
       },
       {
         title: "Histórico Social",
         content: anamnese.social_history,
-        id: "habitosDeVida",
+        id: "anamnese.social_history",
       },
       {
         title: "Histórico Familiar",
         content: anamnese.family_history,
-        id: "habitosDeVida",
+        id: "anamnese.family_history",
       },
       {
         title: "Exames Físicos",
         content: anamnese.physical_exams,
-        id: "examesFisicos",
+        id: "anamnese.physical_exams",
       },
       {
         title: "Exames Complementares",
         content: anamnese.complementary_exams,
-        id: "examesComplementares",
+        id: "anamnese.complementary_exams",
       },
       {
         title: "Abordagem Terapêutica",
         content: anamnese.therapeutic_approach,
-        id: "abordagemTerapeutica",
+        id: "anamnese.therapeutic_approach",
       },
       {
         title: "Hipóteses Diagnósticas",
         content: anamnese.diagnostic_hypotheses,
-        id: "hipotesesDiagnosticas",
+        id: "anamnese.diagnostic_hypotheses",
       },
     ];
 

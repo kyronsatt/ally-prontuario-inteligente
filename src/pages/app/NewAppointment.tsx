@@ -24,7 +24,8 @@ const NewAppointment: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { createAppointment } = useAppointment();
+
+  const { appointment, isProcessing, createAppointment } = useAppointment();
   const { createPatient, getPatientsByUser, patients, setPatient } =
     usePatient();
 
@@ -38,7 +39,17 @@ const NewAppointment: React.FC = () => {
     if (user?.id) {
       getPatientsByUser(user.id);
     }
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    if (appointment && !isProcessing) {
+      console.log(
+        "Appointment created with success. Redirecting for listening: ",
+        appointment
+      );
+      navigate("/app/escuta");
+    }
+  }, [appointment, isProcessing]);
 
   const validateAppointmentType = (): boolean => {
     if (!appointmentType) {
@@ -81,32 +92,6 @@ const NewAppointment: React.FC = () => {
     }
   };
 
-  const createNewAppointment = async (patientId: string): Promise<boolean> => {
-    try {
-      const { appointment, patient } = await createAppointment({
-        doctor_id: user.id,
-        patient_id: patientId,
-        type: appointmentType,
-      });
-
-      if (!appointment || !patient) {
-        toast({ description: "Erro ao criar o atendimento. Tente novamente." });
-        return false;
-      }
-
-      setPatient(patient);
-      toast({ description: "Atendimento iniciado com sucesso!" });
-      navigate("/app/escuta");
-      return true;
-    } catch (error) {
-      console.error("Erro ao criar o atendimento:", error);
-      toast({
-        description: "Ocorreu um erro ao criar o atendimento. Tente novamente.",
-      });
-      return false;
-    }
-  };
-
   const startAppointment = async () => {
     if (!validateAppointmentType()) return;
 
@@ -130,6 +115,28 @@ const NewAppointment: React.FC = () => {
     }
 
     await createNewAppointment(patientId);
+  };
+
+  const createNewAppointment = async (patientId: string): Promise<boolean> => {
+    try {
+      const { appointment, patient } = await createAppointment({
+        doctor_id: user.id,
+        patient_id: patientId,
+        type: appointmentType,
+      });
+
+      if (!appointment || !patient) {
+        toast({ description: "Erro ao criar o atendimento. Tente novamente." });
+        return false;
+      }
+
+      setPatient(patient);
+    } catch (error) {
+      console.error("Erro ao criar o atendimento:", error);
+      toast({
+        description: "Ocorreu um erro ao criar o atendimento. Tente novamente.",
+      });
+    }
   };
 
   return (
@@ -201,7 +208,7 @@ const NewAppointment: React.FC = () => {
           <Button
             disabled={
               !appointmentType ||
-              (appointmentType === "NEW" && !patientName) ||
+              (appointmentType === "NEW" && !patientName) || // TODO -> REVIEW THIS WHEN OPTIMIZING PATIENT ID
               (appointmentType === "RETURN" && !selectedPatientId)
             }
             onClick={startAppointment}

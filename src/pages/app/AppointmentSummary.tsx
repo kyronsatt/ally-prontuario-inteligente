@@ -13,16 +13,19 @@ import ActionButtons from "@/components/molecules/appointment-summary/action-but
 import PatientInfoCard from "@/components/organisms/appointment-summary/patient-info-card";
 import AppointmentReport from "@/components/organisms/appointment-summary/report-content";
 import { supabase } from "@/integrations/supabase/client";
-import { Anamnese } from "@/context/AppointmentContext";
+import { IAnamnese, useAnamnese } from "@/context/AnamneseContext";
+import { useTranscription } from "@/context/TranscriptionContext";
 
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
-  const { appointment, setAppointment, isProcessing } = useAppointment();
+  const { appointment, setAppointment } = useAppointment();
+  const { anamnese, isGeneratingAnamnese, generateAnamnese } = useAnamnese();
+  const { transcription } = useTranscription();
   const { patient } = usePatient();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedAnamnese, setEditedAnamnese] = useState<Anamnese | undefined>(
-    appointment.anamnese
+  const [editedAnamnese, setEditedAnamnese] = useState<IAnamnese | undefined>(
+    anamnese
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -30,22 +33,18 @@ const AppointmentSummary: React.FC = () => {
   const appointmentId = searchParams.get("appointment_id");
 
   useEffect(() => {
-    if (!appointment.anamnese) {
-      if (!appointmentId) {
-        toast.error("ID de atendimento não encontrado.");
-        navigate("/app/novo-atendimento");
-        return;
-      }
-
-      // TODO -> Fetch the appointment data from Supabase
+    if (!anamnese && transcription) {
+      generateAnamnese(transcription.raw_text);
     }
-  }, [appointment, isProcessing, navigate, appointmentId]);
+
+    // TODO -> Fetch the appointment data from Supabase
+  }, [anamnese, transcription]);
 
   useEffect(() => {
-    if (appointment.anamnese && !editedAnamnese) {
-      setEditedAnamnese({ ...appointment.anamnese });
+    if (anamnese && !editedAnamnese) {
+      setEditedAnamnese({ ...anamnese });
     }
-  }, [appointment.anamnese, editedAnamnese]);
+  }, [anamnese, editedAnamnese]);
 
   const formattedDate = appointment.date
     ? format(appointment.date, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
@@ -108,7 +107,7 @@ const AppointmentSummary: React.FC = () => {
     }
   };
 
-  if (isProcessing) {
+  if (isGeneratingAnamnese) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <div className="flex flex-col items-center justify-center space-y-4">
@@ -181,7 +180,7 @@ const AppointmentSummary: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => {
-                  setEditedAnamnese(appointment.anamnese);
+                  setEditedAnamnese(anamnese);
                   setIsEditing(false);
                 }}
               >
@@ -199,7 +198,7 @@ const AppointmentSummary: React.FC = () => {
       </div>
 
       <AppointmentReport
-        anamnese={isEditing ? editedAnamnese : appointment.anamnese}
+        anamnese={isEditing ? editedAnamnese : anamnese}
         isEditable={isEditing}
         onUpdateSection={handleUpdateSection}
       />
