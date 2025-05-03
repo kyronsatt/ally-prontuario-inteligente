@@ -1,3 +1,4 @@
+
 // @ts-expect-error :: deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-expect-error :: deno
@@ -79,7 +80,7 @@ async function validateAuthHeader(authHeader: string | null) {
   return { supabaseClient, jwt };
 }
 
-function validateRequestData(requestData: Record<string, string>) {
+function validateRequestData(requestData: Record<string, any>) {
   const requiredFields = [
     "transcription",
     "transcriptionId",
@@ -96,11 +97,13 @@ function validateRequestData(requestData: Record<string, string>) {
 
 async function generateAnamneseData(
   openai: OpenAI,
-  requestData: Record<string, string>
+  requestData: Record<string, any>
 ) {
   const systemPrompt = createSystemPrompt(
     requestData.patientName,
-    requestData.appointmentType
+    requestData.appointmentType,
+    requestData.patientInfo,
+    requestData.previousAnamnese
   );
 
   const completion = await openai.chat.completions.create({
@@ -147,7 +150,7 @@ async function getUserData(supabaseClient: SupabaseClient, jwt: string) {
 async function insertAnamneseIntoDb(
   supabaseClient: SupabaseClient,
   anamneseData: Record<string, unknown>,
-  requestData: Record<string, unknown>,
+  requestData: Record<string, any>,
   userData: Record<string, Record<string, unknown>>
 ) {
   const { data: insertData, error: insertError } = await supabaseClient
@@ -183,15 +186,54 @@ async function insertAnamneseIntoDb(
 
 function createSystemPrompt(
   patientName: string,
-  appointmentType: string
+  appointmentType: string,
+  patientInfo: Record<string, string> = {},
+  previousAnamnese: Record<string, string> | null = null
 ): string {
+  let identificationDetails = "";
+  
+  if (patientInfo) {
+    identificationDetails = `
+Dados detalhados do paciente para inclusão na seção "identification":
+- Nome: ${patientName || "Não informado"}
+- Idade: ${patientInfo.age || "Não informada"}
+- Sexo Biológico: ${patientInfo.sex || "Não informado"}
+- Gênero: ${patientInfo.gender || "Não informado"}
+- Profissão: ${patientInfo.profession || "Não informada"}
+- Cor/Etnia: ${patientInfo.color || "Não informada"}
+- Moradia: ${patientInfo.housing || "Não informada"}
+- Estado Civil: ${patientInfo.maritalStatus || "Não informado"}
+- Religião: ${patientInfo.religion || "Não informada"}
+`;
+  }
+
+  let previousAnamneseContext = "";
+  
+  if (previousAnamnese && appointmentType === "RETURN") {
+    previousAnamneseContext = `
+Esta é uma consulta de RETORNO. Considere as seguintes informações da consulta anterior:
+
+Queixa principal anterior: ${previousAnamnese.main_complaint || "Não disponível"}
+História da doença atual anterior: ${previousAnamnese.current_illness_history || "Não disponível"}
+Histórico médico pregresso: ${previousAnamnese.past_medical_history || "Não disponível"}
+Hipóteses diagnósticas anteriores: ${previousAnamnese.diagnostic_hypotheses || "Não disponível"}
+Abordagem terapêutica anterior: ${previousAnamnese.therapeutic_approach || "Não disponível"}
+
+Ao gerar a nova anamnese, compare os achados atuais com os anteriores, destacando evoluções, melhorias ou pioras do quadro. Mantenha as informações relevantes do histórico anterior e adicione as novas.
+`;
+  }
+
   return `Você é um assistente médico especializado em gerar anamneses estruturadas a partir de transcrições de consultas.
 
 Com base na transcrição fornecida, gere uma anamnese completa em português, utilizando termos médicos apropriados. Evite jargões, exceto no campo "main_complaint".
 
+${identificationDetails}
+
 O paciente é ${patientName || "desconhecido"} e esta é uma consulta ${
     appointmentType === "NEW" ? "inicial" : "de retorno"
   }.
+
+${previousAnamneseContext}
 
 Retorne os seguintes campos em formato JSON:
 
@@ -206,7 +248,11 @@ Retorne os seguintes campos em formato JSON:
 - therapeutic_approach
 - diagnostic_hypotheses
 
+Para a seção "identification", utilize o formato estruturado incluindo nome, idade, sexo, gênero, profissão, cor/etnia, moradia, estado civil e religião quando disponíveis.
+
 Se alguma informação não estiver presente na transcrição, indique claramente com "Informação não fornecida na consulta".
+
+Use marcação Markdown nos campos para formatação básica, como **negrito** para termos importantes, listas com - ou 1. para enumerar achados, e # para títulos quando apropriado.
 
 Não inclua informações adicionais fora desses campos. Seja claro e conciso.`;
 }

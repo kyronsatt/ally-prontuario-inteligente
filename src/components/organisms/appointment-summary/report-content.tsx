@@ -1,6 +1,8 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+import MarkdownEditor from "@/components/molecules/markdown-editor";
 
 import { IAnamnese } from "@/context/AnamneseContext";
 
@@ -20,52 +22,52 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
       {
         title: "Identificação",
         content: anamnese.identification,
-        id: "anamnese.identification",
+        id: "identification",
       },
       {
         title: "Queixa Principal",
         content: anamnese.main_complaint,
-        id: "anamnese.main_complaint",
+        id: "main_complaint",
       },
       {
         title: "História da Doença Atual",
         content: anamnese.current_illness_history,
-        id: "anamnese.current_illness_history",
+        id: "current_illness_history",
       },
       {
         title: "História Patológica Pregressa",
         content: anamnese.past_medical_history,
-        id: "anamnese.past_medical_history",
+        id: "past_medical_history",
       },
       {
         title: "Histórico Social",
         content: anamnese.social_history,
-        id: "anamnese.social_history",
+        id: "social_history",
       },
       {
         title: "Histórico Familiar",
         content: anamnese.family_history,
-        id: "anamnese.family_history",
+        id: "family_history",
       },
       {
         title: "Exames Físicos",
         content: anamnese.physical_exams,
-        id: "anamnese.physical_exams",
+        id: "physical_exams",
       },
       {
         title: "Exames Complementares",
         content: anamnese.complementary_exams,
-        id: "anamnese.complementary_exams",
+        id: "complementary_exams",
       },
       {
         title: "Abordagem Terapêutica",
         content: anamnese.therapeutic_approach,
-        id: "anamnese.therapeutic_approach",
+        id: "therapeutic_approach",
       },
       {
         title: "Hipóteses Diagnósticas",
         content: anamnese.diagnostic_hypotheses,
-        id: "anamnese.diagnostic_hypotheses",
+        id: "diagnostic_hypotheses",
       },
     ];
 
@@ -89,10 +91,9 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
             </CardHeader>
             <CardContent className="pt-4">
               {isEditable ? (
-                <textarea
-                  className="w-full p-2 border rounded-md min-h-[100px] focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent"
-                  value={content}
-                  onChange={(e) => handleContentChange(id, e.target.value)}
+                <MarkdownEditor
+                  content={content}
+                  onChange={(newContent) => handleContentChange(id, newContent)}
                 />
               ) : (
                 <p className="text-gray-700 whitespace-pre-line">{content}</p>

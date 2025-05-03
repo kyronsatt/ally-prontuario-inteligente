@@ -1,5 +1,6 @@
+
 import React from "react";
-import { Printer, Download, Share2 } from "lucide-react";
+import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ActionButtonsProps {

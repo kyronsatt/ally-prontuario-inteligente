@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +8,7 @@ import { toast } from "@/components/ui/sonner";
 import { useAppointment } from "./AppointmentContext";
 import { useAuth } from "./AuthContext";
 import { useTranscription } from "./TranscriptionContext";
+import { usePatient } from "./PatientContext";
 
 interface AnamneseContextType {
   anamnese: IAnamnese | null;
@@ -42,17 +44,60 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { session } = useAuth();
-
-  const { appointment } = useAppointment();
+  const navigate = useNavigate();
+  const { appointment, setAppointment } = useAppointment();
   const { transcription } = useTranscription();
+  const { patient } = usePatient();
 
   const [isGeneratingAnamnese, setIsGeneratingAnamnese] = useState(false);
   const [isRetrievingAnamnese, setIsRetrievingAnamnese] = useState(false);
   const [anamnese, setAnamnese] = useState<IAnamnese | null>(null);
 
-  const generateAnamnese = async () => {
+  const getPreviousAnamnese = async (patientId: string) => {
+    try {
+      const { data, error } = await fetch(
+        `${envs.SUPABASE_HOST}/functions/v1/get-previous-anamnese`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ patientId }),
+        }
+      ).then(res => res.json());
+
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.error("Erro ao obter anamnese anterior:", e);
+      return null;
+    }
+  };
+
+  const generateAnamnese = async (transcriptionText: string) => {
     setIsGeneratingAnamnese(true);
     try {
+      let previousAnamnese = null;
+      
+      // Get previous anamnese if this is a return appointment
+      if (appointment.type === "RETURN" && appointment.patient?.id) {
+        previousAnamnese = await getPreviousAnamnese(appointment.patient.id);
+      }
+      
+      // Get extended patient information
+      const patientInfo = {
+        name: patient?.name || appointment.patient?.name,
+        age: patient?.age || appointment.patient?.age,
+        gender: patient?.gender || appointment.patient?.gender,
+        sex: patient?.sex || "NOT_PROVIDED",
+        profession: patient?.profession || "NOT_PROVIDED",
+        color: patient?.color || "NOT_PROVIDED",
+        housing: patient?.housing || "NOT_PROVIDED",
+        maritalStatus: patient?.maritalStatus || "NOT_PROVIDED",
+        religion: patient?.religion || "NOT_PROVIDED",
+      };
+
       const response = await fetch(
         `${envs.SUPABASE_HOST}/functions/v1/generate-medical-report`,
         {
@@ -62,12 +107,14 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            transcription: transcription.raw_text,
+            transcription: transcriptionText,
             transcriptionId: transcription.id,
-            patientName: appointment.patient?.name,
+            patientName: patientInfo.name,
             patientId: appointment.patient?.id,
+            patientInfo: patientInfo,
             appointmentType: appointment.type,
             appointmentId: appointment.id,
+            previousAnamnese: previousAnamnese,
           }),
         }
       );
@@ -76,12 +123,16 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error("Erro ao gerar anamnese");
       }
 
-      const anamnese = await response.json();
-      setAnamnese(anamnese);
+      const anamneseResponse = await response.json();
+      setAnamnese(anamneseResponse);
 
       toast("Anamnese pronta!", {
         description: "Relatório gerado com sucesso.",
       });
+
+      // Navigate to the anamnese visualization page
+      navigate(`/app/resumo?appointmentId=${appointment.id}`);
+      
     } catch (e) {
       toast("Erro ao gerar anamnese", { description: String(e) });
     } finally {
