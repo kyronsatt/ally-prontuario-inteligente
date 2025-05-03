@@ -31,6 +31,9 @@ const Step: React.FC<StepProps> = ({ icon, title, description, number }) => {
   );
 };
 
+// "Na página inicial do app você deve usar um layout que destaque a proposta de valor do App, que é poupar o tempo do médico. Para isso, mostre dados como quantos minutos estimados foram salvos no dia e na semana, ou quantos pacientes a mais foram atendidos, ou qual o percentual de melhora na produtividade. Você pode usar gráficos ou gauges para mostrar esses dados. Além disso, coloque isso em destaque, antes mesmo do Resumo de atividades. Remova a parte de acesso rápido.
+
+// Além disso, na tela de demonstração da anamnese, melhore a UI, mantendo todas as funcionalidades existentes, com exceção das de "compartilhar" e "ver histórico".  Além disso, o usuário deve ter a opção de editar cada campo da anamnese e isso deve ser persistido no banco de dados. "
 const HowItWorksSection: React.FC = () => {
   const steps = [
     {

@@ -48,6 +48,16 @@ interface IAppointmentCreationResponse {
   patient: PatientData;
 }
 
+interface Transcription {
+  id: string;
+  raw_text: string;
+  segments: Record<string, string>;
+  appointment_id: string;
+  errors: Record<string, string> | null;
+  metadata: Record<string, any>;
+  created_at: Date;
+}
+
 interface AppointmentContextType {
   appointment: AppointmentData;
   setAppointment: React.Dispatch<React.SetStateAction<AppointmentData>>;
@@ -197,12 +207,13 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const transcriptionResult = await transcriptionResponse.json();
-      const transcription = transcriptionResult.data.raw_test;
+      const transcriptionEntity: Transcription = transcriptionResult.data;
+      const transcriptionRawText = transcriptionEntity.raw_text;
 
       // Update appointment with transcription
       setAppointment((prev) => ({
         ...prev,
-        transcription,
+        transcription: transcriptionRawText,
       }));
 
       toast("Áudio transcrito", {
@@ -219,7 +230,8 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            transcription,
+            transcription: transcriptionRawText,
+            transcriptionId: transcriptionEntity.id,
             patientName: appointment.patient?.name,
             appointmentType: appointment.type,
             appointmentId: appointment.id,
@@ -239,7 +251,7 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({
       // Update appointment with SOAP and Anamnese notes
       setAppointment((prev) => ({
         ...prev,
-        transcription,
+        transcription: transcriptionRawText,
         soapNote: reportResult.soapNote,
         anamneseNote: reportResult.anamneseNote,
       }));
