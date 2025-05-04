@@ -33,6 +33,7 @@ export interface IAnamneseMedicalPayload {
   therapeutic_approach: string;
   diagnostic_hypotheses: string;
 }
+
 export interface IAnamnese extends IAnamneseMedicalPayload {
   id: string;
   appointment_id: string;
@@ -99,7 +100,7 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         profession: patient?.profession || "NOT_PROVIDED",
         color: patient?.color || "NOT_PROVIDED",
         housing: patient?.housing || "NOT_PROVIDED",
-        maritalStatus: patient?.maritalStatus || "NOT_PROVIDED",
+        maritalStatus: patient?.marital_status || "NOT_PROVIDED",
         religion: patient?.religion || "NOT_PROVIDED",
       };
 

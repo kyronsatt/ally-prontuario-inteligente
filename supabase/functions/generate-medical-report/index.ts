@@ -1,4 +1,3 @@
-
 // @ts-expect-error :: deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-expect-error :: deno
@@ -87,6 +86,7 @@ function validateRequestData(requestData: Record<string, any>) {
     "appointmentType",
     "appointmentId",
     "patientId",
+    "patientInfo",
   ];
   requiredFields.forEach((field) => {
     if (!requestData[field]) {
@@ -190,71 +190,66 @@ function createSystemPrompt(
   patientInfo: Record<string, string> = {},
   previousAnamnese: Record<string, string> | null = null
 ): string {
-  let identificationDetails = "";
-  
-  if (patientInfo) {
-    identificationDetails = `
-Dados detalhados do paciente para inclusão na seção "identification":
-- Nome: ${patientName || "Não informado"}
-- Idade: ${patientInfo.age || "Não informada"}
-- Sexo Biológico: ${patientInfo.sex || "Não informado"}
-- Gênero: ${patientInfo.gender || "Não informado"}
-- Profissão: ${patientInfo.profession || "Não informada"}
-- Cor/Etnia: ${patientInfo.color || "Não informada"}
-- Moradia: ${patientInfo.housing || "Não informada"}
-- Estado Civil: ${patientInfo.maritalStatus || "Não informado"}
-- Religião: ${patientInfo.religion || "Não informada"}
-`;
+  const identification = `O paciente se chama ${
+    patientName || "não informado"
+  }, tem ${patientInfo.age || "idade não informada"}, sexo biológico ${
+    patientInfo.sex || "não informado"
+  }, gênero ${patientInfo.gender || "não informado"}, atua como ${
+    patientInfo.profession || "profissão não informada"
+  }, se identifica como ${
+    patientInfo.color || "cor/etnia não informada"
+  }, mora em ${patientInfo.housing || "local de moradia não informado"}, é ${
+    patientInfo.maritalStatus || "estado civil não informado"
+  } e segue a religião ${patientInfo.religion || "não informada"}.`;
+
+  const isReturn = appointmentType === "RETURN";
+  const returnNote =
+    isReturn && previousAnamnese
+      ? `Consulta de **retorno**. Anamnese anterior:
+  - **Queixa principal**: ${previousAnamnese.main_complaint || "não disponível"}
+  - **História da doença atual**: ${
+    previousAnamnese.current_illness_history || "não disponível"
   }
-
-  let previousAnamneseContext = "";
-  
-  if (previousAnamnese && appointmentType === "RETURN") {
-    previousAnamneseContext = `
-Esta é uma consulta de RETORNO. Considere as seguintes informações da consulta anterior:
-
-Queixa principal anterior: ${previousAnamnese.main_complaint || "Não disponível"}
-História da doença atual anterior: ${previousAnamnese.current_illness_history || "Não disponível"}
-Histórico médico pregresso: ${previousAnamnese.past_medical_history || "Não disponível"}
-Hipóteses diagnósticas anteriores: ${previousAnamnese.diagnostic_hypotheses || "Não disponível"}
-Abordagem terapêutica anterior: ${previousAnamnese.therapeutic_approach || "Não disponível"}
-
-Ao gerar a nova anamnese, compare os achados atuais com os anteriores, destacando evoluções, melhorias ou pioras do quadro. Mantenha as informações relevantes do histórico anterior e adicione as novas.
-`;
+  - **Histórico médico pregresso**: ${
+    previousAnamnese.past_medical_history || "não disponível"
   }
+  - **Hipóteses diagnósticas**: ${
+    previousAnamnese.diagnostic_hypotheses || "não disponível"
+  }
+  - **Abordagem terapêutica**: ${
+    previousAnamnese.therapeutic_approach || "não disponível"
+  }
+  
+  Compare os achados atuais com os anteriores. Destaque evoluções ou pioras, mantendo o que ainda for relevante.`
+      : "";
 
-  return `Você é um assistente médico especializado em gerar anamneses estruturadas a partir de transcrições de consultas.
-
-Com base na transcrição fornecida, gere uma anamnese completa em português, utilizando termos médicos apropriados. Evite jargões, exceto no campo "main_complaint".
-
-${identificationDetails}
-
-O paciente é ${patientName || "desconhecido"} e esta é uma consulta ${
+  return `Você é um assistente médico que gera anamneses estruturadas com base em transcrições de consultas.
+  
+  Com base na transcrição, produza uma anamnese em português, utilizando termos médicos adequados (exceto no campo "main_complaint", onde jargões do paciente podem ser mantidos). Esta é uma consulta ${
     appointmentType === "NEW" ? "inicial" : "de retorno"
   }.
-
-${previousAnamneseContext}
-
-Retorne os seguintes campos em formato JSON:
-
-- identification
-- main_complaint
-- current_illness_history
-- past_medical_history
-- social_history
-- family_history
-- physical_exams
-- complementary_exams
-- therapeutic_approach
-- diagnostic_hypotheses
-
-Para a seção "identification", utilize o formato estruturado incluindo nome, idade, sexo, gênero, profissão, cor/etnia, moradia, estado civil e religião quando disponíveis.
-
-Se alguma informação não estiver presente na transcrição, indique claramente com "Informação não fornecida na consulta".
-
-Use marcação Markdown nos campos para formatação básica, como **negrito** para termos importantes, listas com - ou 1. para enumerar achados, e # para títulos quando apropriado.
-
-Não inclua informações adicionais fora desses campos. Seja claro e conciso.`;
+  
+  ${identification}
+  
+  ${returnNote}
+  
+  Retorne os seguintes campos em JSON:
+  - identification
+  - main_complaint
+  - current_illness_history
+  - past_medical_history
+  - social_history
+  - family_history
+  - physical_exams
+  - complementary_exams
+  - therapeutic_approach
+  - diagnostic_hypotheses
+  
+  Se alguma informação estiver ausente na transcrição, escreva: "Informação não fornecida na consulta".
+  
+  Use Markdown básico para formatação: **negrito**, _itálico_, __sublinhado__, listas e títulos (#).
+  
+  Não inclua conteúdos fora desses campos. Seja objetivo.`;
 }
 
 const anamneseSchema = {

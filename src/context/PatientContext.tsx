@@ -4,12 +4,23 @@ import { envs } from "@/envs";
 
 import { useAuth } from "./AuthContext";
 
-export type PatientGender = "MALE" | "FEMALE" | "OTHER";
+export type PatientSex = "MALE" | "FEMALE" | "OTHER";
+export type PatientMaritalStatus =
+  | "SINGLE"
+  | "MARRIED"
+  | "DIVORCED"
+  | "WIDOWED";
 
 interface PatientCreationPayload {
-  gender: PatientGender;
+  gender: string;
   age: number;
   name: string;
+  sex: PatientSex;
+  marital_status: PatientMaritalStatus;
+  profession: string;
+  religion: string;
+  housing: string;
+  color: string;
   is_new: boolean;
   created_by: string;
 }
