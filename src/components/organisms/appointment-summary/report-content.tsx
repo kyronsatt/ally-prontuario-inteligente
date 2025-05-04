@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Check, FileText, PenBox, X } from "lucide-react";
+import { Check, FileText, Loader, Loader2, PenBox, X } from "lucide-react";
 
 import RichTextEditor from "@/components/molecules/rich-text-editor";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { IAnamnese } from "@/context/AnamneseContext";
+import { cn } from "@/lib/utils";
 
 interface AppointmentReportProps {
   anamnese?: IAnamnese;
+  isSaving: boolean;
   unsavedChanges: boolean;
   saveChanges: () => Promise<void>;
   onUpdateSection?: (section: string, content: string) => void;
@@ -15,16 +17,17 @@ interface AppointmentReportProps {
 
 const AppointmentReport: React.FC<AppointmentReportProps> = ({
   anamnese,
+  isSaving,
+  unsavedChanges,
   onUpdateSection,
   saveChanges,
-  unsavedChanges,
 }) => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [originalAnamnese, setOriginalAnamnese] = useState<IAnamnese>();
 
   useEffect(() => {
-    if (!unsavedChanges) setOriginalAnamnese(anamnese);
-  }, [anamnese, originalAnamnese, unsavedChanges]);
+    if (!unsavedChanges && !isSaving) setOriginalAnamnese(anamnese);
+  }, [anamnese, originalAnamnese, isSaving, unsavedChanges]);
 
   if (anamnese) {
     const sections = [
@@ -86,9 +89,10 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
       }
     };
 
-    const handleSaveChanges = async (sectionId: string) => {
-      await saveChanges();
-      setEditingSection(null);
+    const handleSaveChanges = async () => {
+      saveChanges().then(() => {
+        setEditingSection(null);
+      });
     };
 
     const handleDiscardChanges = async (sectionId: string) => {
@@ -96,38 +100,63 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
       setEditingSection(null);
     };
 
+    const getEditionButtonClassName = (type: "CANCEL" | "SAVE" | "EDIT") => {
+      const baseClassName = `rounded-md p-1.5 transition-all ${
+        isSaving ? "cursor-wait" : "cursor-pointer hover:scale-110"
+      }`;
+      const cancelClassName = `${baseClassName} text-red-800/40 bg-red-100 border border-red-200`;
+      const saveClassName = `${baseClassName} text-green-800/40 bg-green-200 border border-green-300`;
+      const editClassName = `${baseClassName} text-ally-blue/70 hover:text-ally-blue`;
+
+      const indexer = {
+        CANCEL: cancelClassName,
+        SAVE: saveClassName,
+        EDIT: editClassName,
+      };
+
+      return cn(
+        indexer[type],
+        isSaving ? "disabled opacity-70" : "opacity-100"
+      );
+    };
+
     return (
       <div className="space-y-6 animate-fade-in print:space-y-4">
         {sections.map(({ title, content, id: sectionId }) => (
           <Card
             key={`anamnese-section-card-${sectionId}`}
-            className={`shadow-sm hover:shadow transition-shadow border-l-4 border-l-ally-blue overflow-hidden`}
+            className={`border-l-4 border-r-ally-blue/30 border-t-ally-blue/30 border-b-ally-blue/30 border-l-ally-blue overflow-hidden shadow-none`}
           >
             <CardHeader
-              className={`flex flex-row w-full items-center justify-between bg-gradient-to-r from-ally-blue/10 to-ally-gray/5 py-2`}
+              className={`flex flex-row w-full items-center justify-between bg-gradient-to-r from-ally-blue/10 to-ally-blue/10 py-2`}
             >
-              <CardTitle className="text-xl text-gray-800 inline w-fit">
+              <CardTitle className="text-xl text-ally-blue inline w-fit">
                 {title}
               </CardTitle>
-              {editingSection === sectionId ? (
+              {isSaving && editingSection === sectionId && (
+                <Loader2 size={20} className="text-ally-blue animate-spin" />
+              )}
+              {!isSaving && editingSection === sectionId ? (
                 <div className="flex gap-2">
                   <X
-                    className="rounded-md p-1.5 cursor-pointer text-red-800/40 bg-red-100 hover:bg-red-200 hover:scale-110 transition-all"
+                    className={getEditionButtonClassName("CANCEL")}
                     size={32}
                     onClick={() => handleDiscardChanges(sectionId)}
                   />
                   <Check
-                    className="rounded-md p-1.5 cursor-pointer text-green-800/40 bg-green-100 hover:bg-green-200 hover:scale-110 transition-all"
+                    className={getEditionButtonClassName("SAVE")}
                     size={32}
-                    onClick={() => handleSaveChanges(sectionId)}
+                    onClick={() => handleSaveChanges()}
                   />
                 </div>
               ) : (
-                <PenBox
-                  className="rounded-md p-1.5 cursor-pointer text-gray-400 bg-gray-100 hover:bg-gray-200 hover:scale-110 transition-all"
-                  size={32}
-                  onClick={() => setEditingSection(sectionId)}
-                />
+                !isSaving && (
+                  <PenBox
+                    className={getEditionButtonClassName("EDIT")}
+                    size={32}
+                    onClick={() => setEditingSection(sectionId)}
+                  />
+                )
               )}
             </CardHeader>
             <CardContent className="pt-4">

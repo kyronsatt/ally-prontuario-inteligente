@@ -169,6 +169,7 @@ const AppointmentSummary: React.FC = () => {
       <AppointmentReport
         anamnese={editedAnamnese}
         unsavedChanges={unsavedChanges}
+        isSaving={isSaving}
         saveChanges={handleSaveChanges}
         onUpdateSection={handleUpdateSection}
       />
