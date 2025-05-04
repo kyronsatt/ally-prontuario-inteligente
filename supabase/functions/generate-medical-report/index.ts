@@ -190,66 +190,95 @@ function createSystemPrompt(
   patientInfo: Record<string, string> = {},
   previousAnamnese: Record<string, string> | null = null
 ): string {
-  const identification = `O paciente se chama ${
-    patientName || "não informado"
-  }, tem ${patientInfo.age || "idade não informada"}, sexo biológico ${
-    patientInfo.sex || "não informado"
-  }, gênero ${patientInfo.gender || "não informado"}, atua como ${
-    patientInfo.profession || "profissão não informada"
-  }, se identifica como ${
-    patientInfo.color || "cor/etnia não informada"
-  }, mora em ${patientInfo.housing || "local de moradia não informado"}, é ${
-    patientInfo.maritalStatus || "estado civil não informado"
-  } e segue a religião ${patientInfo.religion || "não informada"}.`;
+  const translateSex = (sex: string): string => {
+    const sexTranslations: Record<string, string> = {
+      MALE: "masculino",
+      FEMALE: "feminino",
+      OTHER: "outro",
+    };
+    return sexTranslations[sex] || "desconhecido";
+  };
 
-  const isReturn = appointmentType === "RETURN";
-  const returnNote =
-    isReturn && previousAnamnese
-      ? `Consulta de **retorno**. Anamnese anterior:
-  - **Queixa principal**: ${previousAnamnese.main_complaint || "não disponível"}
-  - **História da doença atual**: ${
-    previousAnamnese.current_illness_history || "não disponível"
-  }
-  - **Histórico médico pregresso**: ${
-    previousAnamnese.past_medical_history || "não disponível"
-  }
-  - **Hipóteses diagnósticas**: ${
-    previousAnamnese.diagnostic_hypotheses || "não disponível"
-  }
-  - **Abordagem terapêutica**: ${
-    previousAnamnese.therapeutic_approach || "não disponível"
-  }
-  
-  Compare os achados atuais com os anteriores. Destaque evoluções ou pioras, mantendo o que ainda for relevante.`
-      : "";
+  const translateMaritalStatus = (status: string): string => {
+    const maritalStatusTranslations: Record<string, string> = {
+      SINGLE: "solteiro(a)",
+      MARRIED: "casado(a)",
+      DIVORCED: "divorciado(a)",
+      WIDOWED: "viúvo(a)",
+      OTHER: "outro",
+    };
+    return maritalStatusTranslations[status] || "desconhecido";
+  };
+
+  const infoParts: string[] = [];
+
+  if (patientName) infoParts.push(`se chama ${patientName}`);
+  if (patientInfo.age) infoParts.push(`tem ${patientInfo.age}`);
+  if (patientInfo.sex)
+    infoParts.push(`sexo biológico ${translateSex(patientInfo.sex)}`);
+  if (patientInfo.gender) infoParts.push(`gênero ${patientInfo.gender}`);
+  if (patientInfo.profession)
+    infoParts.push(`atua como ${patientInfo.profession}`);
+  if (patientInfo.color) infoParts.push(`cor/etnia ${patientInfo.color}`);
+  if (patientInfo.housing) infoParts.push(`mora em ${patientInfo.housing}`);
+  if (patientInfo.marital_status)
+    infoParts.push(`é ${translateMaritalStatus(patientInfo.marital_status)}`);
+  if (patientInfo.religion)
+    infoParts.push(`segue a religião ${patientInfo.religion}`);
+
+  const identification =
+    infoParts.length > 0 ? `O paciente ${infoParts.join(", ")}.` : "";
+
+  //   const isReturn = appointmentType === "RETURN";
+  //   const returnNote =
+  //     isReturn && previousAnamnese
+  //       ? `Consulta de retorno. Anamnese anterior:
+  // - Queixa principal: ${previousAnamnese.main_complaint || "não disponível"}
+  // - História da doença atual: ${
+  //           previousAnamnese.current_illness_history || "não disponível"
+  //         }
+  // - Histórico médico pregresso: ${
+  //           previousAnamnese.past_medical_history || "não disponível"
+  //         }
+  // - Hipóteses diagnósticas: ${
+  //           previousAnamnese.diagnostic_hypotheses || "não disponível"
+  //         }
+  // - Abordagem terapêutica: ${
+  //           previousAnamnese.therapeutic_approach || "não disponível"
+  //         }
+
+  // Compare os achados atuais com os anteriores. Destaque evoluções ou pioras, mantendo o que ainda for relevante.`
+  //       : "";
+  const returnNote = "";
 
   return `Você é um assistente médico que gera anamneses estruturadas com base em transcrições de consultas.
-  
-  Com base na transcrição, produza uma anamnese em português, utilizando termos médicos adequados (exceto no campo "main_complaint", onde jargões do paciente podem ser mantidos). Esta é uma consulta ${
-    appointmentType === "NEW" ? "inicial" : "de retorno"
-  }.
-  
-  ${identification}
-  
-  ${returnNote}
-  
-  Retorne os seguintes campos em JSON:
-  - identification
-  - main_complaint
-  - current_illness_history
-  - past_medical_history
-  - social_history
-  - family_history
-  - physical_exams
-  - complementary_exams
-  - therapeutic_approach
-  - diagnostic_hypotheses
-  
-  Se alguma informação estiver ausente na transcrição, escreva: "Informação não fornecida na consulta".
-  
-  Use Markdown básico para formatação: **negrito**, _itálico_, __sublinhado__, listas e títulos (#).
-  
-  Não inclua conteúdos fora desses campos. Seja objetivo.`;
+
+          Com base na transcrição, produza uma anamnese inteiramente em português(traduza, se necessário), utilizando termos médicos adequados (exceto no campo "main_complaint", onde jargões do paciente podem ser mantidos). Esta é uma consulta ${
+            appointmentType === "NEW" ? "inicial" : "de retorno"
+          }.
+
+          ${identification}
+
+          ${returnNote}
+
+          Retorne os seguintes campos em JSON:
+          - identification
+          - main_complaint
+          - current_illness_history
+          - past_medical_history
+          - social_history
+          - family_history
+          - physical_exams
+          - complementary_exams
+          - therapeutic_approach
+          - diagnostic_hypotheses
+
+          Se alguma informação estiver ausente na transcrição, escreva: "Informação não fornecida na consulta".
+
+          Use Markdown básico para formatação: **negrito**, _itálico_, __sublinhado__ e listas.
+
+          Não inclua conteúdos fora desses campos. Seja objetivo.
+    `;
 }
 
 const anamneseSchema = {

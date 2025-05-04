@@ -93,15 +93,15 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Get extended patient information
       const patientInfo = {
-        name: patient?.name || appointment.patient?.name,
-        age: patient?.age || appointment.patient?.age,
-        gender: patient?.gender || appointment.patient?.gender,
-        sex: patient?.sex || "NOT_PROVIDED",
-        profession: patient?.profession || "NOT_PROVIDED",
-        color: patient?.color || "NOT_PROVIDED",
-        housing: patient?.housing || "NOT_PROVIDED",
-        maritalStatus: patient?.marital_status || "NOT_PROVIDED",
-        religion: patient?.religion || "NOT_PROVIDED",
+        name: patient?.name,
+        age: patient?.age,
+        gender: patient?.gender,
+        sex: patient?.sex,
+        profession: patient?.profession,
+        color: patient?.color,
+        housing: patient?.housing,
+        marital_status: patient?.marital_status,
+        religion: patient?.religion,
       };
 
       const response = await fetch(

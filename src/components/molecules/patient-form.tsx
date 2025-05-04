@@ -1,72 +1,38 @@
-
 import React from "react";
+import { useFormContext } from "react-hook-form";
+
 import Input from "@/components/atoms/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup } from "@/components/ui/radio-group";
-import RadioGroupItem from "@/components/molecules/radio-group-item";
+import { PatientCreationPayload } from "@/context/PatientContext";
 
-interface PatientFormProps {
-  patientName: string;
-  patientAge: string;
-  patientGender: string;
-  patientSex: string;
-  patientProfession: string;
-  patientColor: string;
-  patientHousing: string;
-  patientMaritalStatus: string;
-  patientReligion: string;
-  onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onAgeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onGenderChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onSexChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onProfessionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onColorChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onHousingChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onMaritalStatusChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onReligionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+const PatientForm: React.FC = () => {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<PatientCreationPayload>();
 
-const PatientForm: React.FC<PatientFormProps> = ({
-  patientName,
-  patientAge,
-  patientGender,
-  patientSex,
-  patientProfession,
-  patientColor,
-  patientHousing,
-  patientMaritalStatus,
-  patientReligion,
-  onNameChange,
-  onAgeChange,
-  onGenderChange,
-  onSexChange,
-  onProfessionChange,
-  onColorChange,
-  onHousingChange,
-  onMaritalStatusChange,
-  onReligionChange,
-}) => {
   return (
     <>
       <div className="space-y-1">
-        <Label htmlFor="name">Nome do paciente</Label>
+        <Label htmlFor="name">
+          Nome do paciente<p className="text-ally-blue inline">*</p>
+        </Label>
         <Input
           id="name"
-          value={patientName}
-          onChange={onNameChange}
+          {...register("name", { required: true })}
           placeholder="Nome completo"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="space-y-1">
-          <Label htmlFor="age">Idade</Label>
+          <Label htmlFor="age">
+            Idade<p className="text-ally-blue inline">*</p>
+          </Label>
           <Input
             id="age"
             type="number"
-            value={patientAge}
-            onChange={onAgeChange}
+            {...register("age", { required: true })}
             placeholder="Idade"
           />
         </div>
@@ -75,8 +41,7 @@ const PatientForm: React.FC<PatientFormProps> = ({
           <Label htmlFor="profession">Profissão</Label>
           <Input
             id="profession"
-            value={patientProfession}
-            onChange={onProfessionChange}
+            {...register("profession")}
             placeholder="Profissão"
           />
         </div>
@@ -87,9 +52,8 @@ const PatientForm: React.FC<PatientFormProps> = ({
           <Label htmlFor="sex">Sexo Biológico</Label>
           <select
             id="sex"
-            value={patientSex}
-            onChange={onSexChange}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            {...register("sex")}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
           >
             <option value="">Selecione</option>
             <option value="MALE">Masculino</option>
@@ -99,37 +63,25 @@ const PatientForm: React.FC<PatientFormProps> = ({
 
         <div className="space-y-1">
           <Label htmlFor="gender">Gênero</Label>
-          <select
+          <Input
             id="gender"
-            value={patientGender}
-            onChange={onGenderChange}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option value="">Selecione</option>
-            <option value="MALE">Masculino</option>
-            <option value="FEMALE">Feminino</option>
-            <option value="OTHER">Outro</option>
-          </select>
+            {...register("gender")}
+            placeholder="Heterossexual, homossexual..."
+          />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="space-y-1">
           <Label htmlFor="color">Cor/Etnia</Label>
-          <Input
-            id="color"
-            value={patientColor}
-            onChange={onColorChange}
-            placeholder="Cor/Etnia"
-          />
+          <Input id="color" {...register("color")} placeholder="Cor/Etnia" />
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="housing">Moradia</Label>
           <Input
             id="housing"
-            value={patientHousing}
-            onChange={onHousingChange}
+            {...register("housing")}
             placeholder="Tipo de moradia"
           />
         </div>
@@ -137,12 +89,11 @@ const PatientForm: React.FC<PatientFormProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="space-y-1">
-          <Label htmlFor="maritalStatus">Estado Civil</Label>
+          <Label htmlFor="marital_status">Estado Civil</Label>
           <select
-            id="maritalStatus"
-            value={patientMaritalStatus}
-            onChange={onMaritalStatusChange}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            id="marital_status"
+            {...register("marital_status")}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
           >
             <option value="">Selecione</option>
             <option value="SINGLE">Solteiro(a)</option>
@@ -157,12 +108,13 @@ const PatientForm: React.FC<PatientFormProps> = ({
           <Label htmlFor="religion">Religiosidade</Label>
           <Input
             id="religion"
-            value={patientReligion}
-            onChange={onReligionChange}
+            {...register("religion")}
             placeholder="Religião (ex: Testemunha de Jeová)"
           />
         </div>
       </div>
+
+      {errors && <p className="text-red-600 font-semibold">{errors[0]}</p>}
     </>
   );
 };

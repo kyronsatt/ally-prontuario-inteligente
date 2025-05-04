@@ -9,9 +9,10 @@ export type PatientMaritalStatus =
   | "SINGLE"
   | "MARRIED"
   | "DIVORCED"
-  | "WIDOWED";
+  | "WIDOWED"
+  | "OTHER";
 
-interface PatientCreationPayload {
+export interface PatientCreationPayload {
   gender: string;
   age: number;
   name: string;
