@@ -20,7 +20,8 @@ const NewAppointment: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { appointment, isProcessing, createAppointment } = useAppointment();
+  const { appointment, isProcessing, createAppointment, setAppointment } =
+    useAppointment();
   const { createPatient, getPatientsByUser, patients, setPatient } =
     usePatient();
 
@@ -35,6 +36,10 @@ const NewAppointment: React.FC = () => {
       getPatientsByUser(user.id);
     }
   }, [user]);
+
+  useEffect(() => {
+    setAppointment(null);
+  }, []);
 
   useEffect(() => {
     if (appointment && !isProcessing) {

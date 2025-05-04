@@ -253,7 +253,9 @@ function createSystemPrompt(
 
   return `Você é um assistente médico que gera anamneses estruturadas com base em transcrições de consultas.
 
-          Com base na transcrição, produza uma anamnese inteiramente em português(traduza, se necessário), utilizando termos médicos adequados (exceto no campo "main_complaint", onde jargões do paciente podem ser mantidos). Esta é uma consulta ${
+          Com base na transcrição, produza uma anamnese em português. 
+          Utilize termos médicos adequados (exceto no campo "main_complaint", onde jargões do paciente podem ser mantidos). 
+          Esta é uma consulta ${
             appointmentType === "NEW" ? "inicial" : "de retorno"
           }.
 
