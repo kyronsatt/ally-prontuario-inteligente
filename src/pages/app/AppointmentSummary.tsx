@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
@@ -7,14 +6,13 @@ import { ArrowLeft, Loader2, Pencil, Save } from "lucide-react";
 
 import { useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
+import { IAnamnese, useAnamnese } from "@/context/AnamneseContext";
+import { useTranscription } from "@/context/TranscriptionContext";
 
 import { Button } from "@/components/ui/button";
 import ActionButtons from "@/components/molecules/appointment-summary/action-buttons";
 import PatientInfoCard from "@/components/organisms/appointment-summary/patient-info-card";
 import AppointmentReport from "@/components/organisms/appointment-summary/report-content";
-import { supabase } from "@/integrations/supabase/client";
-import { IAnamnese, useAnamnese } from "@/context/AnamneseContext";
-import { useTranscription } from "@/context/TranscriptionContext";
 
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
@@ -25,11 +23,11 @@ const AppointmentSummary: React.FC = () => {
     generateAnamnese,
     retrieveAnamnese,
     isRetrievingAnamnese,
+    updateAnamnese,
   } = useAnamnese();
   const { transcription } = useTranscription();
   const { patient } = usePatient();
-
-  const [isEditing, setIsEditing] = useState(false);
+  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [editedAnamnese, setEditedAnamnese] = useState<IAnamnese | undefined>(
     anamnese
   );
@@ -68,38 +66,39 @@ const AppointmentSummary: React.FC = () => {
   };
 
   const handleUpdateSection = (section: string, content: string) => {
-    if (editedAnamnese) {
-      setEditedAnamnese({
-        ...editedAnamnese,
+    setUnsavedChanges(true);
+    setEditedAnamnese((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
         [section]: content,
-      });
-    }
+      };
+    });
   };
 
   const handleSaveChanges = async () => {
-    if (!editedAnamnese || !appointment.id) return;
+    if (!editedAnamnese || !editedAnamnese.id) return;
 
     setIsSaving(true);
-
     try {
-      // Update the anamnese in the database
-      const { error } = await supabase
-        .from("anamnese")
-        .update({
-          ...editedAnamnese,
-          created_at: editedAnamnese.created_at.toString(),
-        })
-        .eq("appointment_id", appointment.id);
+      const { success } = await updateAnamnese(editedAnamnese.id, {
+        current_illness_history: editedAnamnese.current_illness_history,
+        identification: editedAnamnese.identification,
+        complementary_exams: editedAnamnese.complementary_exams,
+        diagnostic_hypotheses: editedAnamnese.diagnostic_hypotheses,
+        family_history: editedAnamnese.family_history,
+        main_complaint: editedAnamnese.main_complaint,
+        past_medical_history: editedAnamnese.past_medical_history,
+        physical_exams: editedAnamnese.physical_exams,
+        social_history: editedAnamnese.social_history,
+        therapeutic_approach: editedAnamnese.therapeutic_approach,
+      });
 
-      if (error) throw error;
+      if (!success) {
+        throw new Error("Erro ao atualizar anamnese");
+      }
 
-      // Update the local state
-      setAppointment((prev) => ({
-        ...prev,
-        anamnese: editedAnamnese,
-      }));
-
-      setIsEditing(false);
+      setUnsavedChanges(false);
       toast.success("Alterações salvas com sucesso!");
     } catch (error) {
       console.error("Erro ao salvar alterações:", error);
@@ -163,46 +162,14 @@ const AppointmentSummary: React.FC = () => {
         appointmentDate={formattedDate}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-14">
-        <div>
-          {isEditing ? (
-            <div className="flex gap-2">
-              <Button
-                variant="default"
-                className="bg-green-600 hover:bg-green-700"
-                onClick={handleSaveChanges}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Save className="h-4 w-4 mr-2" />
-                )}
-                Salvar alterações
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setEditedAnamnese(anamnese);
-                  setIsEditing(false);
-                }}
-              >
-                Cancelar
-              </Button>
-            </div>
-          ) : (
-            <Button variant="outline" onClick={() => setIsEditing(true)}>
-              <Pencil className="h-4 w-4 mr-2" />
-              Editar anamnese
-            </Button>
-          )}
-        </div>
+      <div className="flex flex-col sm:flex-row justify-end gap-4 mb-14">
         <ActionButtons onPrint={handlePrint} onDownload={handleDownload} />
       </div>
 
       <AppointmentReport
-        anamnese={isEditing ? editedAnamnese : anamnese}
-        isEditable={isEditing}
+        anamnese={editedAnamnese}
+        unsavedChanges={unsavedChanges}
+        saveChanges={handleSaveChanges}
         onUpdateSection={handleUpdateSection}
       />
     </div>

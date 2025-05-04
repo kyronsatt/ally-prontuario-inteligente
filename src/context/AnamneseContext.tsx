@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,12 +15,13 @@ interface AnamneseContextType {
   isRetrievingAnamnese: boolean;
   generateAnamnese: (transcription: string) => Promise<void>;
   retrieveAnamnese: (appointmentId: string) => Promise<void>;
+  updateAnamnese: (
+    anamneseId: string,
+    updatedData: IAnamneseMedicalPayload
+  ) => Promise<{ success: boolean }>;
 }
 
-export interface IAnamnese {
-  id: string;
-  appointment_id: string;
-  transcription_id: string;
+export interface IAnamneseMedicalPayload {
   identification: string;
   main_complaint: string;
   current_illness_history: string;
@@ -32,6 +32,11 @@ export interface IAnamnese {
   complementary_exams: string;
   therapeutic_approach: string;
   diagnostic_hypotheses: string;
+}
+export interface IAnamnese extends IAnamneseMedicalPayload {
+  id: string;
+  appointment_id: string;
+  transcription_id: string;
   created_by: string;
   created_at: Date;
 }
@@ -65,7 +70,7 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
           },
           body: JSON.stringify({ patientId }),
         }
-      ).then(res => res.json());
+      ).then((res) => res.json());
 
       if (error) throw error;
       return data;
@@ -79,12 +84,12 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsGeneratingAnamnese(true);
     try {
       let previousAnamnese = null;
-      
+
       // Get previous anamnese if this is a return appointment
       if (appointment.type === "RETURN" && appointment.patient?.id) {
         previousAnamnese = await getPreviousAnamnese(appointment.patient.id);
       }
-      
+
       // Get extended patient information
       const patientInfo = {
         name: patient?.name || appointment.patient?.name,
@@ -132,7 +137,6 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Navigate to the anamnese visualization page
       navigate(`/app/resumo?appointmentId=${appointment.id}`);
-      
     } catch (e) {
       toast("Erro ao gerar anamnese", { description: String(e) });
     } finally {
@@ -172,6 +176,48 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const updateAnamnese = async (
+    anamneseId: string,
+    updatedData: IAnamneseMedicalPayload
+  ) => {
+    try {
+      const response = await fetch(
+        `${envs.SUPABASE_HOST}/functions/v1/update-anamnese-entry`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: anamneseId,
+            data: updatedData,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar anamnese");
+      }
+
+      const updatedAnamnese = await response.json();
+      setAnamnese((prev) => ({
+        ...prev,
+        ...updatedData,
+      }));
+
+      toast("Anamnese atualizada!", {
+        description: "As alterações foram salvas com sucesso.",
+      });
+
+      return updatedAnamnese;
+    } catch (e) {
+      toast("Erro ao atualizar anamnese", { description: String(e) });
+      console.error("Erro ao atualizar anamnese:", e);
+      return null;
+    }
+  };
+
   return (
     <AnamneseContext.Provider
       value={{
@@ -180,6 +226,7 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         isRetrievingAnamnese,
         generateAnamnese,
         retrieveAnamnese,
+        updateAnamnese,
       }}
     >
       {children}
