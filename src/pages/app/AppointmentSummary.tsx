@@ -128,7 +128,7 @@ const AppointmentSummary: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto pb-20">
       <div className="flex items-center mb-6">
         <Button
           onClick={() => navigate("/app")}
@@ -148,7 +148,7 @@ const AppointmentSummary: React.FC = () => {
       <PatientInfoCard
         patientName={
           appointment?.patient?.name ??
-          patient?.name ??
+          anamnese.patient?.name ??
           "Paciente não identificado"
         }
         appointmentDate={formattedDate}

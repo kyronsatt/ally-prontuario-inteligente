@@ -6,7 +6,6 @@ import { Plus, Clock, TrendingUp, ChartBar, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { AppointmentHistory } from "@/components/organisms/appointment-history";
 
 interface AppointmentStats {
   total_appointments: number;
@@ -23,7 +22,6 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchDashboardData = async () => {

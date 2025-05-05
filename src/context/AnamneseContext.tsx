@@ -7,7 +7,7 @@ import { toast } from "@/components/ui/sonner";
 import { useAppointment } from "./AppointmentContext";
 import { useAuth } from "./AuthContext";
 import { useTranscription } from "./TranscriptionContext";
-import { usePatient } from "./PatientContext";
+import { PatientData, usePatient } from "./PatientContext";
 
 interface AnamneseContextType {
   anamnese: IAnamnese | null;
@@ -38,6 +38,8 @@ export interface IAnamnese extends IAnamneseMedicalPayload {
   id: string;
   appointment_id: string;
   transcription_id: string;
+  patient_id: string;
+  patient: PatientData;
   created_by: string;
   created_at: Date;
 }
