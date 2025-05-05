@@ -229,27 +229,32 @@ function createSystemPrompt(
   const identification =
     infoParts.length > 0 ? `O paciente ${infoParts.join(", ")}.` : "";
 
-  //   const isReturn = appointmentType === "RETURN";
-  //   const returnNote =
-  //     isReturn && previousAnamnese
-  //       ? `Consulta de retorno. Anamnese anterior:
-  // - Queixa principal: ${previousAnamnese.main_complaint || "não disponível"}
-  // - História da doença atual: ${
-  //           previousAnamnese.current_illness_history || "não disponível"
-  //         }
-  // - Histórico médico pregresso: ${
-  //           previousAnamnese.past_medical_history || "não disponível"
-  //         }
-  // - Hipóteses diagnósticas: ${
-  //           previousAnamnese.diagnostic_hypotheses || "não disponível"
-  //         }
-  // - Abordagem terapêutica: ${
-  //           previousAnamnese.therapeutic_approach || "não disponível"
-  //         }
+  const isReturn = appointmentType === "RETURN";
+  const returnNote =
+    isReturn && previousAnamnese
+      ? `Confira a anamnese anterior:
+  - Queixa principal: ${previousAnamnese.main_complaint || "não disponível"}
+  - História da doença atual: ${
+    previousAnamnese.current_illness_history || "não disponível"
+  }
+  - Histórico médico pregresso: ${
+    previousAnamnese.past_medical_history || "não disponível"
+  }
+  - Hipóteses diagnósticas: ${
+    previousAnamnese.diagnostic_hypotheses || "não disponível"
+  }
+  - Abordagem terapêutica: ${
+    previousAnamnese.therapeutic_approach || "não disponível"
+  }
+  - Exames complementares: ${
+    previousAnamnese.complementary_exams || "não disponível"
+  }
+  - Exames físicos: ${previousAnamnese.physical_exams || "não disponível"}
+  - Histórico social: ${previousAnamnese.social_history || "não disponível"}
+  - Histórico familiar: ${previousAnamnese.family_history || "não disponível"}
 
-  // Compare os achados atuais com os anteriores. Destaque evoluções ou pioras, mantendo o que ainda for relevante.`
-  //       : "";
-  const returnNote = "";
+  Compare os achados atuais com os anteriores. Destaque evoluções ou pioras, mantendo o que ainda for relevante.`
+      : "";
 
   return `Você é um assistente médico que gera anamneses estruturadas com base em transcrições de consultas.
 
