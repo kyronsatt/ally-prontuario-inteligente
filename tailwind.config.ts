@@ -56,7 +56,7 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         ally: {
-          blue: "#33C3F0",
+          blue: "#1ad1ff",
           dark: "#221F26",
           light: "#F1F0FB",
           gray: "#8A898C",

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -7,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import AppointmentCard from "@/components/molecules/appointment-history/appointment-card";
+import { AppointmentData } from "@/context/AppointmentContext";
 
 export interface AppointmentHistoryProps {
-  appointments: any[];
+  appointments: AppointmentData[];
   compact?: boolean;
   showSearch?: boolean;
 }
@@ -21,14 +21,13 @@ export const AppointmentHistory: React.FC<AppointmentHistoryProps> = ({
 }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredAppointments, setFilteredAppointments] = useState(appointments);
+  const [filteredAppointments, setFilteredAppointments] =
+    useState(appointments);
 
   useEffect(() => {
     if (searchTerm) {
       const filtered = appointments.filter((appointment) => {
-        const patientName = `${appointment.patient?.first_name || ""} ${
-          appointment.patient?.last_name || ""
-        }`.toLowerCase();
+        const patientName = appointment.patient?.name.toLowerCase();
         return patientName.includes(searchTerm.toLowerCase());
       });
       setFilteredAppointments(filtered);
@@ -39,6 +38,11 @@ export const AppointmentHistory: React.FC<AppointmentHistoryProps> = ({
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  };
+
+  const onViewDetails = (appointmentId: string) => {
+    const anamnesePageUrl = `/app/resumo?appointmentId=${appointmentId}`;
+    navigate(anamnesePageUrl);
   };
 
   if (appointments.length === 0) {
@@ -80,8 +84,11 @@ export const AppointmentHistory: React.FC<AppointmentHistoryProps> = ({
           filteredAppointments.map((appointment) => (
             <AppointmentCard
               key={appointment.id}
-              appointment={appointment}
-              compact={compact}
+              name={appointment.patient.name}
+              date={appointment.created_at}
+              id={appointment.id}
+              type={appointment.type}
+              onClick={() => onViewDetails(appointment.id)}
             />
           ))
         )}

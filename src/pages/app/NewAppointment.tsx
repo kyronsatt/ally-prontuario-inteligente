@@ -108,20 +108,17 @@ const NewAppointment: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <Button variant="ghost" className="mb-6" onClick={() => navigate("/app")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
       </Button>
+      <h1 className="text-4xl md:text-7xl mt-6 font-semibold mb-2 gradient-text">
+        Novo Atendimento
+      </h1>
 
-      <Card className="bg-white border-none shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">
-            Novo Atendimento
-          </CardTitle>
-        </CardHeader>
-
+      <Card className="bg-white border-gray-100 shadow-none pt-8 mt-12">
         <CardContent className="space-y-6">
-          <div className="space-y-4">
+          <div className="space-y-4 mb-12">
             <h3 className="text-lg font-medium">Qual o tipo de atendimento?</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <RadioGroupItem
@@ -172,7 +169,7 @@ const NewAppointment: React.FC = () => {
                     <Button
                       type="submit"
                       disabled={isWaiting}
-                      className="mt-12 w-full bg-ally-blue hover:bg-ally-blue/90"
+                      className="w-full bg-ally-blue hover:bg-ally-blue/90"
                       size="lg"
                     >
                       {isWaiting ? "Aguarde..." : "Iniciar atendimento"}

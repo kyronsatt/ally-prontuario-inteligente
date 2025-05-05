@@ -128,11 +128,9 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
             className={`border-l-4 border-r-ally-blue/30 border-t-ally-blue/30 border-b-ally-blue/30 border-l-ally-blue overflow-hidden shadow-none`}
           >
             <CardHeader
-              className={`flex flex-row w-full items-center justify-between bg-gradient-to-r from-ally-blue/10 to-ally-blue/10 py-2`}
+              className={`flex flex-row w-full items-center justify-between bg-ally-blue/10 py-2`}
             >
-              <CardTitle className="text-xl text-ally-blue inline w-fit">
-                {title}
-              </CardTitle>
+              <CardTitle className="text-xl inline w-fit">{title}</CardTitle>
               {isSaving && editingSection === sectionId && (
                 <Loader2 size={20} className="text-ally-blue animate-spin" />
               )}

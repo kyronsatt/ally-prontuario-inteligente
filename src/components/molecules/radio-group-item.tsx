@@ -19,7 +19,7 @@ const RadioGroupItem: React.FC<RadioGroupItemProps> = ({
   return (
     <div
       className={`flex items-center space-x-2 border p-4 rounded-md cursor-pointer hover:bg-gray-50 ${
-        selectedValue === value ? "bg-gray-100" : ""
+        selectedValue === value ? "bg-ally-blue/10 border-ally-blue/40" : ""
       }`}
       onClick={() => onChange(value)}
     >

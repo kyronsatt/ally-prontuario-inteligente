@@ -111,7 +111,7 @@ const AppointmentSummary: React.FC = () => {
   if (isGeneratingAnamnese || isRetrievingAnamnese) {
     const action = isGeneratingAnamnese ? "Finalizando" : "Acessando";
     return (
-      <div className="max-w-4xl mx-auto text-center py-16">
+      <div className="max-w-7xl mx-auto text-center py-16">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="rounded-full bg-blue-50 p-4">
             <Loader2 className="h-12 w-12 text-ally-blue animate-spin" />
@@ -128,7 +128,7 @@ const AppointmentSummary: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <div className="flex items-center mb-6">
         <Button
           onClick={() => navigate("/app")}
@@ -139,18 +139,10 @@ const AppointmentSummary: React.FC = () => {
         </Button>
       </div>
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
+      <div className="flex justify-between items-center mb-6 mt-12">
+        <h1 className="text-4xl md:text-7xl font-semibold mb-2 gradient-text">
           Anamnese Estruturada
         </h1>
-        <div className="flex gap-3">
-          <Button
-            onClick={() => navigate("/app/novo-atendimento")}
-            className="bg-ally-blue hover:bg-ally-blue/90"
-          >
-            Novo atendimento
-          </Button>
-        </div>
       </div>
 
       <PatientInfoCard

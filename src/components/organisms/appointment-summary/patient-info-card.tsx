@@ -16,11 +16,11 @@ const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
   appointmentDate,
 }) => {
   return (
-    <Card className="mb-5 border-none overflow-hidden">
-      <CardHeader className="bg-ally-blue/10 border-ally-blue/40 border-[1px] rounded-xl">
+    <Card className="mb-5 border border-ally-blue/30 rounded-xl overflow-hidden shadow-none">
+      <CardHeader className="border-none rounded-xl shadow-none">
         <div className="flex justify-between items-center">
           <div>
-            <CardDescription className="text-sm text-gray-600 mb-1">
+            <CardDescription className="text-sm text-ally-gray mb-1">
               Paciente
             </CardDescription>
             <CardTitle className="text-2xl font-semibold">
@@ -28,10 +28,10 @@ const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
             </CardTitle>
           </div>
           <div className="text-right">
-            <CardDescription className="text-sm font-thin text-gray-400 mb-1">
+            <CardDescription className="text-sm font-extralight text-ally-gray mb-1">
               Data do atendimento
             </CardDescription>
-            <p className="font-medium text-ally-dark">{appointmentDate}</p>
+            <p className="font-medium text-ally-blue">{appointmentDate}</p>
           </div>
         </div>
       </CardHeader>

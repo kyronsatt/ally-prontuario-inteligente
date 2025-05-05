@@ -12,7 +12,7 @@ const PatientForm: React.FC = () => {
   } = useFormContext<PatientCreationPayload>();
 
   return (
-    <>
+    <div className="space-y-4 mb-6">
       <div className="space-y-1">
         <Label htmlFor="name">
           Nome do paciente<p className="text-ally-blue inline">*</p>
@@ -24,7 +24,7 @@ const PatientForm: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="space-y-1">
           <Label htmlFor="age">
             Idade<p className="text-ally-blue inline">*</p>
@@ -45,9 +45,18 @@ const PatientForm: React.FC = () => {
             placeholder="Profissão"
           />
         </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="housing">Moradia</Label>
+          <Input
+            id="housing"
+            {...register("housing")}
+            placeholder="Tipo de moradia"
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="space-y-1">
           <Label htmlFor="sex">Sexo Biológico</Label>
           <select
@@ -69,25 +78,14 @@ const PatientForm: React.FC = () => {
             placeholder="Heterossexual, homossexual..."
           />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="space-y-1">
           <Label htmlFor="color">Cor/Etnia</Label>
           <Input id="color" {...register("color")} placeholder="Cor/Etnia" />
         </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="housing">Moradia</Label>
-          <Input
-            id="housing"
-            {...register("housing")}
-            placeholder="Tipo de moradia"
-          />
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="space-y-1">
           <Label htmlFor="marital_status">Estado Civil</Label>
           <select
@@ -115,7 +113,7 @@ const PatientForm: React.FC = () => {
       </div>
 
       {errors && <p className="text-red-600 font-semibold">{errors[0]}</p>}
-    </>
+    </div>
   );
 };
 
