@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from "react";
+import { AllyLogo } from "./atoms/ally-logo";
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -28,7 +28,7 @@ const Header: React.FC = () => {
     >
       <div className="container-ally flex justify-between items-center">
         <a href="#" className="text-ally-dark font-semibold text-xl">
-          <span className="gradient-text">Ally</span>
+          <AllyLogo />
         </a>
 
         <nav className="hidden md:flex items-center space-x-6">
@@ -44,7 +44,10 @@ const Header: React.FC = () => {
           >
             Benefícios
           </a>
-          <a href="#waitlist" className="text-ally-dark hover:text-ally-blue transition-colors">
+          <a
+            href="#waitlist"
+            className="text-ally-dark hover:text-ally-blue transition-colors"
+          >
             Lista de espera
           </a>
           <a href="/login" className="btn-primary">

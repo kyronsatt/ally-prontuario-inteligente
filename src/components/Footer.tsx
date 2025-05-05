@@ -1,4 +1,5 @@
 import React from "react";
+import { AllyLogo } from "./atoms/ally-logo";
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -10,7 +11,7 @@ const Footer: React.FC = () => {
           <div className="mb-4 md:mb-0">
             <div className="flex items-center">
               <a href="#" className="text-ally-dark font-semibold text-xl">
-                <span className="gradient-text">Ally</span>
+                <AllyLogo />
               </a>
             </div>
             <p className="text-ally-gray text-sm mt-2">

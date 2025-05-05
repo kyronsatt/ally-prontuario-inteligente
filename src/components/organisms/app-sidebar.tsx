@@ -1,14 +1,13 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  Home, 
-  PlusCircle, 
-  Clock, 
-  HelpCircle, 
+  Home,
+  PlusCircle,
+  Clock,
+  HelpCircle,
   Settings,
-  UserCircle, 
-  LogOut
+  UserCircle,
+  LogOut,
 } from "lucide-react";
 
 import { useAuth } from "@/context/AuthContext";
@@ -24,9 +23,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AllyLogo } from "../atoms/ally-logo";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -83,13 +83,13 @@ export function AppSidebar() {
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user) return "U";
-    
+
     if (user.user_metadata?.first_name && user.user_metadata?.last_name) {
       return `${user.user_metadata.first_name[0]}${user.user_metadata.last_name[0]}`.toUpperCase();
     } else if (user.email) {
       return user.email[0].toUpperCase();
     }
-    
+
     return "U";
   };
 
@@ -98,13 +98,13 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
+    <Sidebar variant="floating">
       <SidebarHeader>
-        <div className="flex items-center p-4">
-          <span className="text-xl font-semibold gradient-text">Ally</span>
+        <div className="flex justify-center items-center pt-12 pb-8">
+          <AllyLogo className="h-14" />
         </div>
-        <SidebarSeparator />
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
@@ -112,7 +112,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     isActive={isActive(item.path)}
                     onClick={() => navigate(item.path)}
                   >
@@ -124,14 +124,14 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        
+        <SidebarSeparator />
         <SidebarGroup>
           <SidebarGroupLabel>Usuário</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {userMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     isActive={isActive(item.path)}
                     onClick={() => navigate(item.path)}
                   >
@@ -155,10 +155,14 @@ export function AppSidebar() {
             <div className="flex-1 overflow-hidden">
               <p className="text-sm font-medium truncate">
                 {user?.user_metadata?.first_name
-                  ? `Dr. ${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
+                  ? `Dr. ${user.user_metadata.first_name} ${
+                      user.user_metadata.last_name || ""
+                    }`
                   : user?.email || "Usuário"}
               </p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email}
+              </p>
             </div>
           </div>
           <button

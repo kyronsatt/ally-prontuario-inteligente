@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -105,12 +104,16 @@ const Dashboard: React.FC = () => {
         <h1 className="text-3xl md:text-4xl font-semibold mb-2 text-gray-900">
           Bem-vindo(a), <span className="text-ally-blue">Dr(a).</span>
         </h1>
-        <p className="text-gray-600">Veja seu resumo de produtividade e estatísticas de consultas</p>
+        <p className="text-gray-600">
+          Veja seu resumo de produtividade e estatísticas de consultas
+        </p>
       </div>
 
       {/* Productivity Stats */}
       <div className="mb-8">
-        <h2 className="text-2xl font-medium mb-4 text-gray-900">Ganhos de produtividade</h2>
+        <h2 className="text-2xl font-medium mb-4 text-gray-900">
+          Ganhos de produtividade
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <Card className="bg-white border-none shadow-md overflow-hidden transition-all hover:shadow-lg">
             <CardContent className="p-0">
@@ -209,7 +212,9 @@ const Dashboard: React.FC = () => {
       {/* Recent Appointments */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-medium text-gray-900">Consultas recentes</h2>
+          <h2 className="text-2xl font-medium text-gray-900">
+            Consultas recentes
+          </h2>
           <Button
             variant="ghost"
             onClick={() => navigate("/app/historico")}
@@ -218,8 +223,11 @@ const Dashboard: React.FC = () => {
             Ver todas
           </Button>
         </div>
-        
-        <AppointmentHistory appointments={data?.recentAppointments || []} compact={true} />
+
+        <AppointmentHistory
+          appointments={data?.recentAppointments || []}
+          compact={true}
+        />
       </div>
     </div>
   );
