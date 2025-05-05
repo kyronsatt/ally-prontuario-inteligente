@@ -141,7 +141,7 @@ const AppointmentSummary: React.FC = () => {
 
       <div className="flex justify-between items-center mb-6 mt-12">
         <h1 className="text-4xl md:text-6xl font-semibold mb-2 gradient-text">
-          Anamnese Estruturada
+          Anamnese
         </h1>
       </div>
 
