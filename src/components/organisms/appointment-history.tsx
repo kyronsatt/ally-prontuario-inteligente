@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -5,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import { AppointmentCard } from "@/components/molecules/appointment-history/appointment-card";
+import AppointmentCard from "@/components/molecules/appointment-history/appointment-card";
 
 export interface AppointmentHistoryProps {
   appointments: any[];

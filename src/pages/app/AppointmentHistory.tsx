@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -10,7 +11,6 @@ import { ArrowLeft } from "lucide-react";
 const AppointmentHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchTerm, setSearchTerm] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ const AppointmentHistoryPage: React.FC = () => {
         const { data, error } = await supabase.functions.invoke(
           "get-appointments",
           {
-            body: { search: searchTerm },
+            body: {},
           }
         );
 
@@ -43,7 +43,9 @@ const AppointmentHistoryPage: React.FC = () => {
     };
 
     fetchAppointments();
-  }, [searchTerm]);
+  }, []);
+
+  const handleRetry = () => window.location.reload();
 
   return (
     <div className="max-w-4xl flex flex-col justify-self-center w-full">
@@ -55,15 +57,21 @@ const AppointmentHistoryPage: React.FC = () => {
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
       </Button>
 
-      <AppointmentHistory
-        searchTerm={searchTerm}
-        onSearchChange={(e) => setSearchTerm(e.target.value)}
-        appointments={appointments}
-        loading={loading}
-        error={error}
-        selectedAppointmentId={selectedAppointmentId}
-        onRetry={() => window.location.reload()}
-      />
+      {loading ? (
+        <div className="text-center p-6">Carregando...</div>
+      ) : error ? (
+        <div className="text-center p-6 text-red-500">
+          <p>Erro ao carregar histórico: {error}</p>
+          <Button onClick={handleRetry} className="mt-4">
+            Tentar novamente
+          </Button>
+        </div>
+      ) : (
+        <AppointmentHistory
+          appointments={appointments}
+          showSearch={true}
+        />
+      )}
     </div>
   );
 };
