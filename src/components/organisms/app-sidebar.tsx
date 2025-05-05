@@ -146,7 +146,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <div className="px-3 py-2">
-          <div className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-accent cursor-pointer">
+          <div className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-accent">
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-ally-blue text-white">
                 {getUserInitials()}

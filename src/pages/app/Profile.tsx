@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +39,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.id) return;
-      
+
       try {
         setLoading(true);
         const { data, error } = await supabase
@@ -79,7 +78,7 @@ const Profile: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.id) return;
-    
+
     try {
       setLoading(true);
       const { error } = await supabase
@@ -105,7 +104,7 @@ const Profile: React.FC = () => {
       </Button>
 
       <Card>
-        <CardHeader className="bg-gradient-to-r from-ally-light to-blue-50">
+        <CardHeader>
           <CardTitle className="text-2xl">Meu Perfil</CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
@@ -123,7 +122,7 @@ const Profile: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="last_name">Sobrenome</Label>
                   <Input
@@ -133,7 +132,7 @@ const Profile: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="specialty">Especialidade</Label>
                   <Input
@@ -143,7 +142,7 @@ const Profile: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="crm">CRM</Label>
                   <Input
@@ -153,7 +152,7 @@ const Profile: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="city">Cidade</Label>
                   <Input
@@ -163,7 +162,7 @@ const Profile: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="state">Estado</Label>
                   <Input
@@ -174,24 +173,29 @@ const Profile: React.FC = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="flex justify-end pt-4">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="bg-ally-blue hover:bg-ally-blue/90"
                   disabled={loading}
                 >
                   {loading ? "Salvando..." : "Salvar alterações"}
                 </Button>
               </div>
-              
+
               <div className="pt-6 border-t mt-6">
-                <h3 className="text-lg font-medium mb-2">Informações da conta</h3>
+                <h3 className="text-lg font-medium mb-2">
+                  Informações da conta
+                </h3>
                 <p className="text-sm text-muted-foreground mb-1">
                   <span className="font-medium">Email:</span> {user?.email}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  <span className="font-medium">Conta criada em:</span> {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('pt-BR') : 'N/A'}
+                  <span className="font-medium">Conta criada em:</span>{" "}
+                  {profile?.created_at
+                    ? new Date(profile.created_at).toLocaleDateString("pt-BR")
+                    : "N/A"}
                 </p>
               </div>
             </form>

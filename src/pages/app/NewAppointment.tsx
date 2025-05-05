@@ -112,7 +112,7 @@ const NewAppointment: React.FC = () => {
       <Button variant="ghost" className="mb-6" onClick={() => navigate("/app")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
       </Button>
-      <h1 className="text-4xl md:text-7xl mt-6 font-semibold mb-2 gradient-text">
+      <h1 className="text-4xl md:text-6xl mt-6 font-semibold mb-2 gradient-text">
         Novo Atendimento
       </h1>
 

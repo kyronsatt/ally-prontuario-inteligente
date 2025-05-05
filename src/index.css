@@ -146,7 +146,7 @@
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-ally-blue to-blue-600;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-ally-blue to-[#00e6e6];
   }
 }
 

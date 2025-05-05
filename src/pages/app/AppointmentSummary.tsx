@@ -140,7 +140,7 @@ const AppointmentSummary: React.FC = () => {
       </div>
 
       <div className="flex justify-between items-center mb-6 mt-12">
-        <h1 className="text-4xl md:text-7xl font-semibold mb-2 gradient-text">
+        <h1 className="text-4xl md:text-6xl font-semibold mb-2 gradient-text">
           Anamnese Estruturada
         </h1>
       </div>
@@ -148,7 +148,7 @@ const AppointmentSummary: React.FC = () => {
       <PatientInfoCard
         patientName={
           appointment?.patient?.name ??
-          anamnese.patient?.name ??
+          anamnese?.patient?.name ??
           "Paciente não identificado"
         }
         appointmentDate={formattedDate}

@@ -12,11 +12,7 @@ interface RichTextEditorProps {
   isEditable: boolean;
 }
 
-const toolbarOptions = [
-  [{ header: [1, 2, true] }],
-  ["bold", "italic", "underline"],
-  [{ list: "ordered" }, { list: "bullet" }],
-];
+const toolbarOptions = [["bold", "italic", "underline"]];
 
 const modules = {
   toolbar: toolbarOptions,

@@ -90,7 +90,7 @@ const Dashboard: React.FC = () => {
     <div className="max-w-7xl mx-auto w-full mt-12">
       {/* Welcome Banner */}
       <div className="text-ally-dark mb-20">
-        <h1 className="text-4xl md:text-7xl font-semibold mb-2 gradient-text">
+        <h1 className="text-4xl md:text-6xl font-semibold mb-2 gradient-text">
           Dashboard
         </h1>
         <p className="text-ally-gray">

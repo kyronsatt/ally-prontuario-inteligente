@@ -85,7 +85,7 @@ const Settings: React.FC = () => {
       <div className="grid gap-8">
         {/* Perfil do usuário */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 mb-8">
             <CardTitle className="text-xl font-medium">
               Perfil de usuário
             </CardTitle>
@@ -177,7 +177,7 @@ const Settings: React.FC = () => {
 
         {/* Opção de logout */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 mb-8">
             <CardTitle className="text-xl font-medium">Sessão</CardTitle>
             <LogOut className="h-5 w-5 text-ally-gray" />
           </CardHeader>

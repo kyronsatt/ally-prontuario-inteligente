@@ -27,6 +27,7 @@ const ListeningControls: React.FC<ListeningControlsProps> = ({
             : "bg-white/20 text-white border border-white/50 hover:bg-white/30"
         }`}
         size="lg"
+        variant="outline"
       >
         {isPaused ? (
           <div className="flex items-center space-x-2">
@@ -45,6 +46,7 @@ const ListeningControls: React.FC<ListeningControlsProps> = ({
         onClick={onFinish}
         className="bg-white text-ally-blue hover:bg-white/90 px-6 py-6 rounded-full"
         size="lg"
+        variant="outline"
       >
         Finalizar
       </Button>

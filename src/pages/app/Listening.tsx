@@ -65,8 +65,8 @@ const ListeningPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="relative bg-gradient-to-r from-ally-blue to-blue-600 rounded-3xl p-8 mb-8 overflow-hidden shadow-lg shadow-black/10">
+    <div className="max-w-2xl mx-auto flex flex-col h-full justify-center">
+      <div className="relative bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-3xl p-8 mb-8 overflow-hidden shadow-lg shadow-black/10">
         <div className="relative z-10">
           <div className="text-center my-6">
             <h1 className="text-3xl font-bold text-white mb-2">
@@ -87,17 +87,17 @@ const ListeningPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <Card className="border-none shadow-sm">
+      <Card className="border-ally-blue/30 bg-ally-blue/5">
         <CardContent className="p-6">
           <div className="flex items-start space-x-4">
             <div className="bg-ally-light p-3 rounded-full">
               <ShieldIcon className="h-5 w-5 text-ally-blue" />
             </div>
             <div>
-              <h3 className="text-lg font-medium mb-1">
+              <h3 className="text-lg text-ally-blue font-medium mb-1">
                 Escutando com segurança
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-500">
                 Seus dados são criptografados e não são armazenados
                 permanentemente. A Ally gera o prontuário apenas ao final da
                 consulta.
