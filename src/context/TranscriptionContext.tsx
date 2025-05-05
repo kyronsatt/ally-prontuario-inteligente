@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -141,6 +142,9 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       });
 
+      // Add consultation notes if available
+      const consultationNotes = localStorage.getItem("consultationNotes") || "";
+
       const res = await fetch(
         `${envs.SUPABASE_HOST}/functions/v1/transcribe-audio`,
         {
@@ -152,6 +156,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
           body: JSON.stringify({
             audio: base64Audio,
             appointmentId: appointment.id,
+            consultationNotes: consultationNotes, // Pass notes to the transcription service
           }),
         }
       );
@@ -162,6 +167,9 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const { data: transcription } = await res.json();
+
+      // Clear consultation notes from localStorage after successful transcription
+      localStorage.removeItem("consultationNotes");
 
       setTranscription(transcription);
       return transcription;

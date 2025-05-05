@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -106,6 +107,9 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         religion: patient?.religion,
       };
 
+      // Get consultation notes if available
+      const consultationNotes = localStorage.getItem("consultationNotes") || "";
+
       const response = await fetch(
         `${envs.SUPABASE_HOST}/functions/v1/generate-medical-report`,
         {
@@ -123,9 +127,13 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
             appointmentType: appointment.type,
             appointmentId: appointment.id,
             previousAnamnese: previousAnamnese,
+            consultationNotes: consultationNotes, // Pass consultation notes to the medical report generator
           }),
         }
       );
+
+      // Clean up consultation notes
+      localStorage.removeItem("consultationNotes");
 
       if (!response.ok) {
         throw new Error("Erro ao gerar anamnese");
@@ -213,11 +221,11 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         description: "As alterações foram salvas com sucesso.",
       });
 
-      return updatedAnamnese;
+      return { success: true };
     } catch (e) {
       toast("Erro ao atualizar anamnese", { description: String(e) });
       console.error("Erro ao atualizar anamnese:", e);
-      return null;
+      return { success: false };
     }
   };
 
