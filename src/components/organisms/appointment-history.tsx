@@ -1,83 +1,89 @@
-import { ArrowLeft, Loader2 } from "lucide-react";
-import React from "react";
-
-import { AppointmentData } from "@/context/AppointmentContext";
-
-import { Button } from "../ui/button";
-import SearchBar from "../molecules/appointment-history/search-bar";
-import AppointmentCard from "../molecules/appointment-history/appointment-card";
+import React, { useState, useEffect } from "react";
+import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-interface AppointmentHistoryProps {
-  searchTerm: string;
-  onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  appointments: Array<AppointmentData>;
-  loading: boolean;
-  error: string | null;
-  selectedAppointmentId: string | null;
-  onRetry: () => void;
+import { AppointmentCard } from "@/components/molecules/appointment-history/appointment-card";
+
+export interface AppointmentHistoryProps {
+  appointments: any[];
+  compact?: boolean;
+  showSearch?: boolean;
 }
 
 export const AppointmentHistory: React.FC<AppointmentHistoryProps> = ({
-  searchTerm,
-  onSearchChange,
-  appointments,
-  loading,
-  error,
-  selectedAppointmentId,
-  onRetry,
+  appointments = [],
+  compact = false,
+  showSearch = true,
 }) => {
   const navigate = useNavigate();
-  const onViewDetails = (appointmentId: string) => {
-    const anamnesePageUrl = `/app/resumo?appointmentId=${appointmentId}`;
-    navigate(anamnesePageUrl);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredAppointments, setFilteredAppointments] = useState(appointments);
+
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = appointments.filter((appointment) => {
+        const patientName = `${appointment.patient?.first_name || ""} ${
+          appointment.patient?.last_name || ""
+        }`.toLowerCase();
+        return patientName.includes(searchTerm.toLowerCase());
+      });
+      setFilteredAppointments(filtered);
+    } else {
+      setFilteredAppointments(appointments);
+    }
+  }, [searchTerm, appointments]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
+  if (appointments.length === 0) {
+    return (
+      <Card className="p-6 text-center bg-gray-50">
+        <p className="text-gray-500">Nenhum atendimento encontrado.</p>
+        <Button
+          onClick={() => navigate("/app/novo-atendimento")}
+          className="mt-4 bg-ally-blue hover:bg-ally-blue/90"
+        >
+          Iniciar novo atendimento
+        </Button>
+      </Card>
+    );
+  }
+
   return (
-    <div>
-      <div>
-        <div className="flex flex-row items-center justify-between pb-2">
-          <h2 className="text-2xl">Histórico de Atendimentos</h2>
-        </div>
-
-        <div className="space-y-6">
-          <SearchBar
-            placeholder="Buscar paciente por nome..."
+    <div className="space-y-4">
+      {showSearch && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Buscar paciente..."
             value={searchTerm}
-            onChange={onSearchChange}
+            onChange={handleSearchChange}
+            className="pl-10"
           />
-
-          <div className="space-y-4 mt-6">
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-ally-blue" />
-              </div>
-            ) : error ? (
-              <div className="text-center py-8 text-red-500">
-                <p>Erro ao carregar os atendimentos.</p>
-                <Button onClick={onRetry} variant="outline" className="mt-2">
-                  Tentar novamente
-                </Button>
-              </div>
-            ) : appointments.length > 0 ? (
-              appointments.map((appointment) => (
-                <AppointmentCard
-                  key={appointment.id}
-                  id={appointment.id}
-                  name={appointment.patient?.name}
-                  date={appointment.created_at}
-                  type={appointment.type}
-                  isSelected={selectedAppointmentId === appointment.id}
-                  onClick={() => onViewDetails(appointment.id)}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                Nenhum atendimento encontrado com esse nome.
-              </div>
-            )}
-          </div>
         </div>
+      )}
+
+      <div className="space-y-4">
+        {filteredAppointments.length === 0 ? (
+          <Card className="p-6 text-center bg-gray-50">
+            <p className="text-gray-500">
+              Nenhum atendimento encontrado para "{searchTerm}".
+            </p>
+          </Card>
+        ) : (
+          filteredAppointments.map((appointment) => (
+            <AppointmentCard
+              key={appointment.id}
+              appointment={appointment}
+              compact={compact}
+            />
+          ))
+        )}
       </div>
     </div>
   );

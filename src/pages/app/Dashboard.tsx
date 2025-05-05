@@ -1,10 +1,10 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Plus,
-  History,
   Clock,
   Users,
   FileText,
@@ -99,41 +99,22 @@ const Dashboard: React.FC = () => {
       : 0;
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="bg-gradient-to-r from-ally-light to-blue-50 rounded-2xl p-8 shadow-sm">
-        <h1 className="text-3xl md:text-4xl font-semibold mb-2">
+    <div className="max-w-5xl mx-auto">
+      {/* Welcome Banner */}
+      <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl p-8 shadow-sm mb-8">
+        <h1 className="text-3xl md:text-4xl font-semibold mb-2 text-gray-900">
           Bem-vindo(a), <span className="text-ally-blue">Dr(a).</span>
         </h1>
-        <p className="text-ally-gray">O que você deseja fazer hoje?</p>
+        <p className="text-gray-600">Veja seu resumo de produtividade e estatísticas de consultas</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button
-          onClick={() => navigate("/app/novo-atendimento")}
-          size="lg"
-          className="h-24 text-xl flex items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all bg-ally-blue hover:bg-ally-blue/90"
-        >
-          <Plus className="h-6 w-6" />
-          Novo Atendimento
-        </Button>
-
-        <Button
-          onClick={() => navigate("/app/historico")}
-          variant="secondary"
-          size="lg"
-          className="h-24 text-xl flex items-center justify-center gap-3 border border-gray-100 shadow-md hover:shadow-lg transition-all"
-        >
-          <History className="h-6 w-6" />
-          Histórico de Atendimentos
-        </Button>
-      </div>
-      <Separator className="my-8" />
-      <div>
-        <h2 className="text-2xl font-medium mb-6">Ganhos de produtividade</h2>
+      {/* Productivity Stats */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-medium mb-4 text-gray-900">Ganhos de produtividade</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Card className="bg-white border-none shadow-md overflow-hidden">
+          <Card className="bg-white border-none shadow-md overflow-hidden transition-all hover:shadow-lg">
             <CardContent className="p-0">
-              <div className="bg-green-50 p-4 border-b border-green-100">
+              <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 border-b border-green-100">
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold text-green-800">
                     Tempo economizado
@@ -155,9 +136,9 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-none shadow-md overflow-hidden">
+          <Card className="bg-white border-none shadow-md overflow-hidden transition-all hover:shadow-lg">
             <CardContent className="p-0">
-              <div className="bg-blue-50 p-4 border-b border-blue-100">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 border-b border-blue-100">
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold text-blue-800">Produtividade</h3>
                   <TrendingUp className="h-5 w-5 text-blue-600" />
@@ -176,9 +157,9 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-none shadow-md overflow-hidden">
+          <Card className="bg-white border-none shadow-md overflow-hidden transition-all hover:shadow-lg">
             <CardContent className="p-0">
-              <div className="bg-purple-50 p-4 border-b border-purple-100">
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 border-b border-purple-100">
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold text-purple-800">
                     Consultas realizadas
@@ -199,6 +180,46 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Button
+          onClick={() => navigate("/app/novo-atendimento")}
+          size="lg"
+          className="h-20 text-lg flex items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all bg-ally-blue hover:bg-ally-blue/90"
+        >
+          <Plus className="h-6 w-6" />
+          Novo Atendimento
+        </Button>
+
+        <Button
+          onClick={() => navigate("/app/historico")}
+          variant="outline"
+          size="lg"
+          className="h-20 text-lg flex items-center justify-center gap-3 border border-gray-200 shadow-md hover:shadow-lg transition-all"
+        >
+          <Clock className="h-6 w-6" />
+          Histórico de Atendimentos
+        </Button>
+      </div>
+
+      <Separator className="my-8" />
+
+      {/* Recent Appointments */}
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-medium text-gray-900">Consultas recentes</h2>
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/app/historico")}
+            className="text-ally-blue hover:text-ally-blue/90"
+          >
+            Ver todas
+          </Button>
+        </div>
+        
+        <AppointmentHistory appointments={data?.recentAppointments || []} compact={true} />
       </div>
     </div>
   );

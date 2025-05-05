@@ -153,30 +153,54 @@ export type Database = {
       patients: {
         Row: {
           age: number | null
+          color: string | null
           created_at: string
           created_by: string
-          gender: Database["public"]["Enums"]["patient_gender"] | null
+          gender: string | null
+          housing: string | null
           id: string
           is_new: boolean
+          marital_status:
+            | Database["public"]["Enums"]["patient_marital_status"]
+            | null
           name: string
+          profession: string | null
+          religion: string | null
+          sex: Database["public"]["Enums"]["patient_sex"] | null
         }
         Insert: {
           age?: number | null
+          color?: string | null
           created_at?: string
           created_by: string
-          gender?: Database["public"]["Enums"]["patient_gender"] | null
+          gender?: string | null
+          housing?: string | null
           id?: string
           is_new?: boolean
+          marital_status?:
+            | Database["public"]["Enums"]["patient_marital_status"]
+            | null
           name: string
+          profession?: string | null
+          religion?: string | null
+          sex?: Database["public"]["Enums"]["patient_sex"] | null
         }
         Update: {
           age?: number | null
+          color?: string | null
           created_at?: string
           created_by?: string
-          gender?: Database["public"]["Enums"]["patient_gender"] | null
+          gender?: string | null
+          housing?: string | null
           id?: string
           is_new?: boolean
+          marital_status?:
+            | Database["public"]["Enums"]["patient_marital_status"]
+            | null
           name?: string
+          profession?: string | null
+          religion?: string | null
+          sex?: Database["public"]["Enums"]["patient_sex"] | null
         }
         Relationships: []
       }
@@ -293,7 +317,13 @@ export type Database = {
     }
     Enums: {
       appointment_type: "NEW" | "RETURN"
-      patient_gender: "MALE" | "FEMALE" | "OTHER"
+      patient_marital_status:
+        | "SINGLE"
+        | "MARRIED"
+        | "DIVORCED"
+        | "WIDOWED"
+        | "OTHER"
+      patient_sex: "MALE" | "FEMALE" | "OTHER"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -410,7 +440,14 @@ export const Constants = {
   public: {
     Enums: {
       appointment_type: ["NEW", "RETURN"],
-      patient_gender: ["MALE", "FEMALE", "OTHER"],
+      patient_marital_status: [
+        "SINGLE",
+        "MARRIED",
+        "DIVORCED",
+        "WIDOWED",
+        "OTHER",
+      ],
+      patient_sex: ["MALE", "FEMALE", "OTHER"],
     },
   },
 } as const

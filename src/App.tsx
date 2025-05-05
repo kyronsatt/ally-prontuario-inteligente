@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -20,6 +21,8 @@ import Listening from "./pages/app/Listening";
 import AppointmentSummary from "./pages/app/AppointmentSummary";
 import AppointmentHistory from "./pages/app/AppointmentHistory";
 import Settings from "./pages/app/Settings";
+import Help from "./pages/app/Help";
+import Profile from "./pages/app/Profile";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -65,6 +68,8 @@ const App = () => (
               />
               <Route path="historico" element={<AppointmentHistory />} />
               <Route path="configuracoes" element={<Settings />} />
+              <Route path="ajuda" element={<Help />} />
+              <Route path="perfil" element={<Profile />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
