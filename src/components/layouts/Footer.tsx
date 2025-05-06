@@ -1,3 +1,4 @@
+
 import React from "react";
 import { AllyLogo } from "@/components/atoms/ally-logo";
 
@@ -5,7 +6,7 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white border-t border-gray-100 py-8">
+    <footer className="bg-white border-t border-gray-100 py-8" id="footer">
       <div className="container-ally">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
@@ -37,6 +38,12 @@ const Footer: React.FC = () => {
               className="text-ally-dark hover:text-ally-blue transition-colors"
             >
               Lista de espera
+            </a>
+            <a
+              href="mailto:contato@ally.med.br"
+              className="text-ally-dark hover:text-ally-blue transition-colors"
+            >
+              Contato
             </a>
           </div>
         </div>

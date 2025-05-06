@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import { CalendarClock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 const WaitlistForm: React.FC = () => {
   const { toast } = useToast();
+  const { trackEvent } = useAnalytics();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,12 +28,47 @@ const WaitlistForm: React.FC = () => {
     if (error) setError(null);
   };
 
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError("Por favor, informe seu nome completo.");
+      return false;
+    }
+    
+    if (!formData.email.trim()) {
+      setError("Por favor, informe seu e-mail profissional.");
+      return false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Por favor, informe um e-mail válido.");
+      return false;
+    }
+    
+    if (!formData.specialty) {
+      setError("Por favor, selecione sua especialidade médica.");
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Track form submission attempt
+      trackEvent('waitlist_form_submit', {
+        specialty: formData.specialty
+      });
+
       // Inserindo dados na tabela waitlist do Supabase
       const { error: supabaseError } = await supabase.from("waitlist").insert([
         {
@@ -46,6 +83,11 @@ const WaitlistForm: React.FC = () => {
       if (supabaseError) throw supabaseError;
 
       setSubmitted(true);
+      
+      // Track successful submission
+      trackEvent('waitlist_form_success', {
+        specialty: formData.specialty
+      });
 
       toast({
         title: "Demonstração agendada com sucesso!",
@@ -61,6 +103,12 @@ const WaitlistForm: React.FC = () => {
       });
     } catch (err) {
       console.error("Erro ao agendar demonstração:", err);
+      
+      // Track form error
+      trackEvent('waitlist_form_error', {
+        error: err instanceof Error ? err.message : 'Unknown error'
+      });
+      
       setError(
         err instanceof Error
           ? err.message
@@ -76,6 +124,11 @@ const WaitlistForm: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleReset = () => {
+    setSubmitted(false);
+    trackEvent('waitlist_form_reset');
   };
 
   return (
@@ -249,7 +302,7 @@ const WaitlistForm: React.FC = () => {
                   Em breve, entraremos em contato para confirmar os detalhes da sua demonstração exclusiva da Ally.
                 </p>
                 <button
-                  onClick={() => setSubmitted(false)}
+                  onClick={handleReset}
                   className="text-ally-blue hover:underline"
                 >
                   Voltar para o formulário

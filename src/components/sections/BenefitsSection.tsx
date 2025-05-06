@@ -1,150 +1,81 @@
-import React, { useState } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Brain,
-  Check,
-  PaperclipIcon,
-  Shield,
-  ShieldCheck,
-  Activity,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+
+import React from "react";
+import { CheckCircle2, FileText, Clock, Brain } from "lucide-react";
+
+interface BenefitCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  delay: string;
+}
+
+const BenefitCard: React.FC<BenefitCardProps> = ({ icon, title, description, delay }) => {
+  return (
+    <div 
+      className="bg-white p-6 rounded-xl shadow-md border border-gray-100 fade-in-section"
+      style={{ "--delay": delay } as React.CSSProperties}
+    >
+      <div className="flex items-center mb-4">
+        <div className="bg-ally-blue/10 p-3 rounded-lg text-ally-blue">
+          {icon}
+        </div>
+      </div>
+      <h3 className="text-xl font-medium mb-2">{title}</h3>
+      <p className="text-ally-gray">{description}</p>
+    </div>
+  );
+};
 
 const BenefitsSection: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("tab1");
-
-  const tabContent = {
-    tab1: {
-      icon: Activity,
-      tabTitle: "Anamnese estruturada",
-      title: "Anamnese estruturada em segundos",
-      description:
-        "A Ally ouve a conversa da consulta e gera automaticamente uma anamnese clínica completa em até 30 segundos, organizada de acordo com a sua especialidade.",
-      benefits: [
-        "Mantenha contato visual com o paciente",
-        "Reduza em até 40% o tempo gasto com prontuário",
-        "Cuide mais e digite menos",
-      ],
-      image: "/assets/images/female-doctor-5.jpg",
+  const benefits = [
+    {
+      icon: <FileText className="h-6 w-6" />,
+      title: "Documentação Médica Simplificada",
+      description: "Registros detalhados de consultas sem o trabalho de digitação. Prontuários organizados e facilmente acessíveis.",
+      delay: "100ms"
     },
-    tab2: {
-      icon: Brain,
-      tabTitle: "Inteligência clínica",
-      title: "Mais que registros: inteligência clínica",
-      description:
-        "Além de gerar automaticamente documentos como anamnese, Ally oferece relatórios de produtividade e insights inteligentes.",
-      benefits: [
-        "Acompanhe sua performance e melhore sua prática",
-        "Compartilhe resumos clínicos com o paciente",
-        "Amplie a confiança e a experiência do atendimento",
-      ],
-      image: "/assets/images/female-doctor-4.jpg",
+    {
+      icon: <Clock className="h-6 w-6" />,
+      title: "Economia de Tempo",
+      description: "Reduza o tempo gasto com documentação em até 70%. Mais tempo de qualidade com seus pacientes.",
+      delay: "200ms"
     },
-    tab3: {
-      icon: ShieldCheck,
-      tabTitle: "Fácil e segura",
-      title: "Segurança e simplicidade",
-      description:
-        "A Ally funciona do jeito que o médico precisa: é só abrir o app e começar a consulta, em um ambiente de máxima segurança. Todos os dados são anonimizados, criptografados e operam em conformidade com a Lei Geral de Proteção de Dados (LGPD).",
-      benefits: [
-        "Nenhum áudio é armazenado — descarte automático",
-        "Comece a usar em menos de 30 segundos",
-        "Gere documentos com inteligência artificial",
-      ],
-      image: "/assets/images/female-doctor-2.jpg",
+    {
+      icon: <Brain className="h-6 w-6" />,
+      title: "Inteligência Clínica",
+      description: "Insights automáticos ajudam a não perder detalhes importantes durante a consulta, elevando a qualidade do atendimento.",
+      delay: "300ms"
     },
-  };
-
-  const getTabClassName = (tab: string) => {
-    const baseClass = "py-3 px-4 rounded-lg text-center transition-all text-sm";
-    return activeTab === tab
-      ? `${baseClass} bg-ally-blue/5 text-ally-blue border-[1px] border-ally-blue/70`
-      : `${baseClass} bg-ally-light/50 text-ally-gray hover:bg-ally-light border-[1px] border-gray-200`;
-  };
+    {
+      icon: <CheckCircle2 className="h-6 w-6" />,
+      title: "Prática Médica Aprimorada",
+      description: "Foco total na interação médico-paciente, sem distrações. Melhore sua satisfação profissional e a experiência do paciente.",
+      delay: "400ms"
+    }
+  ];
 
   return (
-    <section id="benefits" className="section-spacing bg-white">
+    <section id="benefits" className="section-spacing bg-gray-50">
       <div className="container-ally">
-        <div
-          className="text-center max-w-3xl mx-auto mb-12 md:mb-16 fade-in-section"
-          style={{ "--delay": "100ms" } as React.CSSProperties}
-        >
+        <div className="text-center mb-12 fade-in-section" style={{ "--delay": "0ms" } as React.CSSProperties}>
           <h2 className="heading-lg mb-4">
-            Porque você deve{" "}
-            <span className="gradient-text">escolher a Ally</span>
+            Por que escolher a <span className="gradient-text">Ally</span>
           </h2>
-          <p className="text-md md:text-xl text-ally-gray">
-            Tecnologia que transforma a experiência médica, criada para as
-            necessidades reais da sua prática clínica.
+          <p className="text-lg max-w-2xl mx-auto text-ally-gray">
+            Transforme sua prática médica com tecnologia que entende suas necessidades
           </p>
         </div>
 
-        <div className="max-w-5xl mx-auto fade-in-section">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            <TabsList className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-32 md:mb-8 bg-transparent">
-              {Object.entries(tabContent).map(([key, tab]) => (
-                <TabsTrigger
-                  value={key}
-                  className={cn(
-                    getTabClassName(key),
-                    activeTab === key ? "bg-ally-blue/10" : "bg-gray-100"
-                  )}
-                >
-                  <tab.icon
-                    className={cn(
-                      "inline mr-0 p-1",
-                      activeTab === key ? "text-ally-blue" : "text-ally-gray"
-                    )}
-                  />
-                  {tab.tabTitle}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {Object.entries(tabContent).map(([key, tab]) => (
-              <TabsContent
-                key={key}
-                value={key}
-                className="pt-4 focus:outline-none"
-              >
-                <div className="p-6">
-                  <div className="grid md:grid-cols-2 gap-8 items-center">
-                    <div>
-                      <h3 className="text-2xl font-semibold mb-4 flex items-center">
-                        <tab.icon className="text-ally-blue inline mr-2" />
-                        {tab.title}
-                      </h3>
-                      <p className="mb-6 text-md font-light">
-                        {tab.description}
-                      </p>
-                      <ul className="space-y-3 text-ally-gray">
-                        {tab.benefits.map((benefit, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <Check
-                              size={20}
-                              className="text-ally-blue min-w-5 mt-0.5"
-                            />
-                            <span>{benefit}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="order-first md:order-last transition-all fade-in-10">
-                      <img
-                        src={tab.image}
-                        alt={`Ilustração de ${tab.title}`}
-                        className="w-full aspect-video object-cover rounded-2xl outline outline-1 outline-ally-blue/30 outline-offset-4"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {benefits.map((benefit, index) => (
+            <BenefitCard
+              key={index}
+              icon={benefit.icon}
+              title={benefit.title}
+              description={benefit.description}
+              delay={benefit.delay}
+            />
+          ))}
         </div>
       </div>
     </section>

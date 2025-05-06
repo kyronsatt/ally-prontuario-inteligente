@@ -1,92 +1,70 @@
+
 import React from "react";
-import { Mic, FileText, Lightbulb, History } from "lucide-react";
-
-interface StepProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  number: number;
-}
-
-const Step: React.FC<StepProps> = ({ icon, title, description, number }) => {
-  return (
-    <div
-      className="bg-gradient-to-r from-ally-blue/20 to-ally-blue/5 p-6 rounded-xl overflow-clip border-ally-blue/20 border-[1px] mb-4 relative fade-in-section"
-      style={{ "--delay": `${number * 100}ms` } as React.CSSProperties}
-    >
-      <div className="flex flex-col md:flex-row items-start gap-4">
-        {/* <div className="bg-ally-blue/10 p-3 rounded-xl text-ally-blue mb-4 md:mb-0"> */}
-        <div className="rounded-full p-2 text-ally-blue/30 absolute top-3 -left-10 md:mb-0">
-          {icon}
-        </div>
-        <div className="pl-16">
-          <h3 className="text-xl font-semibold mb-2 text-ally-blue">{title}</h3>
-          <p className="text-ally-gray">{description}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { Mic, FileText, LightbulbIcon, Heart } from "lucide-react";
 
 const HowItWorksSection: React.FC = () => {
   const steps = [
     {
-      icon: <Mic size={90} />,
-      title: "Escuta clínica em tempo real",
-      description:
-        "A Ally ouve a conversa entre médico e paciente, entendendo o contexto com precisão médica.",
+      icon: <Mic className="h-8 w-8" />,
+      title: "Gravação Inteligente",
+      description: "Durante a consulta, a Ally captura a conversa médico-paciente de forma segura e confidencial.",
+      delay: "100ms"
     },
     {
-      icon: <FileText size={90} />,
-      title: "Geração automática da anamnese estruturada",
-      description:
-        "O atendimento é transformado em um texto clínico organizado no formato do prontuário.",
+      icon: <FileText className="h-8 w-8" />,
+      title: "Estruturação Automática",
+      description: "Nossa IA transforma a conversa em uma anamnese estruturada e completa em segundos.",
+      delay: "200ms"
     },
     {
-      icon: <Lightbulb size={90} />,
-      title: "Entrega de insights inteligentes",
-      description:
-        "A Ally identifica riscos, sintomas relevantes e oportunidades de conduta — considerando também o histórico do paciente.",
+      icon: <LightbulbIcon className="h-8 w-8" />,
+      title: "Insights Clínicos",
+      description: "Identificação automática de pontos relevantes, riscos potenciais e achados importantes.",
+      delay: "300ms"
     },
     {
-      icon: <History size={90} />,
-      title: "Acesso ao histórico de atendimentos",
-      description:
-        "Consulte facilmente anamneses anteriores do paciente para uma visão completa de sua trajetória clínica.",
-    },
+      icon: <Heart className="h-8 w-8" />,
+      title: "Prática Médica Aprimorada",
+      description: "Dedique mais tempo à relação com o paciente e menos à documentação.",
+      delay: "400ms"
+    }
   ];
 
   return (
-    <section
-      id="how-it-works"
-      className="section-spacing bg-gradient-to-b from-ally-light/30 to-white relative overflow-hidden"
-    >
+    <section id="how-it-works" className="section-spacing bg-white">
       <div className="container-ally">
-        <div
-          className="text-center max-w-3xl mx-auto mb-12 fade-in-section"
-          style={{ "--delay": "100ms" } as React.CSSProperties}
-        >
+        <div className="text-center mb-12 fade-in-section" style={{ "--delay": "0ms" } as React.CSSProperties}>
           <h2 className="heading-lg mb-4">
-            <span className="gradient-text">O que você pode fazer</span> com a
-            Ally
+            Como <span className="gradient-text">funciona</span>
           </h2>
-          <p className="text-md md:text-xl text-ally-gray">
-            A inteligência da Ally escuta, organiza e gera insights com base na
-            conversa em tempo real — e considera até o histórico de atendimentos
-            anteriores do paciente.
+          <p className="text-lg max-w-2xl mx-auto text-ally-gray">
+            Um processo simples que revoluciona sua rotina médica
           </p>
         </div>
-        {/* Stacked Step Blocks */}
-        <div className="max-w-3xl mx-auto flex flex-col gap-2">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
-            <Step
-              key={index}
-              icon={step.icon}
-              title={step.title}
-              description={step.description}
-              number={index + 1}
-            />
+            <div 
+              key={index} 
+              className="text-center fade-in-section"
+              style={{ "--delay": step.delay } as React.CSSProperties}
+            >
+              <div className="bg-ally-blue/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-ally-blue">
+                {step.icon}
+              </div>
+              <h3 className="text-xl font-medium mb-3">{step.title}</h3>
+              <p className="text-ally-gray">{step.description}</p>
+            </div>
           ))}
+        </div>
+
+        <div className="mt-16 text-center fade-in-section" style={{ "--delay": "500ms" } as React.CSSProperties}>
+          <a href="#waitlist" className="btn-primary inline-flex items-center">
+            Experimentar agora
+            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </a>
         </div>
       </div>
     </section>

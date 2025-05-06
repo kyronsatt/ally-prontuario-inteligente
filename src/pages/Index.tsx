@@ -10,14 +10,19 @@ import WaitlistForm from "@/components/sections/WaitlistForm";
 import Footer from "@/components/layouts/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { useAnimationObserver } from "@/hooks/use-animation-observer";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 const Index = () => {
   useAnimationObserver();
+  const { trackEvent } = useAnalytics();
 
   useEffect(() => {
     // Set custom page title
     document.title = "Ally — Anamnese estruturada em segundos";
-  }, []);
+    
+    // Track page view
+    trackEvent('page_view', { page: 'landing_page' });
+  }, [trackEvent]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
