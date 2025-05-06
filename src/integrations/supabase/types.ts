@@ -20,6 +20,7 @@ export type Database = {
           family_history: string | null
           id: string
           identification: string | null
+          insights: Json | null
           main_complaint: string | null
           past_medical_history: string | null
           patient_id: string | null
@@ -38,6 +39,7 @@ export type Database = {
           family_history?: string | null
           id?: string
           identification?: string | null
+          insights?: Json | null
           main_complaint?: string | null
           past_medical_history?: string | null
           patient_id?: string | null
@@ -56,6 +58,7 @@ export type Database = {
           family_history?: string | null
           id?: string
           identification?: string | null
+          insights?: Json | null
           main_complaint?: string | null
           past_medical_history?: string | null
           patient_id?: string | null

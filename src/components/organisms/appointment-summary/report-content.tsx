@@ -1,8 +1,10 @@
+
 import React, { useEffect, useState } from "react";
-import { Check, FileText, Loader, Loader2, PenBox, X } from "lucide-react";
+import { Check, FileText, Loader, Loader2, PenBox, X, Brain } from "lucide-react";
 
 import RichTextEditor from "@/components/molecules/rich-text-editor";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import ClinicalInsights from "@/components/organisms/clinical-insights";
 
 import { IAnamnese } from "@/context/AnamneseContext";
 import { cn } from "@/lib/utils";
@@ -169,6 +171,11 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
             </CardContent>
           </Card>
         ))}
+        
+        {/* Clinical Insights Section */}
+        {anamnese.insights && anamnese.insights.length > 0 && (
+          <ClinicalInsights insights={anamnese.insights} />
+        )}
       </div>
     );
   }

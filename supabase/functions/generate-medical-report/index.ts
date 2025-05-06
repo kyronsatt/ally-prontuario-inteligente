@@ -1,3 +1,4 @@
+
 // @ts-expect-error :: deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-expect-error :: deno
@@ -131,7 +132,95 @@ async function generateAnamneseData(
   }
 
   try {
-    return JSON.parse(message.content);
+    const anamneseData = JSON.parse(message.content);
+    
+    // Generate clinical insights
+    const insightsCompletion = await openai.chat.completions.create({
+      model: "gpt-4.1-nano",
+      messages: [
+        { 
+          role: "system", 
+          content: `Você é um assistente médico especializado em extrair insights clínicos de anamneses médicas.
+          
+          Com base na anamnese fornecida, identifique insights clínicos relevantes como:
+          - Riscos que o paciente apresenta
+          - Achados importantes que merecem atenção
+          - Sugestões diagnósticas ou terapêuticas importantes
+          - Sinais de alerta ('red flags') que exigem atenção imediata
+          
+          Retorne os insights em formato JSON, com cada insight contendo:
+          - id: um UUID único (pode usar números sequenciais para simplicidade)
+          - type: o tipo do insight (risk, finding, suggestion, red_flag)
+          - label: um rótulo legível para o tipo (em português)
+          - content: texto do insight em português
+          - highlighted_text: (opcional) trecho da anamnese que embasa o insight
+          
+          Limite-se a no máximo 5 insights realmente relevantes.`
+        },
+        { 
+          role: "user", 
+          content: `Anamnese médica:
+          
+          Identificação: ${anamneseData.identification}
+          Queixa Principal: ${anamneseData.main_complaint}
+          História da Doença Atual: ${anamneseData.current_illness_history}
+          História Patológica Pregressa: ${anamneseData.past_medical_history}
+          Histórico Social: ${anamneseData.social_history}
+          Histórico Familiar: ${anamneseData.family_history}
+          Exames Físicos: ${anamneseData.physical_exams}
+          Exames Complementares: ${anamneseData.complementary_exams}
+          Abordagem Terapêutica: ${anamneseData.therapeutic_approach}
+          Hipóteses Diagnósticas: ${anamneseData.diagnostic_hypotheses}`
+        }
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "insights_schema",
+          type: "object",
+          properties: {
+            insights: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  type: { type: "string", enum: ["risk", "finding", "suggestion", "red_flag"] },
+                  label: { type: "string" },
+                  content: { type: "string" },
+                  highlighted_text: { type: "string" },
+                  created_at: { type: "string", format: "date-time" }
+                },
+                required: ["id", "type", "label", "content"]
+              }
+            }
+          }
+        }
+      },
+      temperature: 0.3,
+    });
+
+    try {
+      const insightsData = JSON.parse(insightsCompletion.choices[0].message.content);
+      
+      // Add timestamps to insights if not present
+      if (insightsData && insightsData.insights) {
+        insightsData.insights.forEach((insight: any) => {
+          if (!insight.created_at) {
+            insight.created_at = new Date().toISOString();
+          }
+        });
+        
+        // Add insights to anamnese data
+        anamneseData.insights = insightsData.insights;
+      }
+    } catch (error) {
+      console.error("Error parsing insights response:", error);
+      // Don't fail the whole process if insights generation fails
+      anamneseData.insights = [];
+    }
+    
+    return anamneseData;
   } catch (error) {
     throw new Error("Erro ao analisar a resposta JSON: " + error.message);
   }
@@ -171,6 +260,7 @@ async function insertAnamneseIntoDb(
         complementary_exams: anamneseData.complementary_exams,
         therapeutic_approach: anamneseData.therapeutic_approach,
         diagnostic_hypotheses: anamneseData.diagnostic_hypotheses,
+        insights: anamneseData.insights || [],
         created_by: userData.user.id,
       },
     ])
@@ -334,6 +424,22 @@ const anamneseSchema = {
       type: "string",
       description: "Hipóteses diagnósticas",
     },
+    insights: {
+      type: "array",
+      description: "Insights clínicos extraídos da anamnese",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          type: { type: "string", enum: ["risk", "finding", "suggestion", "red_flag"] },
+          label: { type: "string" },
+          content: { type: "string" },
+          highlighted_text: { type: "string" },
+          created_at: { type: "string", format: "date-time" }
+        },
+        required: ["id", "type", "label", "content"]
+      }
+    }
   },
   required: [
     "identification",

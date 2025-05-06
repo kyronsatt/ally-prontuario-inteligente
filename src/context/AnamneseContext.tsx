@@ -9,6 +9,15 @@ import { useAuth } from "./AuthContext";
 import { useTranscription } from "./TranscriptionContext";
 import { PatientData, usePatient } from "./PatientContext";
 
+export interface InsightItem {
+  id: string;
+  type: "risk" | "finding" | "suggestion" | "red_flag";
+  label: string;
+  content: string;
+  highlighted_text?: string;
+  created_at: string;
+}
+
 interface AnamneseContextType {
   anamnese: IAnamnese | null;
   previousAnamnese: IAnamnese | null;
@@ -46,6 +55,7 @@ export interface IAnamnese extends IAnamneseMedicalPayload {
   patient: PatientData;
   created_by: string;
   created_at: Date;
+  insights: InsightItem[];
 }
 
 const AnamneseContext = createContext<AnamneseContextType | undefined>(

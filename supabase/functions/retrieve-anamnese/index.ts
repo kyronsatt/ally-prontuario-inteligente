@@ -1,3 +1,4 @@
+
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -38,6 +39,12 @@ Deno.serve(async (req) => {
       .single();
 
     if (error) throw error;
+    
+    // Ensure insights is an array even if it's null in the database
+    if (!data.insights) {
+      data.insights = [];
+    }
+    
     return new Response(JSON.stringify(data), {
       headers: {
         "Content-Type": "application/json",

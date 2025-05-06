@@ -1,10 +1,10 @@
+
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "jsr:@supabase/supabase-js";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", {
-      status: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -13,23 +13,48 @@ Deno.serve(async (req) => {
       },
     });
   }
+  try {
+    const { patient_id } = await req.json();
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL"),
+      Deno.env.get("SUPABASE_ANON_KEY"),
+      {
+        global: {
+          headers: {
+            Authorization: req.headers.get("Authorization"),
+          },
+        },
+      }
+    );
 
-  const { patient_id } = await req.json();
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL"),
-    Deno.env.get("SUPABASE_ANON_KEY")
-  );
-  const { data, error } = await supabaseClient
-    .from("anamnese")
-    .select("*")
-    .eq("patient_id", patient_id)
-    .order("created_at", {
-      ascending: false,
-    })
-    .limit(1)
-    .single();
+    const { data, error } = await supabaseClient
+      .from("anamnese")
+      .select(
+        `
+        *,
+        patient:patients (*)
+      `
+      )
+      .eq("patient_id", patient_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-  if (error) {
+    if (error) throw error;
+    
+    // Ensure insights is an array even if it's null in the database
+    if (data && !data.insights) {
+      data.insights = [];
+    }
+    
+    return new Response(JSON.stringify(data || null), {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      status: 200,
+    });
+  } catch (error) {
     return new Response(
       JSON.stringify({
         error: error.message,
@@ -43,11 +68,4 @@ Deno.serve(async (req) => {
       }
     );
   }
-  return new Response(JSON.stringify(data), {
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    },
-    status: 200,
-  });
 });

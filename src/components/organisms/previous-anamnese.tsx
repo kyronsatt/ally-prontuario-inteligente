@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,6 +6,7 @@ import { IAnamnese } from "@/context/AnamneseContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, CheckCircle2 } from "lucide-react";
 import moment from "moment";
+import ClinicalInsights from "./clinical-insights";
 
 interface PreviousAnamneseProps {
   anamnese: IAnamnese | null;
@@ -93,6 +95,60 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
             </div>
           ))}
         </div>
+
+        {anamnese.insights && anamnese.insights.length > 0 && (
+          <div className="mt-6 border-t border-gray-200 pt-4">
+            <h3 className="font-medium text-ally-blue mb-1">Insights Clínicos</h3>
+            <div className="space-y-2">
+              {anamnese.insights.map((insight, index) => (
+                <div
+                  key={insight.id || index}
+                  className="text-sm p-2 border rounded-md"
+                  style={{
+                    borderColor:
+                      insight.type === "risk"
+                        ? "#FFBB5C"
+                        : insight.type === "finding"
+                        ? "#5D9C59"
+                        : insight.type === "suggestion"
+                        ? "#7895CB"
+                        : "#FF6969",
+                    backgroundColor:
+                      insight.type === "risk"
+                        ? "#FFF8E7"
+                        : insight.type === "finding"
+                        ? "#EFF5EE"
+                        : insight.type === "suggestion"
+                        ? "#EFF3FA"
+                        : "#FFF0F0",
+                  }}
+                >
+                  <span
+                    className="font-medium"
+                    style={{
+                      color:
+                        insight.type === "risk"
+                          ? "#B7791F"
+                          : insight.type === "finding"
+                          ? "#276749"
+                          : insight.type === "suggestion"
+                          ? "#2C5282"
+                          : "#C53030",
+                    }}
+                  >
+                    {insight.label}:{" "}
+                  </span>
+                  <span>{insight.content}</span>
+                  {insight.highlighted_text && (
+                    <div className="mt-1 text-xs italic border-l-2 pl-2 opacity-75">
+                      "{insight.highlighted_text}"
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
