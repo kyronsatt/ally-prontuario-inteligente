@@ -15,6 +15,7 @@ import ListeningControls from "@/components/organisms/listening-controls";
 import { Card, CardContent } from "@/components/ui/card";
 import PreviousAnamnese from "@/components/organisms/previous-anamnese";
 import AppointmentNotes from "@/components/organisms/appointment-notes";
+import { Separator } from "@radix-ui/react-separator";
 
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
@@ -105,20 +106,20 @@ const ListeningPage: React.FC = () => {
           />
         </div>
 
-        <div className="col-span-4">
+        <div className="col-span-4 h-full">
           <div className="relative bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-xl pt-8 px-4 h-full overflow-hidden shadow-lg shadow-black/10">
             <div className="relative z-10 flex flex-col justify-between h-full">
               <div className="h-full flex flex-col">
-                <div className="text-center my-6">
-                  <h1 className="text-3xl font-bold text-white mb-2">
-                    Atendimento em Andamento
+                <div className="text-center mt-6 mb-16 px-4">
+                  <h1 className="text-3xl font-extrabold text-white mb-1">
+                    Escutando Consulta
                   </h1>
-                </div>
-                <div className="flex flex-col items-center justify-between pb-12 space-y-10 h-full">
                   <PatientInfo
                     name={patient?.name || ""}
                     type={appointment?.type}
                   />
+                </div>
+                <div className="flex flex-col items-center justify-center gap-20 h-full">
                   <Timer
                     duration={duration}
                     isPaused={recordingStatus === "PAUSED"}

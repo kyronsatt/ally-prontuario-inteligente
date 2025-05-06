@@ -29,8 +29,8 @@ const Timer: React.FC<TimerProps> = ({ duration, isPaused }) => {
       )}
 
       {/* Timer Circle */}
-      <div className="relative z-10 w-72 h-72 border-4 outline-4 outline-offset-[5px] outline-double outline-white/50 border-white rounded-full flex flex-col items-center justify-center shadow-inner shadow-ally-blue">
-        <span className="text-white text-5xl font-bold">
+      <div className="relative z-10 w-52 h-52 border-4 outline-4 outline-offset-[5px] outline-double outline-white/50 border-white rounded-full flex flex-col items-center justify-center shadow-inner shadow-ally-blue">
+        <span className="text-white text-3xl font-bold">
           {formatTime(duration)}
         </span>
       </div>

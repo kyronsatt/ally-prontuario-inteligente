@@ -7,10 +7,9 @@ interface PatientInfoProps {
 
 const PatientInfo: React.FC<PatientInfoProps> = ({ name, type }) => {
   return (
-    <div className="text-white w-full px-24">
-      <p className="text-lg font-medium">Paciente:</p>
-      <p className="text-2xl font-bold">{name}</p>
-      <p className="text-sm mt-1 opacity-75">
+    <div className="text-white w-full flex gap-2 justify-center items-center">
+      <p className="text-xl font-medium">{name}</p>
+      <p className="text-sm font-semibold rounded-full bg-white/10 border border-white py-1 px-4 w-fit">
         {type === "NEW" ? "Primeiro atendimento" : "Paciente de retorno"}
       </p>
     </div>

@@ -232,7 +232,7 @@ async function generateAnamneseData(openai, requestData) {
           - content: texto do insight em português
           - highlighted_text: (opcional) trecho da anamnese que embasa o insight
           
-          Limite-se a no máximo 3 insights realmente relevantes.`,
+          Limite-se a no máximo 3 insights realmente relevantes e evite repetições ou redundâncias.`,
         },
         {
           role: "user",
