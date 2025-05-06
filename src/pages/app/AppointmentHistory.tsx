@@ -45,7 +45,7 @@ const AppointmentHistoryPage: React.FC = () => {
   const handleRetry = () => window.location.reload();
 
   return (
-    <div className="max-w-7xl mt-12 flex flex-col justify-self-center w-full">
+    <div className="max-w-5xl mt-12 flex flex-col justify-self-center w-full">
       <div className="text-ally-dark mb-10">
         <Button
           variant="ghost"

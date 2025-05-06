@@ -87,7 +87,7 @@ const Dashboard: React.FC = () => {
       : 0;
 
   return (
-    <div className="max-w-7xl mx-auto w-full mt-12">
+    <div className="max-w-5xl mx-auto w-full mt-12">
       {/* Welcome Banner */}
       <div className="text-ally-dark mb-20">
         <h1 className="text-4xl md:text-6xl font-semibold mb-2 gradient-text">

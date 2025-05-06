@@ -112,7 +112,7 @@ const AppointmentSummary: React.FC = () => {
   if (isGeneratingAnamnese || isRetrievingAnamnese) {
     const action = isGeneratingAnamnese ? "Finalizando" : "Acessando";
     return (
-      <div className="max-w-7xl mx-auto text-center py-16">
+      <div className="max-w-5xl mx-auto text-center py-16">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="rounded-full bg-blue-50 p-4">
             <Loader2 className="h-12 w-12 text-ally-blue animate-spin" />
@@ -129,7 +129,7 @@ const AppointmentSummary: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto pb-20">
+    <div className="max-w-5xl mx-auto pb-20">
       <div className="flex items-center mb-6">
         <Button
           onClick={() => navigate("/app")}
@@ -149,7 +149,7 @@ const AppointmentSummary: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex gap-4 h-fit mb-10 bg-gray-50 border border-gray-200 p-5 rounded-xl">
+      <div className="flex gap-3 h-fit mb-10 bg-gray-50 border border-gray-200 p-3 rounded-xl">
         <PatientInfoCard
           patientName={
             appointment?.patient?.name ??

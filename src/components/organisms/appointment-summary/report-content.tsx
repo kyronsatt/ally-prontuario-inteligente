@@ -19,6 +19,8 @@ import {
   LucidePill,
   LucideStethoscope,
   LucideProps,
+  LucideCircleArrowRight,
+  LucideArrowRight,
 } from "lucide-react";
 
 import RichTextEditor from "@/components/molecules/rich-text-editor";
@@ -26,6 +28,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { IAnamnese } from "@/context/AnamneseContext";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface AppointmentReportProps {
   anamnese?: IAnamnese;
@@ -57,66 +60,77 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
       icon: React.ForwardRefExoticComponent<
         Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
       >;
+      acronym: string;
     }> = [
       {
         title: "Identificação",
         content: anamnese.identification,
         id: "identification",
-        icon: LucideUser,
+        icon: LucideFingerprint,
+        acronym: "Identificação",
       },
       {
         title: "Queixa Principal",
         content: anamnese.main_complaint,
         id: "main_complaint",
         icon: LucideAngry,
+        acronym: "Queixa",
       },
       {
         title: "História da Doença Atual",
         content: anamnese.current_illness_history,
         id: "current_illness_history",
         icon: LucideThermometer,
+        acronym: "HDA",
       },
       {
         title: "História Patológica Pregressa",
         content: anamnese.past_medical_history,
         id: "past_medical_history",
         icon: LucideHeartPulse,
+        acronym: "HPP",
       },
       {
         title: "Histórico Social",
         content: anamnese.social_history,
         id: "social_history",
         icon: LucideUsers2,
+        acronym: "H. Social",
       },
       {
         title: "Histórico Familiar",
         content: anamnese.family_history,
         id: "family_history",
         icon: LucideHouse,
+        acronym: "H. Familiar",
       },
       {
         title: "Exames Físicos",
         content: anamnese.physical_exams,
         id: "physical_exams",
-        icon: LucideFingerprint,
+        icon: LucideUser,
+        acronym: "E. Físicos",
       },
       {
         title: "Exames Complementares",
         content: anamnese.complementary_exams,
         id: "complementary_exams",
         icon: LucideTestTube2,
+        acronym: "E. Complementares",
       },
       {
         title: "Abordagem Terapêutica",
         content: anamnese.therapeutic_approach,
         id: "therapeutic_approach",
         icon: LucidePill,
+        acronym: "Conduta",
       },
       {
         title: "Hipóteses Diagnósticas",
         content: anamnese.diagnostic_hypotheses,
         id: "diagnostic_hypotheses",
         icon: LucideStethoscope,
+        acronym: "Hipóteses",
       },
     ];
 
@@ -158,56 +172,76 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
     };
 
     return (
-      <div className="space-y-6 animate-fade-in print:space-y-4">
-        {sections.map(({ title, content, id: sectionId, icon: Icon }) => (
-          <Card
-            key={`anamnese-section-card-${sectionId}`}
-            className={`border-l-4 border-r-ally-blue/30 border-t-ally-blue/30 border-b-ally-blue/30 border-l-ally-blue overflow-hidden shadow-none`}
-          >
-            <CardHeader
-              className={`flex flex-row w-full items-center justify-between bg-ally-blue/10 py-2`}
+      <div className="w-full grid grid-cols-8 gap-10 mt-10">
+        <div className="flex flex-col gap-1 col-span-2">
+          <p className="text-md text-gray-300 ml-2">
+            Ir para
+            <LucideArrowRight className="w-4 inline ml-1" />
+          </p>
+          <Separator className="mb-4" />
+          <div className="flex flex-wrap gap-3 w-full mb-8">
+            {sections.map(({ id: sectionId, icon: Icon, acronym }) => (
+              <a
+                href={`#${sectionId}`}
+                className="rounded-md hover:bg-ally-blue/10 hover:scale-110 transition-all cursor-pointer bg-ally-blue/5 border border-ally-blue/40 flex gap-2 items-center justify-center p-2 text-ally-blue"
+              >
+                {<Icon className="h-5" />} {acronym}
+              </a>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-6 animate-fade-in print:space-y-4 col-span-6">
+          {sections.map(({ title, content, id: sectionId, icon: Icon }) => (
+            <Card
+              id={sectionId}
+              key={`anamnese-section-card-${sectionId}`}
+              className={`border-l-4 border-r-ally-blue/30 border-t-ally-blue/30 border-b-ally-blue/30 border-l-ally-blue overflow-hidden shadow-none`}
             >
-              <CardTitle className="text-xl flex items-center gap-3 w-fit">
-                {<Icon className="h-5" />} {title}
-              </CardTitle>
-              {isSaving && editingSection === sectionId && (
-                <Loader2 size={20} className="text-ally-blue animate-spin" />
-              )}
-              {!isSaving && editingSection === sectionId ? (
-                <div className="flex gap-2">
-                  <X
-                    className={getEditionButtonClassName("CANCEL")}
-                    size={32}
-                    onClick={() => handleDiscardChanges(sectionId)}
-                  />
-                  <Check
-                    className={getEditionButtonClassName("SAVE")}
-                    size={32}
-                    onClick={() => handleSaveChanges()}
-                  />
-                </div>
-              ) : (
-                !isSaving && (
-                  <PenBox
-                    className={getEditionButtonClassName("EDIT")}
-                    size={32}
-                    onClick={() => setEditingSection(sectionId)}
-                  />
-                )
-              )}
-            </CardHeader>
-            <CardContent className="pt-4">
-              <RichTextEditor
-                id={sectionId}
-                content={content}
-                onChange={(newContent) =>
-                  handleContentChange(sectionId, newContent)
-                }
-                isEditable={editingSection === sectionId}
-              />
-            </CardContent>
-          </Card>
-        ))}
+              <CardHeader
+                className={`flex flex-row w-full items-center justify-between bg-ally-blue/10 py-2`}
+              >
+                <CardTitle className="text-xl flex items-center gap-3 w-fit">
+                  {<Icon className="h-5" />} {title}
+                </CardTitle>
+                {isSaving && editingSection === sectionId && (
+                  <Loader2 size={20} className="text-ally-blue animate-spin" />
+                )}
+                {!isSaving && editingSection === sectionId ? (
+                  <div className="flex gap-2">
+                    <X
+                      className={getEditionButtonClassName("CANCEL")}
+                      size={32}
+                      onClick={() => handleDiscardChanges(sectionId)}
+                    />
+                    <Check
+                      className={getEditionButtonClassName("SAVE")}
+                      size={32}
+                      onClick={() => handleSaveChanges()}
+                    />
+                  </div>
+                ) : (
+                  !isSaving && (
+                    <PenBox
+                      className={getEditionButtonClassName("EDIT")}
+                      size={32}
+                      onClick={() => setEditingSection(sectionId)}
+                    />
+                  )
+                )}
+              </CardHeader>
+              <CardContent className="pt-4">
+                <RichTextEditor
+                  id={sectionId}
+                  content={content}
+                  onChange={(newContent) =>
+                    handleContentChange(sectionId, newContent)
+                  }
+                  isEditable={editingSection === sectionId}
+                />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }

@@ -33,15 +33,15 @@ const getInsightIcon = (type: string) => {
 const getInsightColor = (type: string) => {
   switch (type) {
     case "risk":
-      return "bg-amber-100 hover:bg-amber-200 text-amber-800 border-amber-300";
+      return "bg-amber-50 text-amber-700 border-amber-200";
     case "finding":
-      return "bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300";
+      return "bg-blue-50 text-blue-700 border-blue-200";
     case "suggestion":
-      return "bg-purple-100 hover:bg-purple-200 text-purple-800 border-purple-300";
+      return "bg-purple-50 text-purple-700 border-purple-200";
     case "red_flag":
-      return "bg-red-100 hover:bg-red-200 text-red-800 border-red-300";
+      return "bg-red-50 text-red-700 border-red-200";
     default:
-      return "bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300";
+      return "bg-gray-50 text-gray-700 border-gray-200";
   }
 };
 
