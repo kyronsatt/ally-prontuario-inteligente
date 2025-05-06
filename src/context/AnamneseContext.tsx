@@ -10,12 +10,9 @@ import { useTranscription } from "./TranscriptionContext";
 import { PatientData, usePatient } from "./PatientContext";
 
 export interface InsightItem {
-  id: string;
   type: "risk" | "finding" | "suggestion" | "red_flag";
   label: string;
   content: string;
-  highlighted_text?: string;
-  created_at: string;
 }
 
 interface AnamneseContextType {

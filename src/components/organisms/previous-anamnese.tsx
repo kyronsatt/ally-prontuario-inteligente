@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,11 +97,13 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
 
         {anamnese.insights && anamnese.insights.length > 0 && (
           <div className="mt-6 border-t border-gray-200 pt-4">
-            <h3 className="font-medium text-ally-blue mb-1">Insights Clínicos</h3>
+            <h3 className="font-medium text-ally-blue mb-1">
+              Insights Clínicos
+            </h3>
             <div className="space-y-2">
               {anamnese.insights.map((insight, index) => (
                 <div
-                  key={insight.id || index}
+                  key={index}
                   className="text-sm p-2 border rounded-md"
                   style={{
                     borderColor:
@@ -139,11 +140,6 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
                     {insight.label}:{" "}
                   </span>
                   <span>{insight.content}</span>
-                  {insight.highlighted_text && (
-                    <div className="mt-1 text-xs italic border-l-2 pl-2 opacity-75">
-                      "{insight.highlighted_text}"
-                    </div>
-                  )}
                 </div>
               ))}
             </div>

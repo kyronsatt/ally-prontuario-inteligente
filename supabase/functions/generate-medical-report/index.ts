@@ -1,74 +1,71 @@
-
 // @ts-expect-error :: deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-expect-error :: deno
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 // @ts-expect-error :: deno
 import OpenAI from "https://esm.sh/openai@4.20.1";
-// @ts-expect-error :: deno
-import { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", {
+      headers: corsHeaders,
+    });
   }
-
   try {
     const authHeader = req.headers.get("Authorization");
     const { supabaseClient, jwt } = await validateAuthHeader(authHeader);
     const requestData = await req.json();
-
     validateRequestData(requestData);
-
     const openai = new OpenAI({
       apiKey: Deno.env.get("OPENAI_API_KEY"),
     });
-
     const anamneseData = await generateAnamneseData(openai, requestData);
-
     const userData = await getUserData(supabaseClient, jwt);
-
-    await insertAnamneseIntoDb(
+    const anamneseEntry = await insertAnamneseIntoDb(
       supabaseClient,
       anamneseData,
       requestData,
       userData
     );
-
-    return new Response(JSON.stringify(anamneseData), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify(anamneseEntry), {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
     });
   } catch (error) {
     console.error("Error in generate-anamnese function:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 });
 
-async function validateAuthHeader(authHeader: string | null) {
+async function validateAuthHeader(authHeader) {
   if (!authHeader) {
     throw new Error("No authorization header");
   }
-
   const jwt = authHeader.replace("Bearer ", "").trim();
-
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
-
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error("Supabase environment variables are missing");
     throw new Error("Supabase configuration is missing");
   }
-
   const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
     global: {
       headers: {
@@ -76,11 +73,12 @@ async function validateAuthHeader(authHeader: string | null) {
       },
     },
   });
-
-  return { supabaseClient, jwt };
+  return {
+    supabaseClient,
+    jwt,
+  };
 }
-
-function validateRequestData(requestData: Record<string, any>) {
+function validateRequestData(requestData) {
   const requiredFields = [
     "transcription",
     "transcriptionId",
@@ -96,10 +94,88 @@ function validateRequestData(requestData: Record<string, any>) {
   });
 }
 
-async function generateAnamneseData(
-  openai: OpenAI,
-  requestData: Record<string, any>
-) {
+const insightsSchema = {
+  type: "array",
+  description: "Insights clínicos extraídos da anamnese",
+  items: {
+    type: "object",
+    properties: {
+      type: {
+        type: "string",
+        enum: ["risk", "finding", "suggestion", "red_flag"],
+      },
+      label: {
+        type: "string",
+      },
+      content: {
+        type: "string",
+      },
+    },
+    required: ["type", "label", "content"],
+    additionalProperties: false,
+  },
+};
+
+const anamneseSchema = {
+  type: "object",
+  properties: {
+    identification: {
+      type: "string",
+      description: "Identificação do paciente",
+    },
+    main_complaint: {
+      type: "string",
+      description: "Queixa principal (pode conter jargões)",
+    },
+    current_illness_history: {
+      type: "string",
+      description: "História da doença atual",
+    },
+    past_medical_history: {
+      type: "string",
+      description: "Histórico médico pregresso",
+    },
+    social_history: {
+      type: "string",
+      description: "Histórico social",
+    },
+    family_history: {
+      type: "string",
+      description: "Histórico familiar",
+    },
+    physical_exams: {
+      type: "string",
+      description: "Exames físicos",
+    },
+    complementary_exams: {
+      type: "string",
+      description: "Exames complementares",
+    },
+    therapeutic_approach: {
+      type: "string",
+      description: "Abordagem terapêutica",
+    },
+    diagnostic_hypotheses: {
+      type: "string",
+      description: "Hipóteses diagnósticas",
+    },
+  },
+  required: [
+    "identification",
+    "main_complaint",
+    "current_illness_history",
+    "past_medical_history",
+    "social_history",
+    "family_history",
+    "physical_exams",
+    "complementary_exams",
+    "therapeutic_approach",
+    "diagnostic_hypotheses",
+  ],
+  additionalProperties: false, // Adicionado conforme necessário
+};
+
+async function generateAnamneseData(openai, requestData) {
   const systemPrompt = createSystemPrompt(
     requestData.patientName,
     requestData.appointmentType,
@@ -107,39 +183,40 @@ async function generateAnamneseData(
     requestData.previousAnamnese,
     requestData.appointmentNotes
   );
-
   const completion = await openai.chat.completions.create({
     model: "gpt-4.1-nano",
     messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: requestData.transcription },
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: requestData.transcription,
+      },
     ],
     response_format: {
       type: "json_schema",
       json_schema: {
-        name: "anamnese_default_v1",
+        name: "anamnese_default_v2",
         strict: true,
         schema: anamneseSchema,
       },
     },
     temperature: 0.5,
   });
-
   const { finish_reason, message } = completion.choices[0];
-
   if (finish_reason !== "stop") {
     throw new Error("Modelo não concluiu a resposta corretamente.");
   }
-
   try {
     const anamneseData = JSON.parse(message.content);
-    
     // Generate clinical insights
     const insightsCompletion = await openai.chat.completions.create({
       model: "gpt-4.1-nano",
       messages: [
-        { 
-          role: "system", 
+        {
+          role: "system",
           content: `Você é um assistente médico especializado em extrair insights clínicos de anamneses médicas.
           
           Com base na anamnese fornecida, identifique insights clínicos relevantes como:
@@ -155,10 +232,10 @@ async function generateAnamneseData(
           - content: texto do insight em português
           - highlighted_text: (opcional) trecho da anamnese que embasa o insight
           
-          Limite-se a no máximo 5 insights realmente relevantes.`
+          Limite-se a no máximo 3 insights realmente relevantes.`,
         },
-        { 
-          role: "user", 
+        {
+          role: "user",
           content: `Anamnese médica:
           
           Identificação: ${anamneseData.identification}
@@ -170,78 +247,55 @@ async function generateAnamneseData(
           Exames Físicos: ${anamneseData.physical_exams}
           Exames Complementares: ${anamneseData.complementary_exams}
           Abordagem Terapêutica: ${anamneseData.therapeutic_approach}
-          Hipóteses Diagnósticas: ${anamneseData.diagnostic_hypotheses}`
-        }
+          Hipóteses Diagnósticas: ${anamneseData.diagnostic_hypotheses}`,
+        },
       ],
       response_format: {
         type: "json_schema",
         json_schema: {
-          name: "insights_schema",
-          type: "object",
-          properties: {
-            insights: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  id: { type: "string" },
-                  type: { type: "string", enum: ["risk", "finding", "suggestion", "red_flag"] },
-                  label: { type: "string" },
-                  content: { type: "string" },
-                  highlighted_text: { type: "string" },
-                  created_at: { type: "string", format: "date-time" }
-                },
-                required: ["id", "type", "label", "content"]
-              }
-            }
-          }
-        }
+          name: "insights_schema_v1",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              insights: insightsSchema,
+            },
+            required: ["insights"],
+            additionalProperties: false,
+          },
+        },
       },
       temperature: 0.3,
     });
 
     try {
-      const insightsData = JSON.parse(insightsCompletion.choices[0].message.content);
-      
-      // Add timestamps to insights if not present
-      if (insightsData && insightsData.insights) {
-        insightsData.insights.forEach((insight: any) => {
-          if (!insight.created_at) {
-            insight.created_at = new Date().toISOString();
-          }
-        });
-        
-        // Add insights to anamnese data
-        anamneseData.insights = insightsData.insights;
-      }
+      const insightsData = JSON.parse(
+        insightsCompletion.choices[0].message.content
+      );
+
+      anamneseData.insights = insightsData.insights;
     } catch (error) {
       console.error("Error parsing insights response:", error);
-      // Don't fail the whole process if insights generation fails
       anamneseData.insights = [];
     }
-    
     return anamneseData;
   } catch (error) {
     throw new Error("Erro ao analisar a resposta JSON: " + error.message);
   }
 }
-
-async function getUserData(supabaseClient: SupabaseClient, jwt: string) {
+async function getUserData(supabaseClient, jwt) {
   const { data: userData, error: userError } =
     await supabaseClient.auth.getUser(jwt);
-
   if (userError || !userData?.user?.id) {
     throw new Error("Failed to retrieve user information");
   }
-
   return userData;
 }
-
 async function insertAnamneseIntoDb(
-  supabaseClient: SupabaseClient,
-  anamneseData: Record<string, unknown>,
-  requestData: Record<string, any>,
-  userData: Record<string, Record<string, unknown>>
+  supabaseClient,
+  anamneseData,
+  requestData,
+  userData
 ) {
   const { data: insertData, error: insertError } = await supabaseClient
     .from("anamnese")
@@ -266,15 +320,12 @@ async function insertAnamneseIntoDb(
     ])
     .select()
     .single();
-
   if (insertError) {
     console.error("Error inserting anamnese into database:", insertError);
     throw new Error("Failed to insert anamnese into database");
   }
-
   return insertData;
 }
-
 function createSystemPrompt(
   patientName: string,
   appointmentType: string,
@@ -317,10 +368,8 @@ function createSystemPrompt(
     infoParts.push(`é ${translateMaritalStatus(patientInfo.marital_status)}`);
   if (patientInfo.religion)
     infoParts.push(`segue a religião ${patientInfo.religion}`);
-
   const identification =
     infoParts.length > 0 ? `O paciente ${infoParts.join(", ")}.` : "";
-
   const isReturn = appointmentType === "RETURN";
   const returnNote =
     isReturn && previousAnamnese
@@ -347,7 +396,6 @@ function createSystemPrompt(
 
   Compare os achados atuais com os anteriores. Destaque evoluções ou pioras, mantendo o que ainda for relevante.`
       : "";
-
   const notesNote =
     appointmentNotes && appointmentNotes !== ""
       ? `
@@ -355,7 +403,6 @@ function createSystemPrompt(
       """${appointmentNotes}"""
       Dê prioridade máxima a estas anotações do médico quando elaborar cada seção do relatório.`
       : "";
-
   return `Você é um assistente médico que gera anamneses estruturadas com base em transcrições de consultas.
 
           Com base na transcrição, produza uma anamnese em português. 
@@ -389,69 +436,3 @@ function createSystemPrompt(
           Não inclua conteúdos fora desses campos. Seja objetivo.
     `;
 }
-
-const anamneseSchema = {
-  type: "object",
-  properties: {
-    identification: {
-      type: "string",
-      description: "Identificação do paciente",
-    },
-    main_complaint: {
-      type: "string",
-      description: "Queixa principal (pode conter jargões)",
-    },
-    current_illness_history: {
-      type: "string",
-      description: "História da doença atual",
-    },
-    past_medical_history: {
-      type: "string",
-      description: "Histórico médico pregresso",
-    },
-    social_history: { type: "string", description: "Histórico social" },
-    family_history: { type: "string", description: "Histórico familiar" },
-    physical_exams: { type: "string", description: "Exames físicos" },
-    complementary_exams: {
-      type: "string",
-      description: "Exames complementares",
-    },
-    therapeutic_approach: {
-      type: "string",
-      description: "Abordagem terapêutica",
-    },
-    diagnostic_hypotheses: {
-      type: "string",
-      description: "Hipóteses diagnósticas",
-    },
-    insights: {
-      type: "array",
-      description: "Insights clínicos extraídos da anamnese",
-      items: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          type: { type: "string", enum: ["risk", "finding", "suggestion", "red_flag"] },
-          label: { type: "string" },
-          content: { type: "string" },
-          highlighted_text: { type: "string" },
-          created_at: { type: "string", format: "date-time" }
-        },
-        required: ["id", "type", "label", "content"]
-      }
-    }
-  },
-  required: [
-    "identification",
-    "main_complaint",
-    "current_illness_history",
-    "past_medical_history",
-    "social_history",
-    "family_history",
-    "physical_exams",
-    "complementary_exams",
-    "therapeutic_approach",
-    "diagnostic_hypotheses",
-  ],
-  additionalProperties: false,
-};

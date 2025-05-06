@@ -1,4 +1,3 @@
-
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -26,25 +25,24 @@ Deno.serve(async (req) => {
         },
       }
     );
-
     const { data, error } = await supabaseClient
       .from("anamnese")
       .select(
         `
-        *,
-        patient:patients (*)
-      `
+    *,
+    patient:patients (*)
+  `
       )
       .eq("appointment_id", appointmentId)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .single();
 
     if (error) throw error;
-    
-    // Ensure insights is an array even if it's null in the database
+
     if (!data.insights) {
       data.insights = [];
     }
-    
     return new Response(JSON.stringify(data), {
       headers: {
         "Content-Type": "application/json",
