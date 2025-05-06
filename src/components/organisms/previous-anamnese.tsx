@@ -1,16 +1,20 @@
-
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IAnamnese } from "@/context/AnamneseContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar, CheckCircle2 } from "lucide-react";
+import moment from "moment";
 
 interface PreviousAnamneseProps {
   anamnese: IAnamnese | null;
   isLoading: boolean;
 }
 
-const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({ anamnese, isLoading }) => {
+const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
+  anamnese,
+  isLoading,
+}) => {
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -23,50 +27,72 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({ anamnese, isLoading
 
   if (!anamnese) {
     return (
-      <Card className="h-full border-ally-blue/30">
+      <Card className="h-fit max-h-[50%] border-ally-blue/30">
         <CardHeader>
-          <CardTitle className="text-xl text-ally-blue">Última Anamnese</CardTitle>
+          <CardTitle className="text-xl text-ally-blue">
+            Última Anamnese
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-500 italic">
-            Não há registros de anamneses anteriores para este paciente.
-          </p>
+        <CardContent className="flex py-8 gap-3 items-center text-gray-500">
+          <CheckCircle2 size={20} className="opacity-90" />
+          <p>Não há registros de anamneses anteriores para este paciente.</p>
         </CardContent>
       </Card>
     );
   }
 
   const sections = [
+    { title: "Identificação", content: anamnese.identification },
     { title: "Queixa Principal", content: anamnese.main_complaint },
-    { title: "História da Doença Atual", content: anamnese.current_illness_history },
-    { title: "História Patológica Pregressa", content: anamnese.past_medical_history },
+    {
+      title: "História da Doença Atual",
+      content: anamnese.current_illness_history,
+    },
+    {
+      title: "História Patológica Pregressa",
+      content: anamnese.past_medical_history,
+    },
     { title: "Histórico Social", content: anamnese.social_history },
     { title: "Histórico Familiar", content: anamnese.family_history },
     { title: "Exames Físicos", content: anamnese.physical_exams },
     { title: "Exames Complementares", content: anamnese.complementary_exams },
     { title: "Abordagem Terapêutica", content: anamnese.therapeutic_approach },
-    { title: "Hipóteses Diagnósticas", content: anamnese.diagnostic_hypotheses },
+    {
+      title: "Hipóteses Diagnósticas",
+      content: anamnese.diagnostic_hypotheses,
+    },
   ];
 
+  const formattedDateOfLastAnamnese = moment(anamnese?.created_at).format(
+    "DD/MM/YY"
+  );
+
   return (
-    <Card className="h-full border-ally-blue/30">
+    <Card className="h-2/3 flex flex-col border-ally-blue/30">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl text-ally-blue">Última Anamnese</CardTitle>
+        <CardTitle className="flex justify-between text-xl text-ally-blue">
+          <p>Última Anamnese</p>
+          <p className="items-center flex gap-1 text-[16px] font-light opacity-80">
+            <Calendar size={16} className="inline" />{" "}
+            {formattedDateOfLastAnamnese}
+          </p>
+        </CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-[calc(100vh-220px)] px-4">
-          <div className="space-y-4 pb-4">
-            {sections.map((section) => (
-              <div key={section.title} className="border-b border-gray-200 pb-3">
-                <h3 className="font-medium text-ally-blue mb-1">{section.title}</h3>
-                <div 
-                  className="text-sm text-gray-700" 
-                  dangerouslySetInnerHTML={{ __html: section.content }}
-                />
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+
+      <CardContent className="flex-1 overflow-auto px-4 py-6">
+        <div className="space-y-4 pb-4">
+          {sections.map((section) => (
+            <div key={section.title} className="border-b border-gray-200 pb-3">
+              <h3 className="font-medium text-ally-blue mb-1">
+                {section.title}
+              </h3>
+              <div
+                className="text-sm text-gray-700"
+                dangerouslySetInnerHTML={{ __html: section.content }}
+              />
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

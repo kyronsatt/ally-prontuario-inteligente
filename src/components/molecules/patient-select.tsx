@@ -14,7 +14,7 @@ const PatientSelect: React.FC<PatientSelectProps> = ({
   onPatientChange,
 }) => {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 w-1/2">
       <Label htmlFor="patient">Selecione o paciente</Label>
       <select
         id="patient"

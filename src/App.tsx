@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -52,7 +51,9 @@ const App = () => (
                 path="escuta"
                 element={
                   <TranscriptionProvider>
-                    <Listening />
+                    <AnamneseProvider>
+                      <Listening />
+                    </AnamneseProvider>
                   </TranscriptionProvider>
                 }
               />

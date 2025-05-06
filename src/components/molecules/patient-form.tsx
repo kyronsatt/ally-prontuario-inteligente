@@ -13,19 +13,18 @@ const PatientForm: React.FC = () => {
 
   return (
     <div className="space-y-4 mb-6">
-      <div className="space-y-1">
-        <Label htmlFor="name">
-          Nome do paciente<p className="text-ally-blue inline">*</p>
-        </Label>
-        <Input
-          id="name"
-          {...register("name", { required: true })}
-          placeholder="Nome completo"
-        />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-2">
+          <Label htmlFor="name">
+            Nome do paciente<p className="text-ally-blue inline">*</p>
+          </Label>
+          <Input
+            id="name"
+            {...register("name", { required: true })}
+            placeholder="Nome completo"
+          />
+        </div>
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="age">
             Idade<p className="text-ally-blue inline">*</p>
           </Label>
@@ -36,7 +35,9 @@ const PatientForm: React.FC = () => {
             placeholder="Idade"
           />
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="space-y-1">
           <Label htmlFor="profession">Profissão</Label>
           <Input
@@ -52,6 +53,15 @@ const PatientForm: React.FC = () => {
             id="housing"
             {...register("housing")}
             placeholder="Tipo de moradia"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="religion">Religiosidade</Label>
+          <Input
+            id="religion"
+            {...register("religion")}
+            placeholder="Religião (ex: Testemunha de Jeová)"
           />
         </div>
       </div>
@@ -71,21 +81,9 @@ const PatientForm: React.FC = () => {
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="gender">Gênero</Label>
-          <Input
-            id="gender"
-            {...register("gender")}
-            placeholder="Heterossexual, homossexual..."
-          />
-        </div>
-
-        <div className="space-y-1">
           <Label htmlFor="color">Cor/Etnia</Label>
           <Input id="color" {...register("color")} placeholder="Cor/Etnia" />
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="space-y-1">
           <Label htmlFor="marital_status">Estado Civil</Label>
           <select
@@ -101,17 +99,7 @@ const PatientForm: React.FC = () => {
             <option value="OTHER">Outro</option>
           </select>
         </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="religion">Religiosidade</Label>
-          <Input
-            id="religion"
-            {...register("religion")}
-            placeholder="Religião (ex: Testemunha de Jeová)"
-          />
-        </div>
       </div>
-
       {errors && <p className="text-red-600 font-semibold">{errors[0]}</p>}
     </div>
   );

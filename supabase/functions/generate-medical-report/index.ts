@@ -1,4 +1,3 @@
-
 // @ts-expect-error :: deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-expect-error :: deno
@@ -105,7 +104,7 @@ async function generateAnamneseData(
     requestData.appointmentType,
     requestData.patientInfo,
     requestData.previousAnamnese,
-    requestData.consultationNotes
+    requestData.appointmentNotes
   );
 
   const completion = await openai.chat.completions.create({
@@ -191,7 +190,7 @@ function createSystemPrompt(
   appointmentType: string,
   patientInfo: Record<string, string> = {},
   previousAnamnese: Record<string, string> | null = null,
-  consultationNotes: string = ""
+  appointmentNotes: string = ""
 ): string {
   const translateSex = (sex: string): string => {
     const sexTranslations: Record<string, string> = {
@@ -259,16 +258,13 @@ function createSystemPrompt(
   Compare os achados atuais com os anteriores. Destaque evoluções ou pioras, mantendo o que ainda for relevante.`
       : "";
 
-  const notesNote = consultationNotes
-    ? `
-IMPORTANTE: O médico fez as seguintes anotações durante a consulta, que devem ser priorizadas na geração do relatório:
-
-"""
-${consultationNotes}
-"""
-
-Dê prioridade máxima a estas anotações do médico quando elaborar cada seção do relatório. Estas informações são mais importantes que a transcrição para compor o relatório final.`
-    : "";
+  const notesNote =
+    appointmentNotes && appointmentNotes !== ""
+      ? `
+      IMPORTANTE: O médico fez as seguintes anotações durante a consulta, que devem ser priorizadas na geração do relatório:
+      """${appointmentNotes}"""
+      Dê prioridade máxima a estas anotações do médico quando elaborar cada seção do relatório.`
+      : "";
 
   return `Você é um assistente médico que gera anamneses estruturadas com base em transcrições de consultas.
 

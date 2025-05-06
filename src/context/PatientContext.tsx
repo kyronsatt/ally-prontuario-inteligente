@@ -34,6 +34,7 @@ export interface PatientData extends PatientCreationPayload {
 interface PatientContextType {
   patient?: PatientData;
   patients?: PatientData[];
+  isLoading: boolean;
   setPatient: (patient: PatientData) => void;
   clearPatient: () => void;
   createPatient: (payload: PatientCreationPayload) => Promise<PatientData>;
@@ -50,7 +51,9 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
   children,
 }) => {
   const [patient, setPatient] = useState<PatientData>();
-  const [patients, setPatients] = useState<PatientData[]>([]);
+  const [patients, setPatients] = useState<PatientData[] | null>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const { user, session } = useAuth();
 
   const clearPatient = () => {
@@ -58,6 +61,7 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
   };
 
   const createPatient = async (payload: PatientCreationPayload) => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         "https://qvcdczmigjsvrxmiryos.supabase.co/functions/v1/create-patient",
@@ -87,10 +91,13 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
       return patientData;
     } catch (error) {
       console.error("Failed to create patient:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const getPatientsByUser = async (userId: string): Promise<PatientData[]> => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${envs.SUPABASE_HOST}/functions/v1/get-patients-by-user?user_id=${userId}`,
@@ -117,6 +124,8 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
     } catch (error) {
       console.error("Failed to fetch patients:", error);
       return [];
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -125,6 +134,7 @@ export const PatientProvider: React.FC<PatientProviderProps> = ({
       value={{
         patient,
         patients,
+        isLoading,
         setPatient,
         clearPatient,
         createPatient,

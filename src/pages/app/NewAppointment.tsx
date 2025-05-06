@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,13 @@ const NewAppointment: React.FC = () => {
 
   const { appointment, isProcessing, createAppointment, setAppointment } =
     useAppointment();
-  const { createPatient, getPatientsByUser, patients, setPatient } =
-    usePatient();
+  const {
+    createPatient,
+    getPatientsByUser,
+    patients,
+    isLoading: isLoadingPatients,
+    setPatient,
+  } = usePatient();
 
   const [appointmentType, setAppointmentType] = useState<AppointmentType>();
   const [selectedPatientId, setSelectedPatientId] = useState<string>("");
@@ -32,10 +37,11 @@ const NewAppointment: React.FC = () => {
   const methods = useForm<PatientCreationPayload>();
 
   useEffect(() => {
-    if (user?.id) {
+    console.log(isLoadingPatients, patients);
+    if (user?.id && !isLoadingPatients && !patients) {
       getPatientsByUser(user.id);
     }
-  }, [user]);
+  }, [user, isLoadingPatients, patients]);
 
   useEffect(() => {
     setAppointment(null);
@@ -107,8 +113,95 @@ const NewAppointment: React.FC = () => {
     setIsWaiting(false);
   };
 
+  const CoreContent = () => (
+    <CardContent className="space-y-6">
+      <div className="space-y-4 mb-12">
+        <h3 className="text-lg font-medium">Qual o tipo de atendimento?</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <RadioGroupItem
+            id="NEW"
+            value="NEW"
+            label="Paciente Novo"
+            onChange={(value) => setAppointmentType(value as AppointmentType)}
+            selectedValue={appointmentType || ""}
+          />
+          <RadioGroupItem
+            id="RETURN"
+            value="RETURN"
+            label="Retorno de Paciente"
+            onChange={(value) => setAppointmentType(value as AppointmentType)}
+            selectedValue={appointmentType || ""}
+          />
+        </div>
+      </div>
+
+      {appointmentType && (
+        <div className="space-y-4 pt-4 border-t">
+          <h3 className="text-lg font-medium">
+            {appointmentType === "NEW"
+              ? "Informações do novo paciente"
+              : "Buscar paciente"}
+          </h3>
+
+          {appointmentType === "NEW" ? (
+            <FormProvider {...methods}>
+              <form
+                onSubmit={methods.handleSubmit(
+                  handleSubmitNewPatient,
+                  (formErrors) => {
+                    console.error("Validation errors:", formErrors);
+                    toast({
+                      title: "Formulário incompleto",
+                      description: "Preencha todos os campos obrigatórios.",
+                    });
+                  }
+                )}
+                className="space-y-4"
+              >
+                <PatientForm />
+                <Button
+                  type="submit"
+                  className="w-full bg-ally-blue hover:bg-ally-blue/90"
+                  size="lg"
+                >
+                  Iniciar atendimento
+                </Button>
+              </form>
+            </FormProvider>
+          ) : (
+            <div>
+              <PatientSelect
+                patients={patients}
+                selectedPatientId={selectedPatientId}
+                onPatientChange={(e) => setSelectedPatientId(e.target.value)}
+              />
+              <Button
+                disabled={!selectedPatientId || isWaiting}
+                onClick={handleStartReturnAppointment}
+                className="mt-12 w-full bg-ally-blue hover:bg-ally-blue/90"
+                size="lg"
+              >
+                Iniciar atendimento
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </CardContent>
+  );
+
+  const LoadingContent = () => (
+    <div className="max-w-2xl mx-auto text-center py-16">
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-16 w-16 text-ally-blue animate-spin" />
+        <h2 className="text-2xl font-bold">Preparando escuta...</h2>
+        <p className="text-gray-600">Vamos iniciar a consulta em instantes.</p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <Button variant="ghost" className="mb-6" onClick={() => navigate("/app")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
       </Button>
@@ -117,87 +210,7 @@ const NewAppointment: React.FC = () => {
       </h1>
 
       <Card className="bg-white border-gray-100 shadow-none pt-8 mt-12">
-        <CardContent className="space-y-6">
-          <div className="space-y-4 mb-12">
-            <h3 className="text-lg font-medium">Qual o tipo de atendimento?</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <RadioGroupItem
-                id="NEW"
-                value="NEW"
-                label="Paciente Novo"
-                onChange={(value) =>
-                  setAppointmentType(value as AppointmentType)
-                }
-                selectedValue={appointmentType || ""}
-              />
-              <RadioGroupItem
-                id="RETURN"
-                value="RETURN"
-                label="Retorno de Paciente"
-                onChange={(value) =>
-                  setAppointmentType(value as AppointmentType)
-                }
-                selectedValue={appointmentType || ""}
-              />
-            </div>
-          </div>
-
-          {appointmentType && (
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="text-lg font-medium">
-                {appointmentType === "NEW"
-                  ? "Informações do novo paciente"
-                  : "Buscar paciente"}
-              </h3>
-
-              {appointmentType === "NEW" ? (
-                <FormProvider {...methods}>
-                  <form
-                    onSubmit={methods.handleSubmit(
-                      handleSubmitNewPatient,
-                      (formErrors) => {
-                        console.error("Validation errors:", formErrors);
-                        toast({
-                          title: "Formulário incompleto",
-                          description: "Preencha todos os campos obrigatórios.",
-                        });
-                      }
-                    )}
-                    className="space-y-4"
-                  >
-                    <PatientForm />
-                    <Button
-                      type="submit"
-                      disabled={isWaiting}
-                      className="w-full bg-ally-blue hover:bg-ally-blue/90"
-                      size="lg"
-                    >
-                      {isWaiting ? "Aguarde..." : "Iniciar atendimento"}
-                    </Button>
-                  </form>
-                </FormProvider>
-              ) : (
-                <div>
-                  <PatientSelect
-                    patients={patients}
-                    selectedPatientId={selectedPatientId}
-                    onPatientChange={(e) =>
-                      setSelectedPatientId(e.target.value)
-                    }
-                  />
-                  <Button
-                    disabled={!selectedPatientId || isWaiting}
-                    onClick={handleStartReturnAppointment}
-                    className="mt-12 w-full bg-ally-blue hover:bg-ally-blue/90"
-                    size="lg"
-                  >
-                    {isWaiting ? "Aguarde..." : "Iniciar atendimento"}
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
+        {isWaiting ? <LoadingContent /> : <CoreContent />}
       </Card>
     </div>
   );

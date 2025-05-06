@@ -18,7 +18,7 @@ const ListeningControls: React.FC<ListeningControlsProps> = ({
 }) => {
   const isPaused = recordingStatus === "PAUSED";
   return (
-    <div className="flex space-x-4">
+    <div className="flex space-x-4 px-8 w-full justify-between">
       <Button
         onClick={onTogglePause}
         className={`px-6 py-6 rounded-full ${
@@ -44,7 +44,7 @@ const ListeningControls: React.FC<ListeningControlsProps> = ({
 
       <Button
         onClick={onFinish}
-        className="bg-white text-ally-blue hover:bg-white/90 px-6 py-6 rounded-full"
+        className="bg-white text-ally-blue hover:bg-white/90 px-6 py-6 rounded-full w-full"
         size="lg"
         variant="outline"
       >

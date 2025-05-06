@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,14 +11,18 @@ import { PatientData, usePatient } from "./PatientContext";
 
 interface AnamneseContextType {
   anamnese: IAnamnese | null;
+  previousAnamnese: IAnamnese | null;
   isGeneratingAnamnese: boolean;
   isRetrievingAnamnese: boolean;
   generateAnamnese: (transcription: string) => Promise<void>;
   retrieveAnamnese: (appointmentId: string) => Promise<void>;
+  retrieveLastAnamnese: (patientId: string) => Promise<void>;
   updateAnamnese: (
     anamneseId: string,
     updatedData: IAnamneseMedicalPayload
   ) => Promise<{ success: boolean }>;
+  setAppointmentNotes: React.Dispatch<React.SetStateAction<string>>;
+  appointmentNotes?: string;
 }
 
 export interface IAnamneseMedicalPayload {
@@ -54,47 +57,23 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { session } = useAuth();
   const navigate = useNavigate();
-  const { appointment, setAppointment } = useAppointment();
+  const { appointment } = useAppointment();
   const { transcription } = useTranscription();
   const { patient } = usePatient();
+  const [appointmentNotes, setAppointmentNotes] = useState<
+    string | undefined
+  >();
 
   const [isGeneratingAnamnese, setIsGeneratingAnamnese] = useState(false);
   const [isRetrievingAnamnese, setIsRetrievingAnamnese] = useState(false);
   const [anamnese, setAnamnese] = useState<IAnamnese | null>(null);
-
-  const getPreviousAnamnese = async (patientId: string) => {
-    try {
-      const { data, error } = await fetch(
-        `${envs.SUPABASE_HOST}/functions/v1/get-previous-anamnese`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ patientId }),
-        }
-      ).then((res) => res.json());
-
-      if (error) throw error;
-      return data;
-    } catch (e) {
-      console.error("Erro ao obter anamnese anterior:", e);
-      return null;
-    }
-  };
+  const [previousAnamnese, setPreviousAnamnese] = useState<IAnamnese | null>(
+    null
+  );
 
   const generateAnamnese = async (transcriptionText: string) => {
     setIsGeneratingAnamnese(true);
     try {
-      let previousAnamnese = null;
-
-      // Get previous anamnese if this is a return appointment
-      if (appointment.type === "RETURN" && appointment.patient?.id) {
-        previousAnamnese = await getPreviousAnamnese(appointment.patient.id);
-      }
-
-      // Get extended patient information
       const patientInfo = {
         name: patient?.name,
         age: patient?.age,
@@ -106,9 +85,6 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         marital_status: patient?.marital_status,
         religion: patient?.religion,
       };
-
-      // Get consultation notes if available
-      const consultationNotes = localStorage.getItem("consultationNotes") || "";
 
       const response = await fetch(
         `${envs.SUPABASE_HOST}/functions/v1/generate-medical-report`,
@@ -127,13 +103,10 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
             appointmentType: appointment.type,
             appointmentId: appointment.id,
             previousAnamnese: previousAnamnese,
-            consultationNotes: consultationNotes, // Pass consultation notes to the medical report generator
+            appointmentNotes: appointmentNotes,
           }),
         }
       );
-
-      // Clean up consultation notes
-      localStorage.removeItem("consultationNotes");
 
       if (!response.ok) {
         throw new Error("Erro ao gerar anamnese");
@@ -146,7 +119,6 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         description: "Relatório gerado com sucesso.",
       });
 
-      // Navigate to the anamnese visualization page
       navigate(`/app/resumo?appointmentId=${appointment.id}`);
     } catch (e) {
       toast("Erro ao gerar anamnese", { description: String(e) });
@@ -187,6 +159,39 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const retrieveLastAnamnese = async (patientId: string) => {
+    setIsRetrievingAnamnese(true);
+    try {
+      const response = await fetch(
+        `${envs.SUPABASE_HOST}/functions/v1/retrieve-last-anamnese`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ patient_id: patientId }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao recuperar anamnese pelo ID do paciente");
+      }
+
+      const retrievedAnamnese = await response.json();
+      setPreviousAnamnese(retrievedAnamnese);
+
+      toast("Anamnese recuperada!", {
+        description: "Relatório carregado com sucesso.",
+      });
+    } catch (e) {
+      toast("Erro ao recuperar anamnese", { description: String(e) });
+      console.error("Erro ao recuperar anamnese pelo ID do paciente:", e);
+    } finally {
+      setIsRetrievingAnamnese(false);
+    }
+  };
+
   const updateAnamnese = async (
     anamneseId: string,
     updatedData: IAnamneseMedicalPayload
@@ -211,7 +216,6 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error("Erro ao atualizar anamnese");
       }
 
-      const updatedAnamnese = await response.json();
       setAnamnese((prev) => ({
         ...prev,
         ...updatedData,
@@ -233,11 +237,15 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
     <AnamneseContext.Provider
       value={{
         anamnese,
+        previousAnamnese,
         isGeneratingAnamnese,
         isRetrievingAnamnese,
         generateAnamnese,
         retrieveAnamnese,
+        retrieveLastAnamnese,
         updateAnamnese,
+        setAppointmentNotes,
+        appointmentNotes,
       }}
     >
       {children}
