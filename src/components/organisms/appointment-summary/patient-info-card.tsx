@@ -4,37 +4,57 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardContent,
 } from "@/components/ui/card";
+import { ListIcon, User2Icon } from "lucide-react";
+import { AppointmentType } from "@/context/AppointmentContext";
 
 interface PatientInfoCardProps {
   patientName: string;
   appointmentDate: string;
+  type: AppointmentType;
 }
 
 const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
   patientName,
   appointmentDate,
+  type,
 }) => {
   return (
-    <Card className="mb-5 border border-ally-blue/30 rounded-xl overflow-hidden shadow-none">
-      <CardHeader className="border-none rounded-xl shadow-none">
-        <div className="flex justify-between items-center">
+    <Card className="h-[19rem] w-[30%]">
+      <CardHeader className="border-none shadow-none">
+        <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
+          <ListIcon className="h-5 w-5" /> Informações
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="h-full">
+        <div className="flex flex-col items-start gap-4 pt-6">
           <div>
-            <CardDescription className="text-sm text-ally-gray mb-1">
+            <CardDescription className="text-sm text-ally-gray">
               Paciente
             </CardDescription>
-            <CardTitle className="text-2xl font-semibold">
+            <p className="text-lg font-semibold text-ally-blue">
               {patientName}
-            </CardTitle>
+            </p>
           </div>
-          <div className="text-right">
-            <CardDescription className="text-sm font-extralight text-ally-gray mb-1">
+          <div>
+            <CardDescription className="text-sm text-ally-gray">
               Data do atendimento
             </CardDescription>
-            <p className="font-medium text-ally-blue">{appointmentDate}</p>
+            <p className="text-lg font-semibold text-ally-blue">
+              {appointmentDate}
+            </p>
+          </div>
+          <div>
+            <CardDescription className="text-sm text-ally-gray">
+              Tipo de Consulta
+            </CardDescription>
+            <p className="text-lg font-semibold text-ally-blue">
+              {type === "NEW" ? "Nova" : "Retorno"}
+            </p>
           </div>
         </div>
-      </CardHeader>
+      </CardContent>
     </Card>
   );
 };

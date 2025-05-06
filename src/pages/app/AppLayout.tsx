@@ -9,8 +9,8 @@ const AppLayout: React.FC = () => {
       <div className="min-h-screen flex w-full bg-gray-100">
         <AppSidebar />
         <SidebarInset>
-          <div className="p-4 h-svh shadow-none bg-gray-100">
-            <div className="border border-gray-200 rounded-2xl bg-white p-8 h-full overflow-auto">
+          <div className="py-4 px-2 h-svh shadow-none bg-gray-100">
+            <div className="border border-gray-200 rounded-2xl bg-white py-8 px-32 h-full overflow-auto">
               <Outlet />
             </div>
           </div>

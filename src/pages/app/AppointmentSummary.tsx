@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import ActionButtons from "@/components/molecules/appointment-summary/action-buttons";
 import PatientInfoCard from "@/components/organisms/appointment-summary/patient-info-card";
 import AppointmentReport from "@/components/organisms/appointment-summary/report-content";
+import ClinicalInsights from "@/components/organisms/clinical-insights";
 
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
@@ -139,25 +140,27 @@ const AppointmentSummary: React.FC = () => {
         </Button>
       </div>
 
-      <div className="flex justify-between items-center mb-6 mt-12">
+      <div className="flex justify-between items-center my-12">
         <h1 className="text-4xl md:text-6xl font-semibold mb-2 gradient-text">
           Anamnese
         </h1>
+        <div className="flex flex-col sm:flex-row justify-end gap-4">
+          <ActionButtons onPrint={handlePrint} onDownload={handleDownload} />
+        </div>
       </div>
 
-      <PatientInfoCard
-        patientName={
-          appointment?.patient?.name ??
-          anamnese?.patient?.name ??
-          "Paciente não identificado"
-        }
-        appointmentDate={formattedDate}
-      />
-
-      <div className="flex flex-col sm:flex-row justify-end gap-4 mb-14">
-        <ActionButtons onPrint={handlePrint} onDownload={handleDownload} />
+      <div className="flex gap-4 h-fit mb-10 bg-gray-50 border border-gray-200 p-5 rounded-xl">
+        <PatientInfoCard
+          patientName={
+            appointment?.patient?.name ??
+            anamnese?.patient?.name ??
+            "Paciente não identificado"
+          }
+          appointmentDate={formattedDate}
+          type={appointment?.type}
+        />
+        <ClinicalInsights insights={anamnese?.insights} />
       </div>
-
       <AppointmentReport
         anamnese={editedAnamnese}
         unsavedChanges={unsavedChanges}

@@ -1,9 +1,15 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { InsightItem } from "@/context/AnamneseContext";
-import { AlertTriangle, Brain, Search, Flag, Zap } from "lucide-react";
+import {
+  AlertTriangle,
+  Brain,
+  Search,
+  Flag,
+  Zap,
+  LucideBlocks,
+} from "lucide-react";
 
 interface ClinicalInsightsProps {
   insights: InsightItem[];
@@ -42,14 +48,14 @@ const getInsightColor = (type: string) => {
 const ClinicalInsights: React.FC<ClinicalInsightsProps> = ({ insights }) => {
   if (!insights || insights.length === 0) {
     return (
-      <Card className="h-fit border-ally-blue/30 mt-6">
+      <Card className="h-[19rem] w-[70%]">
         <CardHeader>
           <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
             <Brain className="h-5 w-5" /> Insights Clínicos
           </CardTitle>
         </CardHeader>
         <CardContent className="flex py-8 gap-3 items-center text-gray-500">
-          <Brain size={20} className="opacity-90" />
+          <LucideBlocks size={20} className="opacity-90" />
           <p>Nenhum insight clínico disponível para esta anamnese.</p>
         </CardContent>
       </Card>
@@ -57,17 +63,17 @@ const ClinicalInsights: React.FC<ClinicalInsightsProps> = ({ insights }) => {
   }
 
   return (
-    <Card className="h-fit border-ally-blue/30 mt-6">
+    <Card className="flex flex-col h-[19rem] w-[70%]">
       <CardHeader>
         <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
           <Brain className="h-5 w-5" /> Insights Clínicos
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="flex-1 overflow-auto">
+        <div className="space-y-4 mt-6">
           {insights.map((insight) => (
             <div
-              key={insight.id}
+              key={`insight-${insight.label}`}
               className={`border rounded-md p-3 ${getInsightColor(
                 insight.type
               )}`}
@@ -79,11 +85,6 @@ const ClinicalInsights: React.FC<ClinicalInsightsProps> = ({ insights }) => {
                 </Badge>
               </div>
               <p className="text-sm">{insight.content}</p>
-              {insight.highlighted_text && (
-                <div className="mt-2 text-xs italic border-l-2 pl-2 text-gray-600">
-                  "{insight.highlighted_text}"
-                </div>
-              )}
             </div>
           ))}
         </div>
