@@ -1,28 +1,48 @@
-
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '@/context/AuthContext';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { toast } from '@/components/ui/sonner';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useAuth } from "@/context/AuthContext";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { toast } from "@/components/ui/sonner";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AllyLogo } from "@/components/atoms/ally-logo";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
-  password: z.string().min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
+  password: z
+    .string()
+    .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
 });
 
 const registerSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
-  password: z.string().min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
+  password: z
+    .string()
+    .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
   first_name: z.string().min(1, { message: "Nome é obrigatório" }),
   last_name: z.string().min(1, { message: "Sobrenome é obrigatório" }),
-  birth_date: z.string().min(1, { message: "Data de nascimento é obrigatória" }),
+  birth_date: z
+    .string()
+    .min(1, { message: "Data de nascimento é obrigatória" }),
   city: z.string().min(1, { message: "Cidade é obrigatória" }),
   state: z.string().min(1, { message: "Estado é obrigatório" }),
   specialty: z.string().min(1, { message: "Especialidade é obrigatória" }),
@@ -35,45 +55,45 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 const Login = () => {
   const { signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('login');
+  const [activeTab, setActiveTab] = useState<string>("login");
   const navigate = useNavigate();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      first_name: '',
-      last_name: '',
-      birth_date: '',
-      city: '',
-      state: '',
-      specialty: '',
-      crm: '',
+      email: "",
+      password: "",
+      first_name: "",
+      last_name: "",
+      birth_date: "",
+      city: "",
+      state: "",
+      specialty: "",
+      crm: "",
     },
   });
 
   const handleLogin = async (data: LoginFormValues) => {
     setIsLoading(true);
-    
+
     try {
       const { error } = await signIn(data.email, data.password);
       if (error) throw error;
-      
-      toast.success('Login realizado com sucesso');
-      navigate('/app');
+
+      toast.success("Login realizado com sucesso");
+      navigate("/app");
     } catch (error: any) {
       console.error(error);
-      toast.error('Falha na autenticação', {
-        description: error?.message || 'Tente novamente mais tarde.',
+      toast.error("Falha na autenticação", {
+        description: error?.message || "Tente novamente mais tarde.",
       });
     } finally {
       setIsLoading(false);
@@ -82,7 +102,7 @@ const Login = () => {
 
   const handleRegister = async (data: RegisterFormValues) => {
     setIsLoading(true);
-    
+
     try {
       // Add user metadata for the profile
       const options = {
@@ -93,21 +113,21 @@ const Login = () => {
           city: data.city,
           state: data.state,
           specialty: data.specialty,
-          crm: data.crm
-        }
+          crm: data.crm,
+        },
       };
-      
+
       const { error } = await signUp(data.email, data.password, options);
       if (error) throw error;
-      
-      toast.success('Cadastro realizado com sucesso', {
-        description: 'Verifique seu email para confirmar o cadastro.',
+
+      toast.success("Cadastro realizado com sucesso", {
+        description: "Verifique seu email para confirmar o cadastro.",
       });
-      setActiveTab('login');
+      setActiveTab("login");
     } catch (error: any) {
       console.error(error);
-      toast.error('Falha no cadastro', {
-        description: error?.message || 'Tente novamente mais tarde.',
+      toast.error("Falha no cadastro", {
+        description: error?.message || "Tente novamente mais tarde.",
       });
     } finally {
       setIsLoading(false);
@@ -115,33 +135,43 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-start pt-[10vw] pb-32 justify-center bg-ally-blue px-4">
       <div className="w-full max-w-lg">
-        <div className="mb-8 text-center">
+        <div className="mb-16 text-accent-foreground flex flex-col items-center">
           <a href="/" className="text-ally-dark font-semibold text-3xl">
-            <span className="gradient-text">Ally</span>
+            <AllyLogo className="h-24" white />
           </a>
-          <p className="mt-2 text-gray-600">Sua plataforma de atendimento inteligente</p>
+          <p className="mt-2 text-lg text-white">Da voz ao prontuário.</p>
         </div>
-        
-        <Card className="bg-white shadow-lg border-none">
+
+        <Card className="bg-white shadow-xl border-none">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
-              {activeTab === 'login' ? 'Entre na sua conta' : 'Crie sua conta'}
+              {activeTab === "login" ? "Entre na sua conta" : "Crie sua conta"}
             </CardTitle>
             <CardDescription className="text-center">
-              {activeTab === 'login' ? 'Digite suas credenciais para continuar' : 'Preencha seus dados para se cadastrar'}
+              {activeTab === "login"
+                ? "Digite suas credenciais para continuar"
+                : "Preencha seus dados para se cadastrar"}
             </CardDescription>
           </CardHeader>
-          
-          <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="px-6">
+
+          <Tabs
+            defaultValue="login"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <div className="px-6 pt-8">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Cadastre-se</TabsTrigger>
+                <TabsTrigger disabled value="register">
+                  {/* TODO -> ENABLE IT BEFORE LAUNCH */}
+                  Cadastre-se
+                </TabsTrigger>
               </TabsList>
             </div>
-            
+
             <TabsContent value="login">
               <Form {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(handleLogin)}>
@@ -165,7 +195,7 @@ const Login = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={loginForm.control}
                       name="password"
@@ -186,20 +216,20 @@ const Login = () => {
                       )}
                     />
                   </CardContent>
-                  
+
                   <CardFooter>
-                    <Button 
+                    <Button
                       type="submit"
                       className="w-full bg-ally-blue hover:bg-ally-blue/90"
                       disabled={isLoading}
                     >
-                      {isLoading ? 'Processando...' : 'Entrar'}
+                      {isLoading ? "Processando..." : "Entrar"}
                     </Button>
                   </CardFooter>
                 </form>
               </Form>
             </TabsContent>
-            
+
             <TabsContent value="register">
               <Form {...registerForm}>
                 <form onSubmit={registerForm.handleSubmit(handleRegister)}>
@@ -213,13 +243,17 @@ const Login = () => {
                           <FormItem>
                             <FormLabel>Nome</FormLabel>
                             <FormControl>
-                              <Input placeholder="João" disabled={isLoading} {...field} />
+                              <Input
+                                placeholder="João"
+                                disabled={isLoading}
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={registerForm.control}
                         name="last_name"
@@ -227,14 +261,18 @@ const Login = () => {
                           <FormItem>
                             <FormLabel>Sobrenome</FormLabel>
                             <FormControl>
-                              <Input placeholder="Silva" disabled={isLoading} {...field} />
+                              <Input
+                                placeholder="Silva"
+                                disabled={isLoading}
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={registerForm.control}
                       name="email"
@@ -254,7 +292,7 @@ const Login = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={registerForm.control}
                       name="password"
@@ -274,7 +312,7 @@ const Login = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={registerForm.control}
                       name="birth_date"
@@ -292,7 +330,7 @@ const Login = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     {/* Location Info */}
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
@@ -302,13 +340,17 @@ const Login = () => {
                           <FormItem>
                             <FormLabel>Cidade</FormLabel>
                             <FormControl>
-                              <Input placeholder="São Paulo" disabled={isLoading} {...field} />
+                              <Input
+                                placeholder="São Paulo"
+                                disabled={isLoading}
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={registerForm.control}
                         name="state"
@@ -316,14 +358,18 @@ const Login = () => {
                           <FormItem>
                             <FormLabel>Estado</FormLabel>
                             <FormControl>
-                              <Input placeholder="SP" disabled={isLoading} {...field} />
+                              <Input
+                                placeholder="SP"
+                                disabled={isLoading}
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    
+
                     {/* Professional Info */}
                     <FormField
                       control={registerForm.control}
@@ -332,13 +378,17 @@ const Login = () => {
                         <FormItem>
                           <FormLabel>Especialidade</FormLabel>
                           <FormControl>
-                            <Input placeholder="Clínica Médica" disabled={isLoading} {...field} />
+                            <Input
+                              placeholder="Clínica Médica"
+                              disabled={isLoading}
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={registerForm.control}
                       name="crm"
@@ -346,21 +396,25 @@ const Login = () => {
                         <FormItem>
                           <FormLabel>CRM</FormLabel>
                           <FormControl>
-                            <Input placeholder="12345/SP" disabled={isLoading} {...field} />
+                            <Input
+                              placeholder="12345/SP"
+                              disabled={isLoading}
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </CardContent>
-                  
+
                   <CardFooter>
-                    <Button 
+                    <Button
                       type="submit"
                       className="w-full bg-ally-blue hover:bg-ally-blue/90"
                       disabled={isLoading}
                     >
-                      {isLoading ? 'Processando...' : 'Cadastrar'}
+                      {isLoading ? "Processando..." : "Cadastrar"}
                     </Button>
                   </CardFooter>
                 </form>
