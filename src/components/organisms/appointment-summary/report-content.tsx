@@ -173,7 +173,7 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
 
     return (
       <div className="w-full grid grid-cols-8 gap-10 mt-10">
-        <div className="flex flex-col gap-1 col-span-2">
+        <div className="print:hidden flex flex-col gap-1 col-span-2">
           <p className="text-md text-gray-300 ml-2">
             Ir para
             <LucideArrowRight className="w-4 inline ml-1" />

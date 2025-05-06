@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import Header from "@/components/layouts/Header";
 import HeroSection from "@/components/sections/HeroSection";
@@ -17,11 +16,8 @@ const Index = () => {
   const { trackEvent } = useAnalytics();
 
   useEffect(() => {
-    // Set custom page title
     document.title = "Ally — Anamnese estruturada em segundos";
-    
-    // Track page view
-    trackEvent('page_view', { page: 'landing_page' });
+    trackEvent("page_view", { page: "landing_page" });
   }, [trackEvent]);
 
   return (

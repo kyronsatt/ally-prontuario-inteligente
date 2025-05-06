@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
@@ -30,7 +29,6 @@ const AppointmentSummary: React.FC = () => {
     updateAnamnese,
   } = useAnamnese();
   const { transcription } = useTranscription();
-  const { patient } = usePatient();
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [editedAnamnese, setEditedAnamnese] = useState<IAnamnese | undefined>(
     anamnese
@@ -57,55 +55,6 @@ const AppointmentSummary: React.FC = () => {
 
   const formattedDate = moment(appointment?.date).format("DD/MM/YY [às] HH:mm");
 
-  const handlePrint = () => {
-    const content = document.querySelector('.print-content');
-    if (!content) {
-      toast.error("Não foi possível imprimir o documento");
-      return;
-    }
-    
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error("Bloqueador de pop-ups pode estar impedindo a impressão");
-      return;
-    }
-    
-    // Create printable content
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Anamnese - ${anamnese?.patient?.name || 'Paciente'}</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-            .section { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-            .section-title { color: #3b82f6; font-weight: bold; margin-bottom: 5px; }
-            .patient-info { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>Anamnese Médica</h1>
-            <p>${formattedDate}</p>
-          </div>
-          <div class="patient-info">
-            <h2>Paciente: ${anamnese?.patient?.name || 'Não identificado'}</h2>
-          </div>
-          ${content.innerHTML}
-        </body>
-      </html>
-    `);
-    
-    printWindow.document.close();
-    printWindow.focus();
-    
-    // Print after content is loaded
-    printWindow.onload = function() {
-      printWindow.print();
-      toast.success("Imprimindo relatório");
-    };
-  };
-
   const handleDownload = async () => {
     if (!reportContentRef.current) {
       toast.error("Não foi possível gerar o PDF");
@@ -123,39 +72,47 @@ const AppointmentSummary: React.FC = () => {
         useCORS: true,
         logging: false,
       });
-      
-      const imgData = canvas.toDataURL('image/png');
-      
+
+      const imgData = canvas.toDataURL("image/png");
+
       // Document dimensions
       const imgWidth = 210; // A4 width in mm
       const pageHeight = 297; // A4 height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      const doc = new jsPDF('p', 'mm', 'a4');
+
+      const doc = new jsPDF("p", "mm", "a4");
       let position = 15; // Start position from top
-      
+
       // Add title
       doc.setFontSize(18);
       doc.setTextColor(44, 62, 80);
-      doc.text('Anamnese Médica', 105, position, { align: 'center' });
+      doc.text("Anamnese Médica", 105, position, { align: "center" });
       position += 10;
-      
+
       // Add patient info
       doc.setFontSize(12);
-      doc.text(`Paciente: ${anamnese?.patient?.name || 'Não identificado'}`, 14, position);
+      doc.text(
+        `Paciente: ${anamnese?.patient?.name || "Não identificado"}`,
+        14,
+        position
+      );
       position += 6;
       doc.text(`Data: ${formattedDate}`, 14, position);
       position += 10;
-      
+
       // Add the content image
-      doc.addImage(imgData, 'PNG', 10, position, imgWidth - 20, imgHeight);
-      
+      doc.addImage(imgData, "PNG", 10, position, imgWidth - 20, imgHeight);
+
       // Save the PDF
-      doc.save(`anamnese_${anamnese?.patient?.name || 'paciente'}_${moment().format('DDMMYYYY')}.pdf`);
-      
+      doc.save(
+        `anamnese_${anamnese?.patient?.name || "paciente"}_${moment().format(
+          "DDMMYYYY"
+        )}.pdf`
+      );
+
       toast.success("PDF gerado com sucesso!");
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
       toast.error("Erro ao gerar o PDF");
     }
   };
@@ -223,7 +180,7 @@ const AppointmentSummary: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto pb-20">
+    <div ref={reportContentRef} className="max-w-5xl mx-auto pb-20">
       <div className="flex items-center mb-6">
         <Button
           onClick={() => navigate("/app")}
@@ -239,7 +196,7 @@ const AppointmentSummary: React.FC = () => {
           Anamnese
         </h1>
         <div className="flex flex-col sm:flex-row justify-end gap-4">
-          <ActionButtons onPrint={handlePrint} onDownload={handleDownload} />
+          <ActionButtons onDownload={handleDownload} />
         </div>
       </div>
 
@@ -255,7 +212,7 @@ const AppointmentSummary: React.FC = () => {
         />
         <ClinicalInsights insights={anamnese?.insights} />
       </div>
-      <div ref={reportContentRef} className="print-content">
+      <div>
         <AppointmentReport
           anamnese={editedAnamnese}
           unsavedChanges={unsavedChanges}
