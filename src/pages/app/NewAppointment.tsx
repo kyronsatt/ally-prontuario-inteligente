@@ -10,15 +10,17 @@ import RadioGroupItem from "@/components/molecules/radio-group-item";
 import PatientSelect from "@/components/molecules/patient-select";
 import PatientForm from "@/components/molecules/patient-form";
 
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-standardized-toast";
 import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePatient, PatientCreationPayload } from "@/context/PatientContext";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 const NewAppointment: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { trackPageView, trackButtonClick, trackEvent } = useAnalytics();
 
   const { appointment, isProcessing, createAppointment, setAppointment } =
     useAppointment();
@@ -37,6 +39,10 @@ const NewAppointment: React.FC = () => {
   const methods = useForm<PatientCreationPayload>();
 
   useEffect(() => {
+    trackPageView('new_appointment');
+  }, []);
+
+  useEffect(() => {
     console.log(isLoadingPatients, patients);
     if (user?.id && !isLoadingPatients && !patients) {
       getPatientsByUser(user.id);
@@ -49,12 +55,21 @@ const NewAppointment: React.FC = () => {
 
   useEffect(() => {
     if (appointment && !isProcessing) {
+      trackEvent('appointment_created', { 
+        appointment_id: appointment.id, 
+        type: appointment.type 
+      });
       navigate("/app/escuta");
     }
-  }, [appointment, isProcessing]);
+  }, [appointment, isProcessing, navigate, trackEvent]);
 
   const startAppointmentWithPatient = async (patientId: string) => {
     try {
+      trackEvent('start_appointment_attempt', {
+        patient_id: patientId,
+        type: appointmentType
+      });
+      
       const result = await createAppointment({
         doctor_id: user.id,
         patient_id: patientId,
@@ -62,14 +77,27 @@ const NewAppointment: React.FC = () => {
       });
 
       if (!result?.patient) {
-        toast({ description: "Erro ao iniciar atendimento." });
+        trackEvent('start_appointment_failed', {
+          patient_id: patientId,
+          error: 'Patient data missing'
+        });
+        toast.error("Erro ao iniciar atendimento.");
         return;
       }
 
+      trackEvent('start_appointment_success', {
+        patient_id: patientId,
+        appointment_id: result.id
+      });
+      
       setPatient(result.patient);
     } catch (error) {
       console.error("Erro ao iniciar atendimento:", error);
-      toast({ description: "Erro ao iniciar atendimento." });
+      trackEvent('start_appointment_error', {
+        patient_id: patientId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error("Erro ao iniciar atendimento.");
     }
   };
 
@@ -77,6 +105,10 @@ const NewAppointment: React.FC = () => {
     setIsWaiting(true);
     try {
       console.log("Creating patient: ", data);
+      trackEvent('create_patient_attempt', {
+        patient_data: { ...data, created_by: user.id }
+      });
+      
       const newPatient = await createPatient({
         ...data,
         is_new: true,
@@ -84,14 +116,24 @@ const NewAppointment: React.FC = () => {
       });
 
       if (!newPatient?.id) {
-        toast({ description: "Erro ao criar o paciente." });
+        trackEvent('create_patient_failed', {
+          error: 'No patient ID returned'
+        });
+        toast.error("Erro ao criar o paciente.");
         return;
       }
 
+      trackEvent('create_patient_success', {
+        patient_id: newPatient.id
+      });
+      
       await startAppointmentWithPatient(newPatient.id);
     } catch (error) {
       console.error("Erro ao criar paciente:", error);
-      toast({ description: "Erro ao criar o paciente." });
+      trackEvent('create_patient_error', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      toast.error("Erro ao criar o paciente.");
     } finally {
       setIsWaiting(false);
     }
@@ -99,18 +141,35 @@ const NewAppointment: React.FC = () => {
 
   const handleStartReturnAppointment = async () => {
     if (!appointmentType || appointmentType !== "RETURN") {
-      toast({ description: "Selecione o tipo de atendimento como 'Retorno'." });
+      toast.warning("Selecione o tipo de atendimento como 'Retorno'.");
       return;
     }
 
     if (!selectedPatientId) {
-      toast({ description: "Selecione um paciente existente." });
+      toast.warning("Selecione um paciente existente.");
       return;
     }
 
     setIsWaiting(true);
     await startAppointmentWithPatient(selectedPatientId);
     setIsWaiting(false);
+  };
+
+  const handleTypeChange = (value: string) => {
+    const type = value as AppointmentType;
+    setAppointmentType(type);
+    trackEvent('appointment_type_selected', { type });
+  };
+
+  const handlePatientChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const patientId = e.target.value;
+    setSelectedPatientId(patientId);
+    trackEvent('patient_selected', { patient_id: patientId });
+  };
+
+  const handleNavigateBack = () => {
+    trackButtonClick('navigate_back_to_dashboard');
+    navigate("/app");
   };
 
   const CoreContent = () => (
@@ -122,14 +181,14 @@ const NewAppointment: React.FC = () => {
             id="NEW"
             value="NEW"
             label="Paciente Novo"
-            onChange={(value) => setAppointmentType(value as AppointmentType)}
+            onChange={handleTypeChange}
             selectedValue={appointmentType || ""}
           />
           <RadioGroupItem
             id="RETURN"
             value="RETURN"
             label="Retorno de Paciente"
-            onChange={(value) => setAppointmentType(value as AppointmentType)}
+            onChange={handleTypeChange}
             selectedValue={appointmentType || ""}
           />
         </div>
@@ -150,19 +209,37 @@ const NewAppointment: React.FC = () => {
                   handleSubmitNewPatient,
                   (formErrors) => {
                     console.error("Validation errors:", formErrors);
-                    toast({
-                      title: "Formulário incompleto",
-                      description: "Preencha todos os campos obrigatórios.",
-                    });
+                    trackEvent('patient_form_validation_error', { errors: Object.keys(formErrors) });
+                    toast.error("Preencha todos os campos obrigatórios.", "Formulário incompleto");
                   }
                 )}
                 className="space-y-4"
               >
                 <PatientForm />
+                <div className="flex items-start mt-4">
+                  <input
+                    type="checkbox"
+                    id="acceptTerms"
+                    {...methods.register("terms_accepted", { required: true })}
+                    className="mt-1 mr-2"
+                    onChange={() => trackEvent('terms_checkbox_changed')}
+                  />
+                  <label
+                    htmlFor="acceptTerms"
+                    className="text-sm text-ally-gray"
+                  >
+                    Li e concordo com os <a href="/terms" className="text-ally-blue hover:underline">Termos de Uso</a> e 
+                    <a href="/privacy" className="text-ally-blue hover:underline"> Política de Privacidade</a>.
+                  </label>
+                </div>
+                {methods.formState.errors.terms_accepted && (
+                  <p className="text-red-500 text-xs">Você precisa aceitar os termos para continuar.</p>
+                )}
                 <Button
                   type="submit"
                   className="w-full bg-ally-blue hover:bg-ally-blue/90"
                   size="lg"
+                  onClick={() => trackButtonClick('start_new_patient_appointment')}
                 >
                   Iniciar atendimento
                 </Button>
@@ -173,7 +250,7 @@ const NewAppointment: React.FC = () => {
               <PatientSelect
                 patients={patients}
                 selectedPatientId={selectedPatientId}
-                onPatientChange={(e) => setSelectedPatientId(e.target.value)}
+                onPatientChange={handlePatientChange}
               />
               <Button
                 disabled={!selectedPatientId || isWaiting}
@@ -202,7 +279,7 @@ const NewAppointment: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Button variant="ghost" className="mb-6" onClick={() => navigate("/app")}>
+      <Button variant="ghost" className="mb-6" onClick={handleNavigateBack}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
       </Button>
       <h1 className="text-4xl md:text-6xl mt-6 font-semibold mb-2 gradient-text">
@@ -210,7 +287,108 @@ const NewAppointment: React.FC = () => {
       </h1>
 
       <Card className="bg-white border-gray-100 shadow-none pt-8 mt-12">
-        {isWaiting ? <LoadingContent /> : <CoreContent />}
+        {isWaiting ? (
+          <div className="max-w-2xl mx-auto text-center py-16">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <Loader2 className="h-16 w-16 text-ally-blue animate-spin" />
+              <h2 className="text-2xl font-bold">Preparando escuta...</h2>
+              <p className="text-gray-600">Vamos iniciar a consulta em instantes.</p>
+            </div>
+          </div>
+        ) : (
+          <CardContent className="space-y-6">
+            <div className="space-y-4 mb-12">
+              <h3 className="text-lg font-medium">Qual o tipo de atendimento?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <RadioGroupItem
+                  id="NEW"
+                  value="NEW"
+                  label="Paciente Novo"
+                  onChange={handleTypeChange}
+                  selectedValue={appointmentType || ""}
+                />
+                <RadioGroupItem
+                  id="RETURN"
+                  value="RETURN"
+                  label="Retorno de Paciente"
+                  onChange={handleTypeChange}
+                  selectedValue={appointmentType || ""}
+                />
+              </div>
+            </div>
+
+            {appointmentType && (
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">
+                  {appointmentType === "NEW"
+                    ? "Informações do novo paciente"
+                    : "Buscar paciente"}
+                </h3>
+
+                {appointmentType === "NEW" ? (
+                  <FormProvider {...methods}>
+                    <form
+                      onSubmit={methods.handleSubmit(
+                        handleSubmitNewPatient,
+                        (formErrors) => {
+                          console.error("Validation errors:", formErrors);
+                          trackEvent('patient_form_validation_error', { errors: Object.keys(formErrors) });
+                          toast.error("Preencha todos os campos obrigatórios.", "Formulário incompleto");
+                        }
+                      )}
+                      className="space-y-4"
+                    >
+                      <PatientForm />
+                      <div className="flex items-start mt-4">
+                        <input
+                          type="checkbox"
+                          id="acceptTerms"
+                          {...methods.register("terms_accepted", { required: true })}
+                          className="mt-1 mr-2"
+                          onChange={() => trackEvent('terms_checkbox_changed')}
+                        />
+                        <label
+                          htmlFor="acceptTerms"
+                          className="text-sm text-ally-gray"
+                        >
+                          Li e concordo com os <a href="/terms" className="text-ally-blue hover:underline">Termos de Uso</a> e 
+                          <a href="/privacy" className="text-ally-blue hover:underline"> Política de Privacidade</a>.
+                        </label>
+                      </div>
+                      {methods.formState.errors.terms_accepted && (
+                        <p className="text-red-500 text-xs">Você precisa aceitar os termos para continuar.</p>
+                      )}
+                      <Button
+                        type="submit"
+                        className="w-full bg-ally-blue hover:bg-ally-blue/90"
+                        size="lg"
+                        onClick={() => trackButtonClick('start_new_patient_appointment')}
+                      >
+                        Iniciar atendimento
+                      </Button>
+                    </form>
+                  </FormProvider>
+                ) : (
+                  <div>
+                    <PatientSelect
+                      patients={patients}
+                      selectedPatientId={selectedPatientId}
+                      onPatientChange={handlePatientChange}
+                    />
+                    <Button
+                      disabled={!selectedPatientId || isWaiting}
+                      onClick={handleStartReturnAppointment}
+                      className="mt-12 w-full bg-ally-blue hover:bg-ally-blue/90"
+                      size="lg"
+                    >
+                      Iniciar atendimento
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        )}
       </Card>
     </div>
   );

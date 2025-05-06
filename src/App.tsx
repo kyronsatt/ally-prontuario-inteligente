@@ -24,6 +24,8 @@ import Help from "./pages/app/Help";
 import Profile from "./pages/app/Profile";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient();
 
