@@ -1,5 +1,5 @@
 import React from "react";
-import { AllyLogo } from "./atoms/ally-logo";
+import { AllyLogo } from "@/components/atoms/ally-logo";
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();

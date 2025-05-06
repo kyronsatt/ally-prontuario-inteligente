@@ -1,7 +1,4 @@
-
 import React from "react";
-import { SectionHeading } from "@/components/atoms/section-heading";
-import { HighlightedText } from "@/components/atoms/highlighted-text";
 
 const AboutSection: React.FC = () => {
   return (
@@ -25,23 +22,28 @@ const AboutSection: React.FC = () => {
             className="space-y-6 fade-in-section"
             style={{ "--delay": "200ms" } as React.CSSProperties}
           >
-            <SectionHeading>
-              Conheça sua nova <span className="gradient-text">parceira clínica</span>
-            </SectionHeading>
+            <h2 className="heading-lg">
+              Conheça sua nova{" "}
+              <span className="gradient-text">parceira clínica</span>
+            </h2>
 
             <div className="space-y-4 text-md font-light">
               <p>
-                A Ally usa <HighlightedText>Inteligência Artificial</HighlightedText>{" "}
+                A Ally usa{" "}
+                <p className="bg-ally-blue/20 inline">
+                  Inteligência Artificial
+                </p>{" "}
                 avançada para ouvir a conversa médico-paciente de forma segura e
                 discreta, enquanto você realiza o atendimento com tranquilidade
                 e eficiência.
               </p>
               <p>
                 Toda a{" "}
-                <HighlightedText>
+                <p className="bg-ally-blue/20 inline">
                   conversa é automaticamente estruturada em formato de
                   prontuário
-                </HighlightedText>, seguindo os padrões médicos e organizando as informações de
+                </p>
+                , seguindo os padrões médicos e organizando as informações de
                 forma lógica e útil para a sua prática.
               </p>
             </div>
