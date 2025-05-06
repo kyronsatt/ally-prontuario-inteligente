@@ -4,20 +4,19 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 import RadioGroupItem from "@/components/molecules/radio-group-item";
 import PatientSelect from "@/components/molecules/patient-select";
 import PatientForm from "@/components/molecules/patient-form";
 
-import { useToast } from "@/hooks/use-standardized-toast";
+import { toast } from "@/hooks/use-standardized-toast";
 import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePatient, PatientCreationPayload } from "@/context/PatientContext";
 import { useAnalytics } from "@/hooks/use-analytics";
 
 const NewAppointment: React.FC = () => {
-  const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { trackPageView, trackButtonClick, trackEvent } = useAnalytics();
@@ -39,7 +38,7 @@ const NewAppointment: React.FC = () => {
   const methods = useForm<PatientCreationPayload>();
 
   useEffect(() => {
-    trackPageView('new_appointment');
+    trackPageView("new_appointment");
   }, []);
 
   useEffect(() => {
@@ -55,9 +54,9 @@ const NewAppointment: React.FC = () => {
 
   useEffect(() => {
     if (appointment && !isProcessing) {
-      trackEvent('appointment_created', { 
-        appointment_id: appointment.id, 
-        type: appointment.type 
+      trackEvent("appointment_created", {
+        appointment_id: appointment.id,
+        type: appointment.type,
       });
       navigate("/app/escuta");
     }
@@ -65,11 +64,11 @@ const NewAppointment: React.FC = () => {
 
   const startAppointmentWithPatient = async (patientId: string) => {
     try {
-      trackEvent('start_appointment_attempt', {
+      trackEvent("start_appointment_attempt", {
         patient_id: patientId,
-        type: appointmentType
+        type: appointmentType,
       });
-      
+
       const result = await createAppointment({
         doctor_id: user.id,
         patient_id: patientId,
@@ -77,25 +76,25 @@ const NewAppointment: React.FC = () => {
       });
 
       if (!result?.patient) {
-        trackEvent('start_appointment_failed', {
+        trackEvent("start_appointment_failed", {
           patient_id: patientId,
-          error: 'Patient data missing'
+          error: "Patient data missing",
         });
         toast.error("Erro ao iniciar atendimento.");
         return;
       }
 
-      trackEvent('start_appointment_success', {
+      trackEvent("start_appointment_success", {
         patient_id: patientId,
-        appointment_id: result.id
+        appointment_id: result.id,
       });
-      
+
       setPatient(result.patient);
     } catch (error) {
       console.error("Erro ao iniciar atendimento:", error);
-      trackEvent('start_appointment_error', {
+      trackEvent("start_appointment_error", {
         patient_id: patientId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : "Unknown error",
       });
       toast.error("Erro ao iniciar atendimento.");
     }
@@ -105,10 +104,10 @@ const NewAppointment: React.FC = () => {
     setIsWaiting(true);
     try {
       console.log("Creating patient: ", data);
-      trackEvent('create_patient_attempt', {
-        patient_data: { ...data, created_by: user.id }
+      trackEvent("create_patient_attempt", {
+        patient_data: { ...data, created_by: user.id },
       });
-      
+
       const newPatient = await createPatient({
         ...data,
         is_new: true,
@@ -116,22 +115,22 @@ const NewAppointment: React.FC = () => {
       });
 
       if (!newPatient?.id) {
-        trackEvent('create_patient_failed', {
-          error: 'No patient ID returned'
+        trackEvent("create_patient_failed", {
+          error: "No patient ID returned",
         });
         toast.error("Erro ao criar o paciente.");
         return;
       }
 
-      trackEvent('create_patient_success', {
-        patient_id: newPatient.id
+      trackEvent("create_patient_success", {
+        patient_id: newPatient.id,
       });
-      
+
       await startAppointmentWithPatient(newPatient.id);
     } catch (error) {
       console.error("Erro ao criar paciente:", error);
-      trackEvent('create_patient_error', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+      trackEvent("create_patient_error", {
+        error: error instanceof Error ? error.message : "Unknown error",
       });
       toast.error("Erro ao criar o paciente.");
     } finally {
@@ -158,17 +157,17 @@ const NewAppointment: React.FC = () => {
   const handleTypeChange = (value: string) => {
     const type = value as AppointmentType;
     setAppointmentType(type);
-    trackEvent('appointment_type_selected', { type });
+    trackEvent("appointment_type_selected", { type });
   };
 
   const handlePatientChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const patientId = e.target.value;
     setSelectedPatientId(patientId);
-    trackEvent('patient_selected', { patient_id: patientId });
+    trackEvent("patient_selected", { patient_id: patientId });
   };
 
   const handleNavigateBack = () => {
-    trackButtonClick('navigate_back_to_dashboard');
+    trackButtonClick("navigate_back_to_dashboard");
     navigate("/app");
   };
 
@@ -209,37 +208,25 @@ const NewAppointment: React.FC = () => {
                   handleSubmitNewPatient,
                   (formErrors) => {
                     console.error("Validation errors:", formErrors);
-                    trackEvent('patient_form_validation_error', { errors: Object.keys(formErrors) });
-                    toast.error("Preencha todos os campos obrigatórios.", "Formulário incompleto");
+                    trackEvent("patient_form_validation_error", {
+                      errors: Object.keys(formErrors),
+                    });
+                    toast.error(
+                      "Preencha todos os campos obrigatórios.",
+                      "Formulário incompleto"
+                    );
                   }
                 )}
                 className="space-y-4"
               >
                 <PatientForm />
-                <div className="flex items-start mt-4">
-                  <input
-                    type="checkbox"
-                    id="acceptTerms"
-                    {...methods.register("terms_accepted", { required: true })}
-                    className="mt-1 mr-2"
-                    onChange={() => trackEvent('terms_checkbox_changed')}
-                  />
-                  <label
-                    htmlFor="acceptTerms"
-                    className="text-sm text-ally-gray"
-                  >
-                    Li e concordo com os <a href="/terms" className="text-ally-blue hover:underline">Termos de Uso</a> e 
-                    <a href="/privacy" className="text-ally-blue hover:underline"> Política de Privacidade</a>.
-                  </label>
-                </div>
-                {methods.formState.errors.terms_accepted && (
-                  <p className="text-red-500 text-xs">Você precisa aceitar os termos para continuar.</p>
-                )}
                 <Button
                   type="submit"
                   className="w-full bg-ally-blue hover:bg-ally-blue/90"
                   size="lg"
-                  onClick={() => trackButtonClick('start_new_patient_appointment')}
+                  onClick={() =>
+                    trackButtonClick("start_new_patient_appointment")
+                  }
                 >
                   Iniciar atendimento
                 </Button>
@@ -292,13 +279,17 @@ const NewAppointment: React.FC = () => {
             <div className="flex flex-col items-center justify-center space-y-4">
               <Loader2 className="h-16 w-16 text-ally-blue animate-spin" />
               <h2 className="text-2xl font-bold">Preparando escuta...</h2>
-              <p className="text-gray-600">Vamos iniciar a consulta em instantes.</p>
+              <p className="text-gray-600">
+                Vamos iniciar a consulta em instantes.
+              </p>
             </div>
           </div>
         ) : (
           <CardContent className="space-y-6">
             <div className="space-y-4 mb-12">
-              <h3 className="text-lg font-medium">Qual o tipo de atendimento?</h3>
+              <h3 className="text-lg font-medium">
+                Qual o tipo de atendimento?
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <RadioGroupItem
                   id="NEW"
@@ -332,37 +323,25 @@ const NewAppointment: React.FC = () => {
                         handleSubmitNewPatient,
                         (formErrors) => {
                           console.error("Validation errors:", formErrors);
-                          trackEvent('patient_form_validation_error', { errors: Object.keys(formErrors) });
-                          toast.error("Preencha todos os campos obrigatórios.", "Formulário incompleto");
+                          trackEvent("patient_form_validation_error", {
+                            errors: Object.keys(formErrors),
+                          });
+                          toast.error(
+                            "Preencha todos os campos obrigatórios.",
+                            "Formulário incompleto"
+                          );
                         }
                       )}
                       className="space-y-4"
                     >
                       <PatientForm />
-                      <div className="flex items-start mt-4">
-                        <input
-                          type="checkbox"
-                          id="acceptTerms"
-                          {...methods.register("terms_accepted", { required: true })}
-                          className="mt-1 mr-2"
-                          onChange={() => trackEvent('terms_checkbox_changed')}
-                        />
-                        <label
-                          htmlFor="acceptTerms"
-                          className="text-sm text-ally-gray"
-                        >
-                          Li e concordo com os <a href="/terms" className="text-ally-blue hover:underline">Termos de Uso</a> e 
-                          <a href="/privacy" className="text-ally-blue hover:underline"> Política de Privacidade</a>.
-                        </label>
-                      </div>
-                      {methods.formState.errors.terms_accepted && (
-                        <p className="text-red-500 text-xs">Você precisa aceitar os termos para continuar.</p>
-                      )}
                       <Button
                         type="submit"
                         className="w-full bg-ally-blue hover:bg-ally-blue/90"
                         size="lg"
-                        onClick={() => trackButtonClick('start_new_patient_appointment')}
+                        onClick={() =>
+                          trackButtonClick("start_new_patient_appointment")
+                        }
                       >
                         Iniciar atendimento
                       </Button>

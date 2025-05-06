@@ -1,5 +1,7 @@
-
-import { toast as originalToast, useToast as useOriginalToast } from "@/hooks/use-toast";
+import {
+  toast as originalToast,
+  useToast as useOriginalToast,
+} from "@/hooks/use-toast";
 import { Info, Check, X, AlertTriangle } from "lucide-react";
 import React from "react";
 
@@ -11,7 +13,7 @@ type ToastOptions = {
   duration?: number;
 };
 
-const getToastIcon = (type: ToastType) => {
+const getToastIcon = (type: ToastType): JSX.Element => {
   switch (type) {
     case "success":
       return <Check className="h-4 w-4 text-green-600" />;
@@ -48,10 +50,14 @@ export function useStandardizedToast() {
   return {
     ...originalHook,
     toast: showToast,
-    success: (description: string, title?: string) => showToast({ description, title, type: "success" }),
-    error: (description: string, title?: string) => showToast({ description, title, type: "error" }),
-    info: (description: string, title?: string) => showToast({ description, title, type: "info" }),
-    warning: (description: string, title?: string) => showToast({ description, title, type: "warning" }),
+    success: (description: string, title?: string) =>
+      showToast({ description, title, type: "success" }),
+    error: (description: string, title?: string) =>
+      showToast({ description, title, type: "error" }),
+    info: (description: string, title?: string) =>
+      showToast({ description, title, type: "info" }),
+    warning: (description: string, title?: string) =>
+      showToast({ description, title, type: "warning" }),
   };
 }
 

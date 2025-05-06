@@ -17,6 +17,9 @@
       "@components/*": [
         "./src/components/*"
       ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,

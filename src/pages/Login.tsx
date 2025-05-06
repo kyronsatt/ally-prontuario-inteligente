@@ -165,7 +165,7 @@ const Login = () => {
             <div className="px-6 pt-8">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger disabled value="register">
+                <TabsTrigger value="register">
                   {/* TODO -> ENABLE IT BEFORE LAUNCH */}
                   Cadastre-se
                 </TabsTrigger>

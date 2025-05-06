@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { AllyLogo } from "@/components/atoms/ally-logo";
 import { LucideMenu } from "lucide-react";
@@ -28,7 +27,7 @@ const Header: React.FC = () => {
       )}
     >
       <div className="container-ally flex justify-between items-center">
-        <a href="#" className="text-ally-dark font-semibold text-xl">
+        <a href="/" className="text-ally-dark font-semibold text-xl">
           <AllyLogo />
         </a>
 

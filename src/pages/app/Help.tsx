@@ -79,10 +79,10 @@ const Help: React.FC = () => {
               <p className="text-sm text-muted-foreground">
                 Entre em contato com nosso suporte técnico através do email{" "}
                 <a
-                  href="mailto:suporte@ally.med.br"
+                  href="mailto:suporte@allymed.com.br"
                   className="text-ally-blue underline"
                 >
-                  suporte@ally.med.br
+                  suporte@allymed.com.br
                 </a>
               </p>
             </div>

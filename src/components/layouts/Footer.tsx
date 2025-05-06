@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { AllyLogo } from "@/components/atoms/ally-logo";
@@ -27,42 +26,42 @@ const Footer: React.FC = () => {
             <a
               href="#about"
               className="text-ally-dark hover:text-ally-blue transition-colors"
-              onClick={() => trackButtonClick('footer_about')}
+              onClick={() => trackButtonClick("footer_about")}
             >
               Sobre
             </a>
             <a
               href="#benefits"
               className="text-ally-dark hover:text-ally-blue transition-colors"
-              onClick={() => trackButtonClick('footer_benefits')}
+              onClick={() => trackButtonClick("footer_benefits")}
             >
               Benefícios
             </a>
             <a
               href="#waitlist"
               className="text-ally-dark hover:text-ally-blue transition-colors"
-              onClick={() => trackButtonClick('footer_waitlist')}
+              onClick={() => trackButtonClick("footer_waitlist")}
             >
               Lista de espera
             </a>
             <Link
-              to="/terms"
+              to="/termo-de-uso"
               className="text-ally-dark hover:text-ally-blue transition-colors"
-              onClick={() => trackButtonClick('footer_terms')}
+              onClick={() => trackButtonClick("footer_terms")}
             >
               Termos de Uso
             </Link>
             <Link
-              to="/privacy"
+              to="/politica-privacidade"
               className="text-ally-dark hover:text-ally-blue transition-colors"
-              onClick={() => trackButtonClick('footer_privacy')}
+              onClick={() => trackButtonClick("footer_privacy")}
             >
               Privacidade
             </Link>
             <a
-              href="mailto:contato@ally.med.br"
+              href="mailto:contato@allymed.com.br"
               className="text-ally-dark hover:text-ally-blue transition-colors"
-              onClick={() => trackButtonClick('footer_contact')}
+              onClick={() => trackButtonClick("footer_contact")}
             >
               Contato
             </a>

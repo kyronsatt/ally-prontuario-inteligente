@@ -1,12 +1,10 @@
-
 import React, { useState } from "react";
 import { CalendarClock, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-standardized-toast";
+import { toast } from "@/hooks/use-standardized-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/use-analytics";
 
 const WaitlistForm: React.FC = () => {
-  const { toast } = useToast();
   const { trackEvent, trackFormSubmit, trackButtonClick } = useAnalytics();
   const [formData, setFormData] = useState({
     name: "",
@@ -21,19 +19,22 @@ const WaitlistForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value, type } = e.target as HTMLInputElement;
-    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-    
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
     setFormData((prev) => ({ ...prev, [name]: newValue }));
-    
+
     // Track form field interaction
-    trackEvent('form_field_change', {
-      form_name: 'waitlist',
-      field_name: name
+    trackEvent("form_field_change", {
+      form_name: "waitlist",
+      field_name: name,
     });
-    
+
     // Limpar erro quando o usuário começa a digitar novamente
     if (error) setError(null);
   };
@@ -43,46 +44,48 @@ const WaitlistForm: React.FC = () => {
       setError("Por favor, informe seu nome completo.");
       return false;
     }
-    
+
     if (!formData.email.trim()) {
       setError("Por favor, informe seu e-mail profissional.");
       return false;
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError("Por favor, informe um e-mail válido.");
       return false;
     }
-    
+
     if (!formData.specialty) {
       setError("Por favor, selecione sua especialidade médica.");
       return false;
     }
-    
+
     if (!formData.acceptTerms) {
-      setError("Você precisa aceitar os termos de uso e política de privacidade para continuar.");
+      setError(
+        "Você precisa aceitar os termos de uso e política de privacidade para continuar."
+      );
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
-      trackFormSubmit('waitlist', 'error', { error: error });
+      trackFormSubmit("waitlist", "error", { error: error });
       return;
     }
-    
+
     setIsSubmitting(true);
     setError(null);
 
     try {
       // Track form submission attempt
-      trackEvent('waitlist_form_submit', {
-        specialty: formData.specialty
+      trackEvent("waitlist_form_submit", {
+        specialty: formData.specialty,
       });
 
       // Inserindo dados na tabela waitlist do Supabase
@@ -100,10 +103,10 @@ const WaitlistForm: React.FC = () => {
       if (supabaseError) throw supabaseError;
 
       setSubmitted(true);
-      
+
       // Track successful submission
-      trackFormSubmit('waitlist', 'success', {
-        specialty: formData.specialty
+      trackFormSubmit("waitlist", "success", {
+        specialty: formData.specialty,
       });
 
       toast.success(
@@ -121,12 +124,12 @@ const WaitlistForm: React.FC = () => {
       });
     } catch (err) {
       console.error("Erro ao agendar demonstração:", err);
-      
+
       // Track form error
-      trackFormSubmit('waitlist', 'error', {
-        error: err instanceof Error ? err.message : 'Unknown error'
+      trackFormSubmit("waitlist", "error", {
+        error: err instanceof Error ? err.message : "Unknown error",
       });
-      
+
       setError(
         err instanceof Error
           ? err.message
@@ -144,7 +147,7 @@ const WaitlistForm: React.FC = () => {
 
   const handleReset = () => {
     setSubmitted(false);
-    trackButtonClick('waitlist_form_reset');
+    trackButtonClick("waitlist_form_reset");
   };
 
   return (
@@ -163,7 +166,8 @@ const WaitlistForm: React.FC = () => {
               <span className="gradient-text">hoje mesmo</span>
             </h2>
             <p className="text-lg text-ally-gray">
-              Agende uma demonstração exclusiva e descubra como a Ally pode revolucionar suas consultas.
+              Agende uma demonstração exclusiva e descubra como a Ally pode
+              revolucionar suas consultas.
             </p>
           </div>
 
@@ -257,7 +261,7 @@ const WaitlistForm: React.FC = () => {
                     placeholder="Ex: 12345/UF"
                   />
                 </div>
-                
+
                 <div>
                   <label
                     htmlFor="message"
@@ -275,8 +279,8 @@ const WaitlistForm: React.FC = () => {
                     placeholder="Conte-nos como podemos ajudar na sua prática clínica"
                   />
                 </div>
-                
-                <div className="flex items-start">
+
+                {/* <div className="flex items-start">
                   <input
                     type="checkbox"
                     id="acceptTerms"
@@ -289,10 +293,24 @@ const WaitlistForm: React.FC = () => {
                     htmlFor="acceptTerms"
                     className="text-sm text-ally-gray"
                   >
-                    Li e concordo com os <a href="/terms" className="text-ally-blue hover:underline">Termos de Uso</a> e 
-                    <a href="/privacy" className="text-ally-blue hover:underline"> Política de Privacidade</a>.
+                    Li e concordo com os{" "}
+                    <a
+                      href="/termo-de-uso"
+                      className="text-ally-blue hover:underline"
+                    >
+                      Termos de Uso
+                    </a>{" "}
+                    e
+                    <a
+                      href="/politica-privacidade"
+                      className="text-ally-blue hover:underline"
+                    >
+                      {" "}
+                      Política de Privacidade
+                    </a>
+                    .
                   </label>
-                </div>
+                </div> */}
 
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
@@ -304,7 +322,7 @@ const WaitlistForm: React.FC = () => {
                   type="submit"
                   className="w-full btn-primary flex items-center justify-center h-12 mt-4"
                   disabled={isSubmitting}
-                  onClick={() => trackButtonClick('submit_waitlist')}
+                  onClick={() => trackButtonClick("submit_waitlist")}
                 >
                   {isSubmitting ? (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -332,9 +350,12 @@ const WaitlistForm: React.FC = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Demonstração agendada!</h3>
+                <h3 className="text-xl font-medium mb-2">
+                  Demonstração agendada!
+                </h3>
                 <p className="text-ally-gray mb-6">
-                  Em breve, entraremos em contato para confirmar os detalhes da sua demonstração exclusiva da Ally.
+                  Em breve, entraremos em contato para confirmar os detalhes da
+                  sua demonstração exclusiva da Ally.
                 </p>
                 <button
                   onClick={handleReset}
