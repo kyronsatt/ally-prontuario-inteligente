@@ -87,7 +87,13 @@ const BenefitsSection: React.FC = () => {
           >
             <TabsList className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-32 md:mb-8 bg-transparent">
               {Object.entries(tabContent).map(([key, tab]) => (
-                <TabsTrigger value={key} className={getTabClassName(key)}>
+                <TabsTrigger
+                  value={key}
+                  className={cn(
+                    getTabClassName(key),
+                    activeTab === key ? "bg-ally-blue/10" : "bg-gray-100"
+                  )}
+                >
                   <tab.icon
                     className={cn(
                       "inline mr-0 p-1",

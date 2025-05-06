@@ -36,8 +36,8 @@ const SpecialtyCard: React.FC<SpecialtyCardProps> = ({
   description,
 }) => {
   return (
-    <Card className="h-full border border-ally-blue/50 bg-gradient-to-b from-ally-blue/10 to-ally-blue/5 rounded-2xl">
-      <CardHeader className="pb-0 text-center overflow-clip">
+    <Card className="h-full border border-ally-blue/50 bg-gradient-to-r from-ally-blue/15 to-[#00e6e630] rounded-2xl">
+      <CardHeader className="pb-0 text-center overflow-clip bg-transparent">
         <div className="flex justify-center">
           <div className="py-3 rounded-full text-ally-blue/20">{icon}</div>
         </div>

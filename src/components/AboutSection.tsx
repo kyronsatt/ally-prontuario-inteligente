@@ -11,9 +11,9 @@ const AboutSection: React.FC = () => {
           >
             <div className="bg-white p-4 rounded-2xl">
               <img
-                src="/assets/images/desktop-1.svg"
+                src="/assets/mockups/mockup-anamnese.png"
                 alt="Médico utilizando tecnologia durante atendimento"
-                className="w-full h-auto"
+                className="w-full h-auto scale-125"
               />
             </div>
           </div>

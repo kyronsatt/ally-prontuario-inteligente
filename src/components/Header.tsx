@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AllyLogo } from "./atoms/ally-logo";
+import { LucideMenu } from "lucide-react";
+import { Button } from "./ui/button";
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -23,7 +25,7 @@ const Header: React.FC = () => {
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+        scrolled ? "bg-white/50 backdrop-blur-xl py-2" : "bg-transparent py-4"
       }`}
     >
       <div className="container-ally flex justify-between items-center">
@@ -50,14 +52,14 @@ const Header: React.FC = () => {
           >
             Lista de espera
           </a>
-          <a href="/login" className="btn-primary">
-            Entrar
+          <a href="/login" className="">
+            <Button>Entrar</Button>
           </a>
         </nav>
 
         <button className="md:hidden text-ally-dark">
           {/* Menu mobile (omitido para simplicidade) */}
-          <span>≡</span>
+          <LucideMenu size={18} />
         </button>
       </div>
     </header>
