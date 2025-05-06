@@ -6,6 +6,7 @@ import { Plus, Clock, TrendingUp, ChartBar, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 interface AppointmentStats {
   total_appointments: number;
@@ -18,6 +19,7 @@ interface DashboardData {
 }
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
@@ -28,7 +30,8 @@ const Dashboard: React.FC = () => {
       try {
         setLoading(true);
         const { data, error } = await supabase.functions.invoke(
-          "get-dashboard-data"
+          "get-dashboard-data",
+          { body: { user_id: user.id } }
         );
 
         if (error) {
