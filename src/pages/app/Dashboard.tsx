@@ -1,9 +1,15 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Clock, TrendingUp, ChartBar, Loader2, Users } from "lucide-react";
+import {
+  Plus,
+  Clock,
+  TrendingUp,
+  ChartBar,
+  Loader2,
+  Users,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-standardized-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +28,7 @@ interface DashboardData {
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const { trackPageView, trackButtonClick } = useAnalytics();
+  const { trackPageView, trackButtonClick, trackEvent } = useAnalytics();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
@@ -43,9 +49,9 @@ const Dashboard: React.FC = () => {
         }
 
         setData(data);
-        trackEvent("dashboard_data_loaded", { 
+        trackEvent("dashboard_data_loaded", {
           total_appointments: data?.stats?.total_appointments || 0,
-          new_patients: data?.stats?.new_patients || 0
+          new_patients: data?.stats?.new_patients || 0,
         });
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
@@ -94,26 +100,29 @@ const Dashboard: React.FC = () => {
   // Calculate productivity metrics based on the formula provided
   const timeWithAlly = 10; // minutes
   const timeReductionPercentage = 0.37; // 37% time reduction
-  
+
   // Formula calculations
   const timeWithoutAlly = timeWithAlly / (1 - timeReductionPercentage); // ≈ 15.87 minutes
   const timeSavedPerAppointment = timeWithoutAlly - timeWithAlly; // ≈ 5.87 minutes
   const totalTimeSavedMinutes = totalAppointments * timeSavedPerAppointment;
-  const additionalAppointmentsPossible = Math.floor(totalTimeSavedMinutes / timeWithAlly);
-  const productivityGainPercentage = totalAppointments > 0 
-    ? Math.round((additionalAppointmentsPossible / totalAppointments) * 100) 
-    : 0;
+  const additionalAppointmentsPossible = Math.floor(
+    totalTimeSavedMinutes / timeWithAlly
+  );
+  const productivityGainPercentage =
+    totalAppointments > 0
+      ? Math.round((additionalAppointmentsPossible / totalAppointments) * 100)
+      : 0;
 
   // Format time saved for display
   const formatTimeSaved = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = Math.round(minutes % 60);
-    
+
     if (hours === 0) {
       return `${remainingMinutes}min`;
     }
-    
-    return `${hours}h${remainingMinutes > 0 ? `${remainingMinutes}min` : ''}`;
+
+    return `${hours}h${remainingMinutes > 0 ? `${remainingMinutes}min` : ""}`;
   };
 
   const handleNewAppointmentClick = () => {
@@ -235,12 +244,6 @@ const Dashboard: React.FC = () => {
       </div>
     </div>
   );
-};
-
-// Add this missing function for analytics tracking
-const trackEvent = (eventName: string, eventProperties?: Record<string, any>) => {
-  const { trackEvent } = useAnalytics();
-  trackEvent(eventName, eventProperties);
 };
 
 export default Dashboard;
