@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -51,7 +50,9 @@ const registerSchema = z.object({
   specialty: z.string().min(1, { message: "Especialidade é obrigatória" }),
   crm: z.string().min(1, { message: "CRM é obrigatório" }),
   termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: "Você deve aceitar os termos de uso e política de privacidade" }),
+    errorMap: () => ({
+      message: "Você deve aceitar os termos de uso e política de privacidade",
+    }),
   }),
 });
 
@@ -85,6 +86,7 @@ const Login = () => {
       state: "",
       specialty: "",
       crm: "",
+      // @ts-expect-error :: zod
       termsAccepted: false,
     },
   });
@@ -105,15 +107,16 @@ const Login = () => {
       trackEvent("login_success", { email: data.email });
       toast.success("Login realizado com sucesso");
       navigate("/app");
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      trackEvent("login_error", { 
-        email: data.email, 
-        error: error?.message || "Unknown error" 
+      trackEvent("login_error", {
+        email: data.email,
+        error: error?.message || "Unknown error",
       });
-      toast.error("Falha na autenticação", {
-        description: error?.message || "Tente novamente mais tarde.",
-      });
+      toast.error(
+        error?.message || "Tente novamente mais tarde.",
+        "Falha na autenticação"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -141,19 +144,21 @@ const Login = () => {
       if (error) throw error;
 
       trackEvent("register_success", { email: data.email });
-      toast.success("Cadastro realizado com sucesso", {
-        description: "Verifique seu email para confirmar o cadastro.",
-      });
+      toast.success(
+        "Verifique seu email para confirmar o cadastro.",
+        "Cadastro realizado com sucesso"
+      );
       setActiveTab("login");
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      trackEvent("register_error", { 
-        email: data.email, 
-        error: error?.message || "Unknown error" 
+      trackEvent("register_error", {
+        email: data.email,
+        error: error?.message || "Unknown error",
       });
-      toast.error("Falha no cadastro", {
-        description: error?.message || "Tente novamente mais tarde.",
-      });
+      toast.error(
+        error?.message || "Tente novamente mais tarde.",
+        "Falha no cadastro"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -190,9 +195,7 @@ const Login = () => {
             <div className="px-6 pt-8">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">
-                  Cadastre-se
-                </TabsTrigger>
+                <TabsTrigger value="register">Cadastre-se</TabsTrigger>
               </TabsList>
             </div>
 
@@ -430,7 +433,7 @@ const Login = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     {/* Terms and Privacy Policy */}
                     <FormField
                       control={registerForm.control}
@@ -447,11 +450,17 @@ const Login = () => {
                           <div className="space-y-1 leading-none">
                             <FormLabel>
                               Eu aceito os{" "}
-                              <Link to="/terms" className="text-ally-blue hover:underline">
+                              <Link
+                                to="/termos-de-uso"
+                                className="text-ally-blue hover:underline"
+                              >
                                 Termos de Uso
                               </Link>{" "}
                               e{" "}
-                              <Link to="/privacy" className="text-ally-blue hover:underline">
+                              <Link
+                                to="/politica-privacidade"
+                                className="text-ally-blue hover:underline"
+                              >
                                 Política de Privacidade
                               </Link>
                             </FormLabel>

@@ -38,7 +38,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/termo-de-uso" element={<Terms />} />
+            <Route path="/termos-de-uso" element={<Terms />} />
             <Route path="/politica-privacidade" element={<Privacy />} />
 
             <Route path="/login" element={<Login />} />
