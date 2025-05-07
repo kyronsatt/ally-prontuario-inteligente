@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -20,11 +22,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-standardized-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AllyLogo } from "@/components/atoms/ally-logo";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
@@ -47,6 +50,9 @@ const registerSchema = z.object({
   state: z.string().min(1, { message: "Estado é obrigatório" }),
   specialty: z.string().min(1, { message: "Especialidade é obrigatória" }),
   crm: z.string().min(1, { message: "CRM é obrigatório" }),
+  termsAccepted: z.literal(true, {
+    errorMap: () => ({ message: "Você deve aceitar os termos de uso e política de privacidade" }),
+  }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -57,6 +63,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("login");
   const navigate = useNavigate();
+  const { trackEvent, trackPageView } = useAnalytics();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -78,20 +85,32 @@ const Login = () => {
       state: "",
       specialty: "",
       crm: "",
+      termsAccepted: false,
     },
+  });
+
+  // Track page view when component mounts
+  useState(() => {
+    trackPageView("login_page");
   });
 
   const handleLogin = async (data: LoginFormValues) => {
     setIsLoading(true);
 
     try {
+      trackEvent("login_attempt", { email: data.email });
       const { error } = await signIn(data.email, data.password);
       if (error) throw error;
 
+      trackEvent("login_success", { email: data.email });
       toast.success("Login realizado com sucesso");
       navigate("/app");
     } catch (error: any) {
       console.error(error);
+      trackEvent("login_error", { 
+        email: data.email, 
+        error: error?.message || "Unknown error" 
+      });
       toast.error("Falha na autenticação", {
         description: error?.message || "Tente novamente mais tarde.",
       });
@@ -104,6 +123,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
+      trackEvent("register_attempt", { email: data.email });
       // Add user metadata for the profile
       const options = {
         data: {
@@ -120,12 +140,17 @@ const Login = () => {
       const { error } = await signUp(data.email, data.password, options);
       if (error) throw error;
 
+      trackEvent("register_success", { email: data.email });
       toast.success("Cadastro realizado com sucesso", {
         description: "Verifique seu email para confirmar o cadastro.",
       });
       setActiveTab("login");
     } catch (error: any) {
       console.error(error);
+      trackEvent("register_error", { 
+        email: data.email, 
+        error: error?.message || "Unknown error" 
+      });
       toast.error("Falha no cadastro", {
         description: error?.message || "Tente novamente mais tarde.",
       });
@@ -166,7 +191,6 @@ const Login = () => {
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">
-                  {/* TODO -> ENABLE IT BEFORE LAUNCH */}
                   Cadastre-se
                 </TabsTrigger>
               </TabsList>
@@ -403,6 +427,36 @@ const Login = () => {
                             />
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Terms and Privacy Policy */}
+                    <FormField
+                      control={registerForm.control}
+                      name="termsAccepted"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={isLoading}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Eu aceito os{" "}
+                              <Link to="/terms" className="text-ally-blue hover:underline">
+                                Termos de Uso
+                              </Link>{" "}
+                              e{" "}
+                              <Link to="/privacy" className="text-ally-blue hover:underline">
+                                Política de Privacidade
+                              </Link>
+                            </FormLabel>
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )}
                     />
