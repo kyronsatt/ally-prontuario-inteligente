@@ -20,7 +20,7 @@ interface TranscriptionContextProps {
   isRecording: boolean;
   startRecording: () => void;
   stopRecording: () => void;
-  pauseRecording: () => void;  // Added missing property
+  pauseRecording: () => void;
   appointmentType: string | null;
   setAppointmentType: (type: string | null) => void;
   isCreatingAppointment: boolean;
@@ -28,9 +28,9 @@ interface TranscriptionContextProps {
   appointmentId: string | null;
   setIsCreatingAppointment: (isCreating: boolean) => void;
   resetContext: () => void;
-  duration: number;  // Added missing property
-  recordingStatus: RecordingStatus;  // Added missing property
-  isTranscribing: boolean;  // Added missing property
+  duration: number;
+  recordingStatus: RecordingStatus;
+  isTranscribing: boolean;
 }
 
 const TranscriptionContext = createContext<TranscriptionContextProps | undefined>(

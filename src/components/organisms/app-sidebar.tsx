@@ -1,6 +1,6 @@
 
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   FilePlus,
@@ -21,16 +21,20 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { AllyLogo } from "@/components/atoms/ally-logo";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useStandardizedToast } from "@/hooks/use-standardized-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function AppSidebar() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
+  const { openMobile, setOpenMobile } = useSidebar();
+  const toast = useStandardizedToast();
 
   const handleSignOut = async () => {
     try {
@@ -48,6 +52,13 @@ export function AppSidebar() {
       );
     }
   };
+
+  // Close mobile sidebar when route changes
+  React.useEffect(() => {
+    if (isMobile && openMobile) {
+      setOpenMobile(false);
+    }
+  }, [location.pathname, isMobile, openMobile, setOpenMobile]);
 
   const logoClassName = isMobile ? 'scale-75' : '';
 

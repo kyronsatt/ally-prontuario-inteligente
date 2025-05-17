@@ -135,32 +135,44 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const retrieveAnamnese = async (appointmentId: string) => {
-    setIsRetrievingAnamnese(true);
     try {
-      const response = await fetch(
-        `${envs.SUPABASE_HOST}/functions/v1/retrieve-anamnese`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ appointmentId }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao recuperar anamnese");
+      if (!appointmentId) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao buscar anamnese",
+          description: "ID do atendimento não fornecido.",
+        });
+        return;
       }
 
-      const retrievedAnamnese = await response.json();
-      setAnamnese(retrievedAnamnese);
+      setIsRetrievingAnamnese(true);
 
-      toast("Anamnese recuperada!", {
-        description: "Relatório carregado com sucesso.",
+      const { data, error } = await supabase
+        .from("anamneses")
+        .select("*, patient:patients(*)")
+        .eq("appointment_id", appointmentId)
+        .single();
+
+      if (error) {
+        console.error("Error retrieving anamnese:", error);
+        toast({
+          variant: "destructive",
+          title: "Erro ao buscar anamnese",
+          description: "Não foi possível recuperar os dados da anamnese.",
+        });
+        return;
+      }
+
+      if (data) {
+        setAnamnese(data);
+      }
+    } catch (error) {
+      console.error("Error retrieving anamnese:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao buscar anamnese",
+        description: "Ocorreu um erro ao buscar a anamnese.",
       });
-    } catch (e) {
-      toast("Erro ao recuperar anamnese", { description: String(e) });
     } finally {
       setIsRetrievingAnamnese(false);
     }

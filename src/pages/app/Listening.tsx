@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ShieldIcon } from "lucide-react";
 
@@ -6,19 +7,22 @@ import { useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
 import { useAnamnese } from "@/context/AnamneseContext";
 import { useTranscription } from "@/context/TranscriptionContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { toast } from "@/hooks/use-toast";
 
 import PatientInfo from "@/components/organisms/patient-info";
 import Timer from "@/components/molecules/timer";
 import ListeningControls from "@/components/organisms/listening-controls";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PreviousAnamnese from "@/components/organisms/previous-anamnese";
 import AppointmentNotes from "@/components/organisms/appointment-notes";
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "@/components/ui/separator";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { appointment } = useAppointment();
   const {
     startRecording,
@@ -50,7 +54,7 @@ const ListeningPage: React.FC = () => {
     } else if (recordingStatus === "STOPPED" && transcription) {
       navigate("/app/resumo");
     }
-  }, [recordingStatus, transcription, isTranscribing]);
+  }, [recordingStatus, transcription, isTranscribing, navigate]);
 
   useEffect(() => {
     const fetchAnamneseIfReturn = async () => {
@@ -69,7 +73,7 @@ const ListeningPage: React.FC = () => {
     };
 
     fetchAnamneseIfReturn();
-  }, [appointment?.type, patient?.id]);
+  }, [appointment?.type, patient?.id, retrieveLastAnamnese]);
 
   const handleStopRecording = async () => {
     await stopRecording();
@@ -92,6 +96,66 @@ const ListeningPage: React.FC = () => {
     );
   }
 
+  // Mobile layout
+  if (isMobile) {
+    return (
+      <div className="w-full max-w-full h-full">
+        {/* Recording panel - Always visible at the top */}
+        <div className="bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-xl p-4 mb-4 shadow-lg">
+          <div className="text-center mb-4">
+            <h1 className="text-xl font-bold text-white mb-1">
+              Escutando Consulta
+            </h1>
+            <PatientInfo
+              name={patient?.name || ""}
+              type={appointment?.type}
+            />
+          </div>
+          
+          <div className="flex flex-col items-center justify-center gap-4 mb-4">
+            <Timer
+              duration={duration}
+              isPaused={recordingStatus === "PAUSED"}
+            />
+            <ListeningControls
+              recordingStatus={recordingStatus}
+              onTogglePause={pauseRecording}
+              onFinish={handleStopRecording}
+            />
+          </div>
+          
+          <Card className="bg-transparent border-none shadow-none mt-2">
+            <CardContent className="p-2 flex justify-center">
+              <div className="flex items-start space-x-2">
+                <ShieldIcon className="h-4 w-4 text-white/50 mt-1" />
+                <p className="text-xs text-white/70">
+                  Escutando com segurança. A gravação não será armazenada.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Previous anamnese */}
+        <div className="mb-4">
+          <PreviousAnamnese
+            anamnese={previousAnamnese}
+            isLoading={isRetrievingAnamnese}
+          />
+        </div>
+
+        {/* Appointment Notes */}
+        <div className="mb-4">
+          <AppointmentNotes
+            notes={appointmentNotes}
+            setNotes={setAppointmentNotes}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop layout
   return (
     <div className="w-full max-w-full h-full max-h-[100vh]">
       <div className="grid grid-cols-10 gap-4 h-full">

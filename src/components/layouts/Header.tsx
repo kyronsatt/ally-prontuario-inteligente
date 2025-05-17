@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { AllyLogo } from "@/components/atoms/ally-logo";
-import { LucideMenu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -25,11 +25,11 @@ const Header: React.FC = () => {
     <header
       className={cn(
         "fixed top-0 left-0 w-full z-50 transition-all duration-300",
-        scrolled ? "bg-white/50 backdrop-blur-xl py-2" : "bg-transparent py-4"
+        scrolled ? "bg-white/95 backdrop-blur-xl py-2 shadow-sm" : "bg-transparent py-4"
       )}
     >
       <div className="container-ally flex justify-between items-center">
-        <a href="/" className="text-ally-dark font-semibold text-xl">
+        <a href="/" className="text-ally-dark font-semibold text-xl z-10">
           <AllyLogo />
         </a>
 
@@ -47,7 +47,7 @@ const Header: React.FC = () => {
         <Sheet>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
-              <LucideMenu size={22} />
+              <Menu size={22} />
               <span className="sr-only">Menu</span>
             </Button>
           </SheetTrigger>

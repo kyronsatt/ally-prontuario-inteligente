@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
@@ -10,6 +11,7 @@ import { useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
 import { IAnamnese, useAnamnese } from "@/context/AnamneseContext";
 import { useTranscription } from "@/context/TranscriptionContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { Button } from "@/components/ui/button";
 import ActionButtons from "@/components/molecules/appointment-summary/action-buttons";
@@ -19,6 +21,7 @@ import ClinicalInsights from "@/components/organisms/clinical-insights";
 
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { appointment, setAppointment } = useAppointment();
   const {
     anamnese,
@@ -43,9 +46,14 @@ const AppointmentSummary: React.FC = () => {
     if (!anamnese && appointmentId) {
       retrieveAnamnese(appointmentId);
     } else if (!anamnese && transcription) {
-      generateAnamnese(transcription.raw_text);
+      // Handle the case where transcription might be a string or an object with raw_text
+      const transcriptionText = typeof transcription === 'string' 
+        ? transcription 
+        : (transcription as any)?.raw_text || '';
+      
+      generateAnamnese(transcriptionText);
     }
-  }, [anamnese, appointmentId, transcription]);
+  }, [anamnese, appointmentId, transcription, retrieveAnamnese, generateAnamnese]);
 
   useEffect(() => {
     if (anamnese && !editedAnamnese) {
@@ -160,22 +168,6 @@ const AppointmentSummary: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        if (!anamnese && appointmentId) {
-          retrieveAnamnese(appointmentId);
-        } else if (!anamnese && transcription) {
-          generateAnamnese(transcription.raw_text);
-        }
-      } catch (error) {
-        console.error("Error loading data:", error);
-      }
-    };
-
-    loadData();
-  }, [appointment, anamnese]);
-
   if (isGeneratingAnamnese || isRetrievingAnamnese) {
     const action = isGeneratingAnamnese ? "Finalizando" : "Acessando";
     return (
@@ -195,6 +187,63 @@ const AppointmentSummary: React.FC = () => {
     );
   }
 
+  // Mobile layout
+  if (isMobile) {
+    return (
+      <div ref={reportContentRef} className="max-w-full mx-auto pb-20">
+        <div className="flex items-center mb-6">
+          <Button
+            onClick={() => navigate("/app")}
+            variant="ghost"
+            className="mr-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
+          </Button>
+        </div>
+
+        <h1 className="text-3xl font-semibold mb-4 gradient-text">
+          Anamnese
+        </h1>
+
+        {/* Main content */}
+        <div className="space-y-6">
+          {/* Patient info and insights at the top */}
+          <div className="bg-gray-50 border border-gray-200 p-3 rounded-xl">
+            <PatientInfoCard
+              patientName={
+                appointment?.patient?.name ??
+                anamnese?.patient?.name ??
+                "Paciente não identificado"
+              }
+              appointmentDate={formattedDate}
+              type={appointment?.type}
+            />
+            <div className="mt-4">
+              <ClinicalInsights insights={anamnese?.insights} />
+            </div>
+          </div>
+          
+          {/* Action buttons */}
+          <div className="flex justify-end gap-2">
+            <ActionButtons onDownload={handleDownload} />
+          </div>
+          
+          {/* Anamnese content */}
+          <div className="mt-4">
+            <AppointmentReport
+              anamnese={editedAnamnese}
+              unsavedChanges={unsavedChanges}
+              isSaving={isSaving}
+              saveChanges={handleSaveChanges}
+              onUpdateSection={handleUpdateSection}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop layout
   return (
     <div ref={reportContentRef} className="max-w-5xl mx-auto pb-20">
       <div className="flex items-center mb-6">
