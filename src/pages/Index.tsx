@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import Header from "@/components/layouts/Header";
 import HeroSection from "@/components/sections/HeroSection";
@@ -25,7 +26,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
 
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         <HeroSection />
         <AboutSection />
         <BenefitsSection />

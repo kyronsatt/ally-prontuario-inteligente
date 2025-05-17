@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+
+import React, { useEffect } from "react";
 import {
   Heart,
   Brain,
@@ -33,18 +34,22 @@ const SpecialtyCard: React.FC<SpecialtyCardProps> = ({
   title,
   description,
 }) => {
+  const isMobile = useIsMobile();
+  
   return (
     <Card className="h-full border border-ally-blue/50 bg-gradient-to-r from-ally-blue/15 to-[#00e6e630] rounded-2xl">
       <CardHeader className="pb-0 text-center overflow-clip bg-transparent">
         <div className="flex justify-center">
-          <div className="py-3 rounded-full text-ally-blue/20">{icon}</div>
+          <div className="py-3 rounded-full text-ally-blue/20">
+            {icon}
+          </div>
         </div>
-        <CardTitle className="text-xl font-bold text-ally-blue">
+        <CardTitle className="text-lg md:text-xl font-bold text-ally-blue">
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="text-center pb-6 pt-2">
-        <CardDescription className="text-ally-gray">
+        <CardDescription className="text-xs md:text-sm text-ally-gray">
           {description}
         </CardDescription>
       </CardContent>
@@ -67,57 +72,59 @@ const SpecialtiesSection: React.FC = () => {
       } else {
         carouselApi.scrollTo(0); // loop back to start
       }
-    }, 2000); // scroll every 3 seconds
+    }, 2000); // scroll every 2 seconds
 
     return () => clearInterval(interval);
   }, [carouselApi]);
 
+  const iconSize = isMobile ? 60 : 100;
+
   const specialties = [
     {
-      icon: <Heart size={100} />,
+      icon: <Heart size={iconSize} />,
       title: "Cardiologia",
       description: "Sintomas cardíacos, fatores de risco e histórico familiar",
     },
     {
-      icon: <Brain size={100} />,
+      icon: <Brain size={iconSize} />,
       title: "Neurologia",
       description: "Sinais neurológicos, reflexos e histórico neurológico",
     },
     {
-      icon: <Baby size={100} />,
+      icon: <Baby size={iconSize} />,
       title: "Pediatria",
       description:
         "Linguagem adaptada à idade, calendário vacinal e antecedentes",
     },
     {
-      icon: <UserRound size={100} />,
+      icon: <UserRound size={iconSize} />,
       title: "Ginecologia",
       description: "Ciclo, queixas ginecológicas e saúde reprodutiva",
     },
     {
-      icon: <ActivitySquare size={100} />,
+      icon: <ActivitySquare size={iconSize} />,
       title: "Ortopedia",
       description: "Dor musculoesquelética, traumas e exames de imagem",
     },
     {
-      icon: <Stethoscope size={100} />,
+      icon: <Stethoscope size={iconSize} />,
       title: "Clínica Geral",
       description: "Queixas variadas e rastreios comuns",
     },
   ];
 
   return (
-    <section id="specialties" className="section-spacing bg-white relative">
-      <div className="relative w-full">
+    <section id="specialties" className="py-16 md:py-24 bg-white relative">
+      <div className="relative w-full px-4 md:px-0">
         <div
-          className="text-center max-w-3xl mx-auto mb-12 fade-in-section px-6 md:px-12"
+          className="text-center max-w-3xl mx-auto mb-8 md:mb-12 fade-in-section"
           style={{ "--delay": "100ms" } as React.CSSProperties}
         >
-          <h2 className="heading-lg mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4">
             Personalizada para sua{" "}
             <span className="gradient-text">especialidade.</span>
           </h2>
-          <p className="text-md md:text-xl text-ally-gray">
+          <p className="text-sm md:text-md lg:text-xl text-ally-gray px-4">
             A Ally adapta a estrutura da anamnese, termos clínicos e sugestões
             conforme sua área de atuação – para você ter mais precisão,
             relevância e agilidade em cada atendimento.
@@ -129,8 +136,8 @@ const SpecialtiesSection: React.FC = () => {
           style={{ "--delay": "200ms" } as React.CSSProperties}
         >
           {/* Vignette effect */}
-          <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-white to-transparent pointer-events-none z-10"></div>
-          <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none z-10"></div>
+          <div className="absolute inset-y-0 left-0 w-6 md:w-12 bg-gradient-to-r from-white to-transparent pointer-events-none z-10"></div>
+          <div className="absolute inset-y-0 right-0 w-6 md:w-12 bg-gradient-to-l from-white to-transparent pointer-events-none z-10"></div>
 
           <Carousel
             opts={{
@@ -146,8 +153,8 @@ const SpecialtiesSection: React.FC = () => {
                   key={index}
                   className={`pl-4 ${
                     isMobile
-                      ? "basis-full px-12"
-                      : "basis-1/2 md:basis-1/3 lg:bases-1/4  xl:basis-1/4"
+                      ? "basis-full sm:basis-1/2"
+                      : "md:basis-1/3 lg:basis-1/4"
                   }`}
                 >
                   <div className="p-1 h-full">

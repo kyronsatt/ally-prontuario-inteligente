@@ -1,17 +1,19 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Brain,
   Check,
-  PaperclipIcon,
   Shield,
   ShieldCheck,
   Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const BenefitsSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState("tab1");
+  const isMobile = useIsMobile();
 
   const tabContent = {
     tab1: {
@@ -56,20 +58,20 @@ const BenefitsSection: React.FC = () => {
   };
 
   const getTabClassName = (tab: string) => {
-    const baseClass = "py-3 px-4 rounded-lg text-center transition-all text-sm";
+    const baseClass = "py-2 md:py-3 px-3 md:px-4 rounded-lg text-center transition-all text-xs md:text-sm";
     return activeTab === tab
       ? `${baseClass} bg-ally-blue/5 text-ally-blue border-[1px] border-ally-blue/70`
       : `${baseClass} bg-ally-light/50 text-ally-gray hover:bg-ally-light border-[1px] border-gray-200`;
   };
 
   return (
-    <section id="benefits" className="section-spacing bg-white">
-      <div className="container-ally">
+    <section id="benefits" className="section-spacing bg-white py-16 md:py-24">
+      <div className="container-ally px-4 md:px-8 lg:px-24">
         <div
-          className="text-center max-w-3xl mx-auto mb-12 md:mb-16 fade-in-section"
+          className="text-center max-w-3xl mx-auto mb-8 md:mb-16 fade-in-section"
           style={{ "--delay": "100ms" } as React.CSSProperties}
         >
-          <h2 className="heading-lg mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4">
             Por que você deve{" "}
             <span className="gradient-text">escolher a Ally</span>
           </h2>
@@ -85,9 +87,10 @@ const BenefitsSection: React.FC = () => {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-32 md:mb-8 bg-transparent">
+            <TabsList className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6 md:mb-8 bg-transparent overflow-x-auto flex-wrap">
               {Object.entries(tabContent).map(([key, tab]) => (
                 <TabsTrigger
+                  key={key}
                   value={key}
                   className={cn(
                     getTabClassName(key),
@@ -99,8 +102,9 @@ const BenefitsSection: React.FC = () => {
                       "inline mr-0 p-1",
                       activeTab === key ? "text-ally-blue" : "text-ally-gray"
                     )}
+                    size={isMobile ? 16 : 20}
                   />
-                  {tab.tabTitle}
+                  <span className="hidden sm:inline">{tab.tabTitle}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -111,11 +115,11 @@ const BenefitsSection: React.FC = () => {
                 value={key}
                 className="pt-4 focus:outline-none"
               >
-                <div className="p-6">
+                <div className="p-4 md:p-6">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
-                      <h3 className="text-2xl font-semibold mb-4 flex items-center">
-                        <tab.icon className="text-ally-blue inline mr-2" />
+                      <h3 className="text-xl md:text-2xl font-semibold mb-4 flex items-center">
+                        <tab.icon className="text-ally-blue inline mr-2" size={isMobile ? 20 : 24} />
                         {tab.title}
                       </h3>
                       <p className="mb-6 text-md font-light">
@@ -125,7 +129,7 @@ const BenefitsSection: React.FC = () => {
                         {tab.benefits.map((benefit, index) => (
                           <li key={index} className="flex items-start gap-2">
                             <Check
-                              size={20}
+                              size={isMobile ? 16 : 20}
                               className="text-ally-blue min-w-5 mt-0.5"
                             />
                             <span>{benefit}</span>

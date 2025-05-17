@@ -1,3 +1,4 @@
+
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -24,10 +25,12 @@ import {
 import { AllyLogo } from "@/components/atoms/ally-logo";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/hooks/use-standardized-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function AppSidebar() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
     try {
@@ -46,13 +49,15 @@ export function AppSidebar() {
     }
   };
 
+  const logoClassName = isMobile ? 'scale-75' : '';
+
   return (
     <Sidebar variant="floating">
-      <SidebarHeader className=" relative border-b border-border py-4 px-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 px-4 pb-6 pt-10">
+      <SidebarHeader className="relative border-b border-border py-2 md:py-4 px-1 md:px-2 flex items-center justify-between">
+        <div className={`flex items-center gap-2 px-2 md:px-4 pb-4 md:pb-6 pt-6 md:pt-10 ${logoClassName}`}>
           <AllyLogo />
         </div>
-        <SidebarTrigger className="fixed top-0 left-0 m-5" />
+        <SidebarTrigger className="fixed top-0 left-0 m-2 md:m-5" />
       </SidebarHeader>
 
       <SidebarContent className="p-2 flex flex-col gap-2">
@@ -67,7 +72,7 @@ export function AppSidebar() {
                   }
                   end
                 >
-                  <LayoutDashboard />
+                  <LayoutDashboard size={isMobile ? 18 : 24} />
                   <span>Dashboard</span>
                 </NavLink>
               </SidebarMenuButton>
@@ -81,7 +86,7 @@ export function AppSidebar() {
                     isActive ? "text-ally-blue" : "text-muted-foreground"
                   }
                 >
-                  <FilePlus />
+                  <FilePlus size={isMobile ? 18 : 24} />
                   <span>Novo Atendimento</span>
                 </NavLink>
               </SidebarMenuButton>
@@ -95,7 +100,7 @@ export function AppSidebar() {
                     isActive ? "text-ally-blue" : "text-muted-foreground"
                   }
                 >
-                  <Clock />
+                  <Clock size={isMobile ? 18 : 24} />
                   <span>Histórico</span>
                 </NavLink>
               </SidebarMenuButton>
@@ -115,7 +120,7 @@ export function AppSidebar() {
                     isActive ? "text-ally-blue" : "text-muted-foreground"
                   }
                 >
-                  <CreditCard />
+                  <CreditCard size={isMobile ? 18 : 24} />
                   <span>Assinatura</span>
                 </NavLink>
               </SidebarMenuButton>
@@ -129,7 +134,7 @@ export function AppSidebar() {
                     isActive ? "text-ally-blue" : "text-muted-foreground"
                   }
                 >
-                  <User />
+                  <User size={isMobile ? 18 : 24} />
                   <span>Perfil</span>
                 </NavLink>
               </SidebarMenuButton>
@@ -143,7 +148,7 @@ export function AppSidebar() {
                     isActive ? "text-ally-blue" : "text-muted-foreground"
                   }
                 >
-                  <Settings />
+                  <Settings size={isMobile ? 18 : 24} />
                   <span>Configurações</span>
                 </NavLink>
               </SidebarMenuButton>
@@ -157,7 +162,7 @@ export function AppSidebar() {
                     isActive ? "text-ally-blue" : "text-muted-foreground"
                   }
                 >
-                  <HelpCircle />
+                  <HelpCircle size={isMobile ? 18 : 24} />
                   <span>Ajuda</span>
                 </NavLink>
               </SidebarMenuButton>
@@ -173,7 +178,7 @@ export function AppSidebar() {
               onClick={handleSignOut}
               className="text-muted-foreground hover:text-destructive"
             >
-              <LogOut />
+              <LogOut size={isMobile ? 18 : 24} />
               <span>Sair</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

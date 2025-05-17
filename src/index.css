@@ -101,42 +101,58 @@
   body {
     @apply bg-white text-ally-dark font-sans overflow-x-clip;
     font-family: 'DM Sans', sans-serif; /* Apply DM Sans globally */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
   }
 
   /* Estilizando a página para deslocar suavemente para as seções */
   html {
     scroll-behavior: smooth;
+    font-size: 16px;
+    
+    /* Responsive text sizing */
+    @media (max-width: 768px) {
+      font-size: 15px;
+    }
+    @media (max-width: 480px) {
+      font-size: 14px;
+    }
+  }
+  
+  /* Improve form inputs on mobile */
+  input, select, textarea {
+    @apply focus:outline-none;
+    font-size: 16px; /* Prevents iOS zoom on focus */
   }
 }
 
 /* Classes de utilidade para a página da Ally */
 @layer components {
   .container-ally {
-    @apply container max-w-7xl mx-auto px-8 md:px-12 lg:px-24;
+    @apply container max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-24;
   }
 
   .section-spacing {
-    @apply py-16 md:py-24;
+    @apply py-12 sm:py-16 md:py-24;
   }
   
   .btn-primary {
-    @apply bg-ally-blue text-white hover:bg-opacity-90 font-medium rounded-md px-6 py-3 transition-all shadow-md hover:shadow-lg;
+    @apply bg-ally-blue text-white hover:bg-opacity-90 font-medium rounded-md px-4 py-2 md:px-6 md:py-3 transition-all shadow-md hover:shadow-lg;
   }
   
   .heading-3xl {
-    @apply text-7xl md:text-8xl lg:text-9xl font-semibold leading-tight;
+    @apply text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-semibold leading-tight;
   }
 
   .heading-xl {
-    @apply text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight;
   }
   
   .heading-lg {
-    @apply text-3xl md:text-4xl font-semibold leading-tight;
+    @apply text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight;
   }
   
   .heading-md {
-    @apply text-2xl md:text-3xl font-medium leading-snug;
+    @apply text-xl sm:text-2xl md:text-3xl font-medium leading-snug;
   }
 
   .fade-in-section {
@@ -148,15 +164,41 @@
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-ally-blue to-[#00e6e6];
   }
+  
+  /* Mobile specific utilities */
+  .mobile-container {
+    @apply px-4 sm:px-6;
+  }
+  
+  .mobile-padding {
+    @apply py-8 sm:py-12;
+  }
 }
 
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
   border-radius: 12px;
-
 }
+
 ::-webkit-scrollbar-thumb {
   border-radius: 12px;
   background: #efefef;
+}
+
+/* Mobile touch improvements */
+@media (max-width: 768px) {
+  button, a {
+    @apply min-h-10 min-w-10; /* Minimum touch target size for buttons and links */
+  }
+  
+  .touch-feedback {
+    @apply active:opacity-70 transition-opacity;
+  }
+}
+
+/* Improved visibility for modals on mobile */
+.mobile-sheet-content {
+  @apply p-4 pt-12;
 }
