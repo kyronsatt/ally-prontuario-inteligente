@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +48,7 @@ const getInsightColor = (type: string) => {
 const ClinicalInsights: React.FC<ClinicalInsightsProps> = ({ insights }) => {
   if (!insights || insights.length === 0) {
     return (
-      <Card className="h-[19rem] w-[70%]">
+      <Card className="h-[19rem] w-full lg:w-[70%]">
         <CardHeader>
           <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
             <Brain className="h-5 w-5" /> Insights Clínicos
@@ -64,7 +63,7 @@ const ClinicalInsights: React.FC<ClinicalInsightsProps> = ({ insights }) => {
   }
 
   return (
-    <Card className="flex flex-col h-[19rem] w-[70%]">
+    <Card className="flex flex-col h-[19rem] w-full lg:w-[70%]">
       <CardHeader>
         <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
           <Brain className="h-5 w-5" /> Insights Clínicos

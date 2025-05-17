@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
@@ -47,13 +46,20 @@ const AppointmentSummary: React.FC = () => {
       retrieveAnamnese(appointmentId);
     } else if (anamnese === null && transcription) {
       // Handle the case where transcription might be a string or an object with raw_text
-      const transcriptionText = typeof transcription === 'string' 
-        ? transcription 
-        : transcription?.raw_text || '';
-      
+      const transcriptionText =
+        typeof transcription === "string"
+          ? transcription
+          : transcription?.raw_text || "";
+
       generateAnamnese(transcriptionText);
     }
-  }, [anamnese, appointmentId, transcription, retrieveAnamnese, generateAnamnese]);
+  }, [
+    anamnese,
+    appointmentId,
+    transcription,
+    retrieveAnamnese,
+    generateAnamnese,
+  ]);
 
   useEffect(() => {
     if (anamnese && !editedAnamnese) {
@@ -201,9 +207,7 @@ const AppointmentSummary: React.FC = () => {
           </Button>
         </div>
 
-        <h1 className="text-3xl font-semibold mb-4 gradient-text">
-          Anamnese
-        </h1>
+        <h1 className="text-3xl font-semibold mb-4 gradient-text">Anamnese</h1>
 
         {/* Main content */}
         <div className="space-y-6">
@@ -222,12 +226,12 @@ const AppointmentSummary: React.FC = () => {
               <ClinicalInsights insights={anamnese?.insights || []} />
             </div>
           </div>
-          
+
           {/* Action buttons */}
           <div className="flex justify-end gap-2">
             <ActionButtons onDownload={handleDownload} />
           </div>
-          
+
           {/* Anamnese content */}
           <div className="mt-4">
             <AppointmentReport

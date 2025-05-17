@@ -21,7 +21,7 @@ const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
   type,
 }) => {
   return (
-    <Card className="h-[19rem] w-[30%]">
+    <Card className="h-[19rem] w-full lg:w-[30%]">
       <CardHeader className="border-none shadow-none">
         <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
           <ListIcon className="h-5 w-5" /> Informações
