@@ -47,12 +47,12 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar variant="floating" className="border-r border-border">
-      <SidebarHeader className="border-b border-border py-4 px-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 px-4">
+    <Sidebar variant="floating">
+      <SidebarHeader className=" relative border-b border-border py-4 px-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 px-4 pb-6 pt-10">
           <AllyLogo />
         </div>
-        <SidebarTrigger />
+        <SidebarTrigger className="fixed top-0 left-0 m-5" />
       </SidebarHeader>
 
       <SidebarContent className="p-2 flex flex-col gap-2">
