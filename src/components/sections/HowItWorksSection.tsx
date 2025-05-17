@@ -75,7 +75,7 @@ const HowItWorksSection: React.FC = () => {
           className="mt-16 text-center fade-in-section"
           style={{ "--delay": "500ms" } as React.CSSProperties}
         >
-          <a href="#waitlist">
+          <a href="#pricing">
             <Button size="lg">
               Experimentar agora
               <LucideArrowRight size={14} />

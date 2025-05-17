@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,17 +24,16 @@ const HeroContent: React.FC = () => (
     style={{ "--delay": "100ms" } as React.CSSProperties}
   >
     <h1 className="heading-xl font-bold mb-2">
-      <span className="gradient-text">Ally</span> — da voz ao
-      prontuário.
+      <span className="gradient-text">Ally</span> — da voz ao prontuário.
     </h1>
 
     <p className="text-xl md:text-2xl text-ally-gray font-extralight">
-      Registre consultas automaticamente, sem digitar uma linha.
-      Anamneses completas e estruturadas em segundos.
+      Registre consultas automaticamente, sem digitar uma linha. Anamneses
+      completas e estruturadas em segundos.
     </p>
 
     <div className="pt-6">
-      <a href="#benefits">
+      <a href="#about">
         <Button size="lg">
           Ver como funciona na prática
           <ArrowRight

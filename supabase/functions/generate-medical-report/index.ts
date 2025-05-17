@@ -1,3 +1,4 @@
+
 // @ts-expect-error :: deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-expect-error :: deno
@@ -32,6 +33,10 @@ serve(async (req) => {
       requestData,
       userData
     );
+    
+    // Update productivity metrics after inserting the anamnese
+    await updateProductivityMetrics(supabaseClient, userData.user.id);
+    
     return new Response(JSON.stringify(anamneseEntry), {
       headers: {
         ...corsHeaders,
@@ -435,4 +440,115 @@ function createSystemPrompt(
 
           Não inclua conteúdos fora desses campos. Seja objetivo.
     `;
+}
+
+// New function to update productivity metrics
+async function updateProductivityMetrics(supabaseClient, userId) {
+  try {
+    console.log("Updating productivity metrics for user:", userId);
+    
+    // Constants for productivity calculations
+    const TIME_WITH_ALLY_MINUTES = 10;
+    const TIME_REDUCTION_PERCENTAGE = 0.37;
+    
+    // Fetch the user's anamneses count and appointment data
+    const { data: anamneseData, error: anamneseError } = await supabaseClient
+      .from("anamnese")
+      .select("id, created_at, appointment_id")
+      .eq("created_by", userId);
+      
+    if (anamneseError) {
+      console.error("Error fetching anamnese data:", anamneseError);
+      throw new Error("Failed to fetch anamnese data");
+    }
+    
+    // Count total appointments
+    const totalAppointments = anamneseData?.length || 0;
+    
+    // Count new patients (based on the is_new flag in patients table)
+    // First get all patient IDs from user's anamneses
+    const appointmentIds = anamneseData?.map(a => a.appointment_id).filter(Boolean) || [];
+    
+    const { data: appointmentsData, error: appointmentsError } = await supabaseClient
+      .from("appointments")
+      .select("patient_id")
+      .in("id", appointmentIds);
+      
+    if (appointmentsError) {
+      console.error("Error fetching appointment data:", appointmentsError);
+      throw new Error("Failed to fetch appointment data");
+    }
+    
+    const patientIds = appointmentsData?.map(a => a.patient_id).filter(Boolean) || [];
+    
+    const { data: newPatientsData, error: newPatientsError } = await supabaseClient
+      .from("patients")
+      .select("id")
+      .in("id", patientIds)
+      .eq("is_new", true);
+      
+    if (newPatientsError) {
+      console.error("Error fetching patient data:", newPatientsError);
+      throw new Error("Failed to fetch patient data");
+    }
+    
+    const newPatients = newPatientsData?.length || 0;
+    
+    // Calculate productivity metrics
+    const timeWithoutAlly = TIME_WITH_ALLY_MINUTES / (1 - TIME_REDUCTION_PERCENTAGE);
+    const timeSavedPerAppointment = timeWithoutAlly - TIME_WITH_ALLY_MINUTES;
+    const totalTimeSavedMinutes = totalAppointments * timeSavedPerAppointment;
+    
+    // Insert or update the appointment_stats table
+    const { data: existingStats, error: statsError } = await supabaseClient
+      .from("appointment_stats")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("date", new Date().toISOString().split('T')[0])
+      .maybeSingle();
+      
+    if (statsError) {
+      console.error("Error checking existing stats:", statsError);
+      throw new Error("Failed to check existing stats");
+    }
+    
+    if (existingStats?.id) {
+      // Update existing stats for today
+      const { error: updateError } = await supabaseClient
+        .from("appointment_stats")
+        .update({
+          total_appointments: totalAppointments,
+          new_patients: newPatients,
+          time_saved_minutes: Math.round(totalTimeSavedMinutes),
+        })
+        .eq("id", existingStats.id);
+        
+      if (updateError) {
+        console.error("Error updating stats:", updateError);
+        throw new Error("Failed to update productivity stats");
+      }
+    } else {
+      // Insert new stats for today
+      const { error: insertError } = await supabaseClient
+        .from("appointment_stats")
+        .insert({
+          user_id: userId,
+          total_appointments: totalAppointments,
+          new_patients: newPatients,
+          time_saved_minutes: Math.round(totalTimeSavedMinutes),
+        });
+        
+      if (insertError) {
+        console.error("Error inserting stats:", insertError);
+        throw new Error("Failed to insert productivity stats");
+      }
+    }
+    
+    console.log("Successfully updated productivity metrics for user:", userId);
+    return true;
+  } catch (error) {
+    console.error("Error in updateProductivityMetrics:", error);
+    // Don't throw here to prevent the main function from failing
+    return false;
+  }
 }

@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
               Benefícios
             </a>
             <a
-              href="#waitlist"
+              href="#pricing"
               className="text-ally-dark hover:text-ally-blue transition-colors"
               onClick={() => trackButtonClick("footer_waitlist")}
             >

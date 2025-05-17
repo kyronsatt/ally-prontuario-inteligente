@@ -1,178 +1,183 @@
 import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
-  Home,
-  PlusCircle,
+  LayoutDashboard,
+  FilePlus,
   Clock,
-  HelpCircle,
   Settings,
-  UserCircle,
+  User,
+  CreditCard,
+  HelpCircle,
   LogOut,
 } from "lucide-react";
-
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/components/ui/sonner";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
+  SidebarMenuButton,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { AllyLogo } from "../atoms/ally-logo";
+import { AllyLogo } from "@/components/atoms/ally-logo";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "@/hooks/use-standardized-toast";
 
 export function AppSidebar() {
+  const { signOut } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user, signOut } = useAuth();
 
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: Home,
-      path: "/app",
-    },
-    {
-      title: "Novo Atendimento",
-      icon: PlusCircle,
-      path: "/app/novo-atendimento",
-    },
-    {
-      title: "Histórico",
-      icon: Clock,
-      path: "/app/historico",
-    },
-  ];
-
-  const userMenuItems = [
-    {
-      title: "Ajuda",
-      icon: HelpCircle,
-      path: "/app/ajuda",
-    },
-    {
-      title: "Configurações",
-      icon: Settings,
-      path: "/app/configuracoes",
-    },
-    {
-      title: "Perfil",
-      icon: UserCircle,
-      path: "/app/perfil",
-    },
-  ];
-
-  const handleLogout = async () => {
+  const handleSignOut = async () => {
     try {
       await signOut();
-      toast.success("Logout realizado com sucesso");
+      toast.success(
+        "Você foi desconectado do sistema.",
+        "Sessão encerrada com sucesso"
+      );
       navigate("/login");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      toast.error("Erro ao fazer logout");
+      console.error("Error signing out:", error);
+      toast.error(
+        "Não foi possível encerrar sua sessão. Tente novamente.",
+        "Erro ao sair"
+      );
     }
-  };
-
-  // Get user initials for avatar
-  const getUserInitials = () => {
-    if (!user) return "U";
-
-    if (user.user_metadata?.first_name && user.user_metadata?.last_name) {
-      return `${user.user_metadata.first_name[0]}${user.user_metadata.last_name[0]}`.toUpperCase();
-    } else if (user.email) {
-      return user.email[0].toUpperCase();
-    }
-
-    return "U";
-  };
-
-  const isActive = (path: string) => {
-    return location.pathname === path;
   };
 
   return (
-    <Sidebar variant="floating">
-      <SidebarHeader>
-        <div className="flex justify-center items-center pt-12 pb-8">
-          <AllyLogo className="h-14" />
+    <Sidebar variant="floating" className="border-r border-border">
+      <SidebarHeader className="border-b border-border py-4 px-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 px-4">
+          <AllyLogo />
         </div>
+        <SidebarTrigger />
       </SidebarHeader>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    isActive={isActive(item.path)}
-                    onClick={() => navigate(item.path)}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarSeparator />
-        <SidebarGroup>
-          <SidebarGroupLabel>Usuário</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {userMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    isActive={isActive(item.path)}
-                    onClick={() => navigate(item.path)}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarContent className="p-2 flex flex-col gap-2">
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/app"
+                  className={({ isActive }) =>
+                    isActive ? "text-ally-blue" : "text-muted-foreground"
+                  }
+                  end
+                >
+                  <LayoutDashboard />
+                  <span>Dashboard</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/app/novo-atendimento"
+                  className={({ isActive }) =>
+                    isActive ? "text-ally-blue" : "text-muted-foreground"
+                  }
+                >
+                  <FilePlus />
+                  <span>Novo Atendimento</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/app/historico"
+                  className={({ isActive }) =>
+                    isActive ? "text-ally-blue" : "text-muted-foreground"
+                  }
+                >
+                  <Clock />
+                  <span>Histórico</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+
+        <div className="border-t border-border my-1"></div>
+
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/app/subscription"
+                  className={({ isActive }) =>
+                    isActive ? "text-ally-blue" : "text-muted-foreground"
+                  }
+                >
+                  <CreditCard />
+                  <span>Assinatura</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/app/perfil"
+                  className={({ isActive }) =>
+                    isActive ? "text-ally-blue" : "text-muted-foreground"
+                  }
+                >
+                  <User />
+                  <span>Perfil</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/app/configuracoes"
+                  className={({ isActive }) =>
+                    isActive ? "text-ally-blue" : "text-muted-foreground"
+                  }
+                >
+                  <Settings />
+                  <span>Configurações</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/app/ajuda"
+                  className={({ isActive }) =>
+                    isActive ? "text-ally-blue" : "text-muted-foreground"
+                  }
+                >
+                  <HelpCircle />
+                  <span>Ajuda</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
       </SidebarContent>
-      <SidebarFooter>
-        <div className="px-3 py-2">
-          <div className="flex items-center gap-3 p-2 rounded-md hover:bg-sidebar-accent">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-ally-blue text-white">
-                {getUserInitials()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium truncate">
-                {user?.user_metadata?.first_name
-                  ? `Dr. ${user.user_metadata.first_name} ${
-                      user.user_metadata.last_name || ""
-                    }`
-                  : user?.email || "Usuário"}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {user?.email}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="mt-2 w-full flex items-center gap-2 text-sm text-red-500 hover:text-red-600 p-2 rounded-md hover:bg-red-50"
-          >
-            <LogOut className="h-4 w-4" />
-            Sair
-          </button>
-        </div>
+
+      <SidebarFooter className="p-2 border-t border-border">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleSignOut}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <LogOut />
+              <span>Sair</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

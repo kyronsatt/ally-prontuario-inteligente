@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,6 @@ import {
   TrendingUp,
   ChartBar,
   Loader2,
-  Users,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-standardized-toast";
@@ -56,7 +56,11 @@ const Dashboard: React.FC = () => {
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         setError(err.message);
-        toast.error("Erro ao carregar dados do dashboard");
+        toast({
+          title: "Erro ao carregar dados do dashboard",
+          description: String(err.message),
+          variant: "destructive"
+        });
         trackEvent("dashboard_data_error", { error: err.message });
       } finally {
         setLoading(false);
@@ -96,6 +100,7 @@ const Dashboard: React.FC = () => {
   // Get base metrics from data
   const totalAppointments = data?.stats?.total_appointments || 0;
   const newPatients = data?.stats?.new_patients || 0;
+  const totalTimeSavedMinutes = data?.stats?.time_saved_minutes || 0;
 
   // Calculate productivity metrics based on the formula provided
   const timeWithAlly = 10; // minutes
@@ -104,7 +109,6 @@ const Dashboard: React.FC = () => {
   // Formula calculations
   const timeWithoutAlly = timeWithAlly / (1 - timeReductionPercentage); // ≈ 15.87 minutes
   const timeSavedPerAppointment = timeWithoutAlly - timeWithAlly; // ≈ 5.87 minutes
-  const totalTimeSavedMinutes = totalAppointments * timeSavedPerAppointment;
   const additionalAppointmentsPossible = Math.floor(
     totalTimeSavedMinutes / timeWithAlly
   );

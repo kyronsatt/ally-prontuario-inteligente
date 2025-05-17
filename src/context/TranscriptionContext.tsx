@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -5,6 +6,8 @@ import { envs } from "@/envs";
 
 import { useAuth } from "./AuthContext";
 import { useAppointment } from "./AppointmentContext";
+import { toast } from "@/hooks/use-standardized-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Transcription {
   id: string;
@@ -41,7 +44,6 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { session } = useAuth();
   const { appointment } = useAppointment();
-  const { toast } = useToast();
 
   const [recordingStatus, setRecordingStatus] =
     useState<RecordingStatus>("NOT_STARTED");
@@ -53,6 +55,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const [duration, setDuration] = useState(0);
+  const recordingStartTime = useRef<number | null>(null);
 
   useEffect(() => {
     if (!appointment) return;
@@ -64,6 +67,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
       toast({
         title: "Não foi possível iniciar a consulta",
         description: "Tente novamente ou contate o suporte.",
+        variant: "destructive",
       });
 
       return;
@@ -83,12 +87,18 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
       mediaRecorder.start();
       setRecordingStatus("RECORDING");
+      recordingStartTime.current = Date.now();
       toast({
         title: "Gravação iniciada",
         description: "Fale normalmente com o paciente.",
+        variant: "default",
       });
     } catch (error) {
-      toast({ title: "Erro ao iniciar gravação", description: String(error) });
+      toast({ 
+        title: "Erro ao iniciar gravação", 
+        description: String(error),
+        variant: "destructive" 
+      });
     }
   };
 
@@ -101,6 +111,25 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
           const audioBlob = new Blob(audioChunks.current, {
             type: "audio/webm",
           });
+          
+          // Calculate the actual duration in seconds
+          const actualDuration = recordingStartTime.current
+            ? Math.floor((Date.now() - recordingStartTime.current) / 1000)
+            : duration;
+          
+          // Update the appointment duration in the database
+          if (appointment && appointment.id) {
+            try {
+              // Update using a direct RLS-compliant query instead of duration_seconds field
+              await supabase
+                .from("appointments")
+                .update({ duration: actualDuration })
+                .eq("id", appointment.id);
+            } catch (error) {
+              console.error("Failed to update appointment duration:", error);
+            }
+          }
+          
           await transcribeAudio(audioBlob);
           resolve();
         };
@@ -117,12 +146,14 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
       toast({
         title: "Escuta retomada",
         description: "A Ally voltou a registrar sua consulta.",
+        variant: "default",
       });
     } else {
       setRecordingStatus("PAUSED");
       toast({
         title: "Escuta pausada",
         description: "A Ally pausou o registro da consulta temporariamente.",
+        variant: "default",
       });
     }
   };
@@ -156,6 +187,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
             audio: base64Audio,
             appointmentId: appointment.id,
             appointmentNotes: appointmentNotes, // Pass notes to the transcription service
+            duration: duration, // Pass the duration to the service
           }),
         }
       );
@@ -173,7 +205,11 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
       setTranscription(transcription);
       return transcription;
     } catch (e) {
-      toast({ title: "Erro na transcrição", description: String(e) });
+      toast({ 
+        title: "Erro na transcrição", 
+        description: String(e),
+        variant: "destructive" 
+      });
       return null;
     } finally {
       setIsTranscribing(false);

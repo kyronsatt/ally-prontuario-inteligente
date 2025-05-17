@@ -34,7 +34,7 @@ const Header: React.FC = () => {
         <nav className="hidden md:flex items-center space-x-6">
           <NavLink href="#about">Sobre</NavLink>
           <NavLink href="#benefits">Benefícios</NavLink>
-          <NavLink href="#waitlist">Lista de espera</NavLink>
+          <NavLink href="#pricing">Lista de espera</NavLink>
           <a href="/login">
             <Button>Entrar</Button>
           </a>

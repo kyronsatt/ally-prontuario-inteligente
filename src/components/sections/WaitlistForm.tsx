@@ -151,10 +151,7 @@ const WaitlistForm: React.FC = () => {
   };
 
   return (
-    <section
-      id="waitlist"
-      className="section-spacing bg-gradient-to-b from-ally-light/30 to-white"
-    >
+    <section id="waitlist" className="section-spacing">
       <div className="container-ally">
         <div className="max-w-xl mx-auto">
           <div

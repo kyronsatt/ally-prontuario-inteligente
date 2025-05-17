@@ -70,7 +70,7 @@ const BenefitsSection: React.FC = () => {
           style={{ "--delay": "100ms" } as React.CSSProperties}
         >
           <h2 className="heading-lg mb-4">
-            Porque você deve{" "}
+            Por que você deve{" "}
             <span className="gradient-text">escolher a Ally</span>
           </h2>
           <p className="text-md md:text-xl text-ally-gray">

@@ -1,491 +1,350 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { FormEvent, useEffect, useState } from "react";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { toast } from "@/hooks/use-standardized-toast";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AllyLogo } from "@/components/atoms/ally-logo";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/use-analytics";
-
-const loginSchema = z.object({
-  email: z.string().email({ message: "Email inválido" }),
-  password: z
-    .string()
-    .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
-});
-
-const registerSchema = z.object({
-  email: z.string().email({ message: "Email inválido" }),
-  password: z
-    .string()
-    .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
-  first_name: z.string().min(1, { message: "Nome é obrigatório" }),
-  last_name: z.string().min(1, { message: "Sobrenome é obrigatório" }),
-  birth_date: z
-    .string()
-    .min(1, { message: "Data de nascimento é obrigatória" }),
-  city: z.string().min(1, { message: "Cidade é obrigatória" }),
-  state: z.string().min(1, { message: "Estado é obrigatório" }),
-  specialty: z.string().min(1, { message: "Especialidade é obrigatória" }),
-  crm: z.string().min(1, { message: "CRM é obrigatório" }),
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({
-      message: "Você deve aceitar os termos de uso e política de privacidade",
-    }),
-  }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/hooks/use-standardized-toast";
 
 const Login = () => {
-  const { signIn, signUp } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("login");
-  const navigate = useNavigate();
-  const { trackEvent, trackPageView } = useAnalytics();
-
-  const loginForm = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+  const { session, signIn, signUp, user } = useAuth();
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    specialty: "",
+    crm: "",
+    agreeToTerms: true,
   });
+  const { trackPageView, trackEvent } = useAnalytics();
 
-  const registerForm = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      first_name: "",
-      last_name: "",
-      birth_date: "",
-      city: "",
-      state: "",
-      specialty: "",
-      crm: "",
-      // @ts-expect-error :: zod
-      termsAccepted: false,
-    },
-  });
-
-  // Track page view when component mounts
-  useState(() => {
+  useEffect(() => {
     trackPageView("login_page");
-  });
+  }, []);
 
-  const handleLogin = async (data: LoginFormValues) => {
-    setIsLoading(true);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData({
+      ...formData,
+      agreeToTerms: checked,
+    });
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      trackEvent("login_attempt", { email: data.email });
-      const { error } = await signIn(data.email, data.password);
-      if (error) throw error;
+      if (mode === "login") {
+        const { error } = await signIn(formData.email, formData.password);
+        if (error) {
+          throw error;
+        }
+        trackEvent("login_success", { email: formData.email });
+      } else {
+        // Register mode
+        if (formData.password !== formData.confirmPassword) {
+          toast({
+            title: "Erro de senha",
+            description: "As senhas não correspondem",
+            variant: "destructive",
+          });
+          return;
+        }
 
-      trackEvent("login_success", { email: data.email });
-      toast.success("Login realizado com sucesso");
-      navigate("/app");
+        if (!formData.agreeToTerms) {
+          toast({
+            title: "Termos de uso",
+            description:
+              "Você precisa concordar com os termos de uso para se registrar",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const { error } = await signUp(formData.email, formData.password, {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          specialty: formData.specialty,
+          crm: formData.crm,
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        toast({
+          title: "Registro bem-sucedido",
+          description:
+            "Sua conta foi criada. Por favor, verifique seu e-mail para confirmar o registro.",
+          variant: "default",
+        });
+
+        trackEvent("register_success", { email: formData.email });
+        setMode("login");
+      }
     } catch (error) {
-      console.error(error);
-      trackEvent("login_error", {
-        email: data.email,
-        error: error?.message || "Unknown error",
+      console.error("Authentication error:", error);
+      toast({
+        title: "Erro de autenticação",
+        description: String(error.message),
+        variant: "destructive",
       });
-      toast.error(
-        error?.message || "Tente novamente mais tarde.",
-        "Falha na autenticação"
-      );
+      trackEvent("authentication_error", { error: error.message });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleRegister = async (data: RegisterFormValues) => {
-    setIsLoading(true);
-
-    try {
-      trackEvent("register_attempt", { email: data.email });
-      // Add user metadata for the profile
-      const options = {
-        data: {
-          first_name: data.first_name,
-          last_name: data.last_name,
-          birth_date: data.birth_date,
-          city: data.city,
-          state: data.state,
-          specialty: data.specialty,
-          crm: data.crm,
-        },
-      };
-
-      const { error } = await signUp(data.email, data.password, options);
-      if (error) throw error;
-
-      trackEvent("register_success", { email: data.email });
-      toast.success(
-        "Verifique seu email para confirmar o cadastro.",
-        "Cadastro realizado com sucesso"
-      );
-      setActiveTab("login");
-    } catch (error) {
-      console.error(error);
-      trackEvent("register_error", {
-        email: data.email,
-        error: error?.message || "Unknown error",
-      });
-      toast.error(
-        error?.message || "Tente novamente mais tarde.",
-        "Falha no cadastro"
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // If user is already authenticated, redirect to dashboard
+  if (session) {
+    return <Navigate to="/app" />;
+  }
 
   return (
-    <div className="flex min-h-screen items-start pt-[10vw] pb-32 justify-center bg-ally-blue px-4">
-      <div className="w-full max-w-lg">
-        <div className="mb-16 text-accent-foreground flex flex-col items-center">
-          <a href="/" className="text-ally-dark font-semibold text-3xl">
-            <AllyLogo className="h-24" white />
-          </a>
-          <p className="mt-2 text-lg text-white">Da voz ao prontuário.</p>
-        </div>
+    <div className="flex min-h-screen w-full">
+      {/* Left side - Login/Register Form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 lg:p-20">
+        <div className="w-full max-w-md">
+          <div className="mb-10">
+            <AllyLogo variant="full" className="h-10 mb-12" />
+            <h1 className="text-3xl font-semibold mb-2">
+              {mode === "login" ? "Bem-vindo(a) de volta" : "Criar sua conta"}
+            </h1>
+            <p className="text-gray-600">
+              {mode === "login"
+                ? "Faça login para acessar sua conta"
+                : "Preencha os campos abaixo para se registrar"}
+            </p>
+          </div>
 
-        <Card className="bg-white shadow-xl border-none">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
-              {activeTab === "login" ? "Entre na sua conta" : "Crie sua conta"}
-            </CardTitle>
-            <CardDescription className="text-center">
-              {activeTab === "login"
-                ? "Digite suas credenciais para continuar"
-                : "Preencha seus dados para se cadastrar"}
-            </CardDescription>
-          </CardHeader>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              {mode === "register" && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="firstName"
+                        className="text-sm font-medium text-gray-700 block"
+                      >
+                        Nome
+                      </label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="lastName"
+                        className="text-sm font-medium text-gray-700 block"
+                      >
+                        Sobrenome
+                      </label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
 
-          <Tabs
-            defaultValue="login"
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            <div className="px-6 pt-8">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Cadastre-se</TabsTrigger>
-              </TabsList>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="specialty"
+                        className="text-sm font-medium text-gray-700 block"
+                      >
+                        Especialidade
+                      </label>
+                      <Input
+                        id="specialty"
+                        name="specialty"
+                        type="text"
+                        value={formData.specialty}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="crm"
+                        className="text-sm font-medium text-gray-700 block"
+                      >
+                        CRM
+                      </label>
+                      <Input
+                        id="crm"
+                        name="crm"
+                        type="text"
+                        value={formData.crm}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="text-sm font-medium text-gray-700 block"
+                >
+                  E-mail
+                </label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700 block"
+                >
+                  Senha
+                </label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              {mode === "register" && (
+                <>
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="confirmPassword"
+                      className="text-sm font-medium text-gray-700 block"
+                    >
+                      Confirmar Senha
+                    </label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2 mt-4">
+                    <Checkbox
+                      id="terms"
+                      checked={formData.agreeToTerms}
+                      onCheckedChange={handleCheckboxChange}
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="text-sm leading-none text-gray-700"
+                    >
+                      Eu concordo com os{" "}
+                      <Link
+                        to="/termos-de-uso"
+                        className="text-ally-blue hover:underline"
+                      >
+                        Termos de Uso
+                      </Link>{" "}
+                      e{" "}
+                      <Link
+                        to="/politica-privacidade"
+                        className="text-ally-blue hover:underline"
+                      >
+                        Política de Privacidade
+                      </Link>
+                    </label>
+                  </div>
+                </>
+              )}
             </div>
 
-            <TabsContent value="login">
-              <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(handleLogin)}>
-                  <CardContent className="space-y-4">
-                    <FormField
-                      control={loginForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="seuemail@exemplo.com"
-                              autoComplete="email"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+            <Button
+              type="submit"
+              className="w-full bg-ally-blue hover:bg-ally-blue/90"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Aguarde...
+                </>
+              ) : mode === "login" ? (
+                "Entrar"
+              ) : (
+                "Criar conta"
+              )}
+            </Button>
 
-                    <FormField
-                      control={loginForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Senha</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              autoComplete="current-password"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </CardContent>
-
-                  <CardFooter>
-                    <Button
-                      type="submit"
-                      className="w-full bg-ally-blue hover:bg-ally-blue/90"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Processando..." : "Entrar"}
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Form>
-            </TabsContent>
-
-            <TabsContent value="register">
-              <Form {...registerForm}>
-                <form onSubmit={registerForm.handleSubmit(handleRegister)}>
-                  <CardContent className="space-y-4">
-                    {/* Basic Info */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={registerForm.control}
-                        name="first_name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nome</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="João"
-                                disabled={isLoading}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={registerForm.control}
-                        name="last_name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Sobrenome</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Silva"
-                                disabled={isLoading}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={registerForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="seuemail@exemplo.com"
-                              autoComplete="email"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={registerForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Senha</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              autoComplete="new-password"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={registerForm.control}
-                      name="birth_date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Data de Nascimento</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="date"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Location Info */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={registerForm.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Cidade</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="São Paulo"
-                                disabled={isLoading}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={registerForm.control}
-                        name="state"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Estado</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="SP"
-                                disabled={isLoading}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* Professional Info */}
-                    <FormField
-                      control={registerForm.control}
-                      name="specialty"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Especialidade</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Clínica Médica"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={registerForm.control}
-                      name="crm"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>CRM</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="12345/SP"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Terms and Privacy Policy */}
-                    <FormField
-                      control={registerForm.control}
-                      name="termsAccepted"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>
-                              Eu aceito os{" "}
-                              <Link
-                                to="/termos-de-uso"
-                                className="text-ally-blue hover:underline"
-                              >
-                                Termos de Uso
-                              </Link>{" "}
-                              e{" "}
-                              <Link
-                                to="/politica-privacidade"
-                                className="text-ally-blue hover:underline"
-                              >
-                                Política de Privacidade
-                              </Link>
-                            </FormLabel>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </CardContent>
-
-                  <CardFooter>
-                    <Button
-                      type="submit"
-                      className="w-full bg-ally-blue hover:bg-ally-blue/90"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Processando..." : "Cadastrar"}
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Form>
-            </TabsContent>
-          </Tabs>
-        </Card>
+            <div className="text-center text-sm mt-6">
+              {mode === "login" ? (
+                <p className="text-gray-600">
+                  Ainda não tem uma conta?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setMode("register")}
+                    className="text-ally-blue hover:underline font-medium"
+                  >
+                    Registrar-se
+                  </button>
+                </p>
+              ) : (
+                <p className="text-gray-600">
+                  Já tem uma conta?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setMode("login")}
+                    className="text-ally-blue hover:underline font-medium"
+                  >
+                    Entrar
+                  </button>
+                </p>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
+
+      {/* Right side - Image/Branding */}
+      <div
+        className="hidden lg:flex lg:w-1/2 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, rgba(26,209,255,0.6), rgba(0,230,230,0.6)), url('/assets/images/female-doctor-3.jpg')",
+        }}
+      ></div>
     </div>
   );
 };
