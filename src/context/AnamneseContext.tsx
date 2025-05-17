@@ -1,254 +1,146 @@
-import React, { createContext, useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import { envs } from "@/envs";
-import { toast } from "@/components/ui/sonner";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-standardized-toast";
 
-import { useAppointment } from "./AppointmentContext";
-import { useAuth } from "./AuthContext";
-import { useTranscription } from "./TranscriptionContext";
-import { PatientData, usePatient } from "./PatientContext";
-
-export interface InsightItem {
-  type: "risk" | "finding" | "suggestion" | "red_flag";
-  label: string;
+// Define interfaces for context types
+interface AnamneseEntry {
+  id?: string;
+  title: string;
   content: string;
+  type: string;
+  created_at?: string;
+  appointment_id?: string;
 }
 
-interface AnamneseContextType {
-  anamnese: IAnamnese | null;
-  previousAnamnese: IAnamnese | null;
-  isGeneratingAnamnese: boolean;
-  isRetrievingAnamnese: boolean;
-  generateAnamnese: (transcription: string) => Promise<void>;
-  retrieveAnamnese: (appointmentId: string) => Promise<void>;
-  retrieveLastAnamnese: (patientId: string) => Promise<void>;
-  updateAnamnese: (
-    anamneseId: string,
-    updatedData: IAnamneseMedicalPayload
-  ) => Promise<{ success: boolean }>;
-  setAppointmentNotes: React.Dispatch<React.SetStateAction<string>>;
-  appointmentNotes?: string;
+interface AnamneseContextProps {
+  anamnese: AnamneseEntry[];
+  setAnamnese: React.Dispatch<React.SetStateAction<AnamneseEntry[]>>;
+  isAnamneseLoading: boolean;
+  isSubmittingAnamnese: boolean;
+  addAnamneseEntry: (entry: AnamneseEntry) => void;
+  updateAnamneseEntry: (id: string, content: string) => void;
+  submitAnamnese: () => Promise<void>;
 }
 
-export interface IAnamneseMedicalPayload {
-  identification: string;
-  main_complaint: string;
-  current_illness_history: string;
-  past_medical_history: string;
-  social_history: string;
-  family_history: string;
-  physical_exams: string;
-  complementary_exams: string;
-  therapeutic_approach: string;
-  diagnostic_hypotheses: string;
-}
-
-export interface IAnamnese extends IAnamneseMedicalPayload {
-  id: string;
-  appointment_id: string;
-  transcription_id: string;
-  patient_id: string;
-  patient: PatientData;
-  created_by: string;
-  created_at: Date;
-  insights: InsightItem[];
-}
-
-const AnamneseContext = createContext<AnamneseContextType | undefined>(
+const AnamneseContext = createContext<AnamneseContextProps | undefined>(
   undefined
 );
 
-export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
+export const useAnamnese = () => {
+  const context = useContext(AnamneseContext);
+  if (!context) {
+    throw new Error("useAnamnese must be used within a AnamneseProvider");
+  }
+  return context;
+};
+
+interface AnamneseProviderProps {
+  children: React.ReactNode;
+}
+
+export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
   children,
 }) => {
-  const { session } = useAuth();
-  const navigate = useNavigate();
-  const { appointment } = useAppointment();
-  const { transcription } = useTranscription();
-  const { patient } = usePatient();
-  const [appointmentNotes, setAppointmentNotes] = useState<
-    string | undefined
-  >();
+  const [anamnese, setAnamnese] = useState<AnamneseEntry[]>([]);
+  const [isAnamneseLoading, setIsAnamneseLoading] = useState<boolean>(false);
+  const [isSubmittingAnamnese, setIsSubmittingAnamnese] =
+    useState<boolean>(false);
+  const params = useParams();
 
-  const [isGeneratingAnamnese, setIsGeneratingAnamnese] = useState(false);
-  const [isRetrievingAnamnese, setIsRetrievingAnamnese] = useState(false);
-  const [anamnese, setAnamnese] = useState<IAnamnese | null>(null);
-  const [previousAnamnese, setPreviousAnamnese] = useState<IAnamnese | null>(
-    null
-  );
+  useEffect(() => {
+    const fetchAnamnese = async () => {
+      if (!params.appointmentId) return;
 
-  const generateAnamnese = async (transcriptionText: string) => {
-    setIsGeneratingAnamnese(true);
-    try {
-      const patientInfo = {
-        name: patient?.name,
-        age: patient?.age,
-        gender: patient?.gender,
-        sex: patient?.sex,
-        profession: patient?.profession,
-        color: patient?.color,
-        housing: patient?.housing,
-        marital_status: patient?.marital_status,
-        religion: patient?.religion,
-      };
+      try {
+        setIsAnamneseLoading(true);
+        // Fetch anamnese data for this appointment
+        const { data, error } = await supabase
+          .from("anamnese_entries")
+          .select("*")
+          .eq("appointment_id", params.appointmentId)
+          .order("created_at", { ascending: true });
 
-      const response = await fetch(
-        `${envs.SUPABASE_HOST}/functions/v1/generate-medical-report`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            transcription: transcriptionText,
-            transcriptionId: transcription.id,
-            patientName: patientInfo.name,
-            patientId: appointment.patient?.id,
-            patientInfo: patientInfo,
-            appointmentType: appointment.type,
-            appointmentId: appointment.id,
-            previousAnamnese: previousAnamnese,
-            appointmentNotes: appointmentNotes,
-          }),
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setAnamnese(data);
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao gerar anamnese");
+      } catch (error: any) {
+        console.error("Error fetching anamnese:", error.message);
+        toast.error("Erro ao carregar anamnese");
+      } finally {
+        setIsAnamneseLoading(false);
       }
+    };
 
-      const anamneseResponse = await response.json();
-      setAnamnese(anamneseResponse);
-
-      toast("Anamnese pronta!", {
-        description: "Relatório gerado com sucesso.",
-      });
-
-      navigate(`/app/resumo?appointmentId=${appointment.id}`);
-    } catch (e) {
-      toast("Erro ao gerar anamnese", { description: String(e) });
-    } finally {
-      setIsGeneratingAnamnese(false);
+    if (params.appointmentId) {
+      fetchAnamnese();
     }
+  }, [params.appointmentId]);
+
+  const addAnamneseEntry = (entry: AnamneseEntry) => {
+    setAnamnese((prev) => [...prev, entry]);
   };
 
-  const retrieveAnamnese = async (appointmentId: string) => {
+  const updateAnamneseEntry = (id: string, content: string) => {
+    setAnamnese((prev) =>
+      prev.map((entry) => {
+        if (entry.id === id) {
+          return { ...entry, content };
+        }
+        return entry;
+      })
+    );
+  };
+
+  const submitAnamnese = async () => {
+    if (!params.appointmentId) {
+      toast.error("ID da consulta não encontrado");
+      return;
+    }
+
     try {
-      if (!appointmentId) {
-        toast({
-          variant: "destructive",
-          title: "Erro ao buscar anamnese",
-          description: "ID do atendimento não fornecido.",
-        });
+      setIsSubmittingAnamnese(true);
+
+      // First, check if there are any entries to submit
+      if (anamnese.length === 0) {
+        toast.info("Nenhuma entrada de anamnese para salvar");
         return;
       }
 
-      setIsRetrievingAnamnese(true);
+      const updatePromises = anamnese.map(async (entry) => {
+        if (entry.id) {
+          // Update existing entry
+          const { error } = await supabase
+            .from("anamnese_entries")
+            .update({ content: entry.content })
+            .eq("id", entry.id);
 
-      const { data, error } = await supabase
-        .from("anamneses")
-        .select("*, patient:patients(*)")
-        .eq("appointment_id", appointmentId)
-        .single();
+          if (error) throw error;
+        } else {
+          // Insert new entry
+          const { error } = await supabase.from("anamnese_entries").insert([
+            {
+              title: entry.title,
+              content: entry.content,
+              type: entry.type,
+              appointment_id: params.appointmentId,
+            },
+          ]);
 
-      if (error) {
-        console.error("Error retrieving anamnese:", error);
-        toast({
-          variant: "destructive",
-          title: "Erro ao buscar anamnese",
-          description: "Não foi possível recuperar os dados da anamnese.",
-        });
-        return;
-      }
-
-      if (data) {
-        setAnamnese(data);
-      }
-    } catch (error) {
-      console.error("Error retrieving anamnese:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao buscar anamnese",
-        description: "Ocorreu um erro ao buscar a anamnese.",
-      });
-    } finally {
-      setIsRetrievingAnamnese(false);
-    }
-  };
-
-  const retrieveLastAnamnese = async (patientId) => {
-    try {
-      setIsRetrievingAnamnese(true);
-      
-      // Fix: Ensure patientId is treated as an object with id property
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/retrieve-last-anamnese?patient_id=${patientId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          if (error) throw error;
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao recuperar anamnese pelo ID do paciente");
-      }
-
-      const retrievedAnamnese = await response.json();
-      setPreviousAnamnese(retrievedAnamnese);
-
-      toast("Anamnese recuperada!", {
-        description: "Relatório carregado com sucesso.",
       });
-    } catch (error) {
-      toast("Erro ao recuperar anamnese", { description: String(error) });
-      console.error("Erro ao recuperar anamnese pelo ID do paciente:", error);
+
+      await Promise.all(updatePromises);
+      toast.success("Anamnese salva com sucesso");
+    } catch (error: any) {
+      console.error("Error submitting anamnese:", error.message);
+      toast.error("Erro ao salvar anamnese");
     } finally {
-      setIsRetrievingAnamnese(false);
-    }
-  };
-
-  const updateAnamnese = async (
-    anamneseId: string,
-    updatedData: IAnamneseMedicalPayload
-  ) => {
-    try {
-      const response = await fetch(
-        `${envs.SUPABASE_HOST}/functions/v1/update-anamnese-entry`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: anamneseId,
-            data: updatedData,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar anamnese");
-      }
-
-      setAnamnese((prev) => ({
-        ...prev,
-        ...updatedData,
-      }));
-
-      toast("Anamnese atualizada!", {
-        description: "As alterações foram salvas com sucesso.",
-      });
-
-      return { success: true };
-    } catch (e) {
-      toast("Erro ao atualizar anamnese", { description: String(e) });
-      console.error("Erro ao atualizar anamnese:", e);
-      return { success: false };
+      setIsSubmittingAnamnese(false);
     }
   };
 
@@ -256,24 +148,15 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
     <AnamneseContext.Provider
       value={{
         anamnese,
-        previousAnamnese,
-        isGeneratingAnamnese,
-        isRetrievingAnamnese,
-        generateAnamnese,
-        retrieveAnamnese,
-        retrieveLastAnamnese,
-        updateAnamnese,
-        setAppointmentNotes,
-        appointmentNotes,
+        setAnamnese,
+        isAnamneseLoading,
+        isSubmittingAnamnese,
+        addAnamneseEntry,
+        updateAnamneseEntry,
+        submitAnamnese,
       }}
     >
       {children}
     </AnamneseContext.Provider>
   );
-};
-
-export const useAnamnese = () => {
-  const ctx = useContext(AnamneseContext);
-  if (!ctx) throw new Error("useAnamnese must be used within AnamneseProvider");
-  return ctx;
 };
