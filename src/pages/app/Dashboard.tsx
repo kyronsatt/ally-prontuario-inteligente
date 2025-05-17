@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useStandardizedToast } from "@/hooks/use-standardized-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useAnalytics } from "@/hooks/use-analytics";
@@ -33,6 +32,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const toast = useStandardizedToast();
 
   useEffect(() => {
     trackPageView("dashboard");
@@ -53,15 +53,13 @@ const Dashboard: React.FC = () => {
           total_appointments: data?.stats?.total_appointments || 0,
           new_patients: data?.stats?.new_patients || 0,
         });
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-        setError(err.message);
-        toast({
-          title: "Erro ao carregar dados do dashboard",
-          description: String(err.message),
-          variant: "destructive"
-        });
-        trackEvent("dashboard_data_error", { error: err.message });
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        toast.error(
+          "Não foi possível carregar os dados do dashboard. Tente novamente mais tarde.",
+          "Erro"
+        );
+        trackEvent("dashboard_data_error", { error: error.message });
       } finally {
         setLoading(false);
       }

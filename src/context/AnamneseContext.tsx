@@ -166,18 +166,18 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const retrieveLastAnamnese = async (patientId: string) => {
-    setIsRetrievingAnamnese(true);
+  const retrieveLastAnamnese = async (patientId) => {
     try {
+      setIsRetrievingAnamnese(true);
+      
+      // Fix: Ensure patientId is treated as an object with id property
       const response = await fetch(
-        `${envs.SUPABASE_HOST}/functions/v1/retrieve-last-anamnese`,
+        `${process.env.NEXT_PUBLIC_API_URL}/retrieve-last-anamnese?patient_id=${patientId}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ patient_id: patientId }),
         }
       );
 
@@ -191,9 +191,9 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       toast("Anamnese recuperada!", {
         description: "Relatório carregado com sucesso.",
       });
-    } catch (e) {
-      toast("Erro ao recuperar anamnese", { description: String(e) });
-      console.error("Erro ao recuperar anamnese pelo ID do paciente:", e);
+    } catch (error) {
+      toast("Erro ao recuperar anamnese", { description: String(error) });
+      console.error("Erro ao recuperar anamnese pelo ID do paciente:", error);
     } finally {
       setIsRetrievingAnamnese(false);
     }

@@ -6,7 +6,7 @@ export const useStandardizedToast = () => {
   const { toast: radixToast } = useToast();
 
   const createToastFn = (
-    toastFn: typeof sonnerToast.success | typeof sonnerToast.error,
+    toastFn: typeof sonnerToast.success | typeof sonnerToast.error | typeof sonnerToast.info | typeof sonnerToast.warning | typeof sonnerToast,
     radixVariant: "default" | "destructive" = "default"
   ) => {
     return (description: string, title?: string) => {
@@ -27,18 +27,16 @@ export const useStandardizedToast = () => {
   };
 
   // Create standardized toast functions
-  const standardizedToast = {
+  return {
     default: createToastFn(sonnerToast),
     success: createToastFn(sonnerToast.success),
     error: createToastFn(sonnerToast.error),
     info: createToastFn(sonnerToast.info),
     warning: createToastFn(sonnerToast.warning),
   };
-
-  return standardizedToast;
 };
 
-// Export as a convenient singleton
+// Export as a convenient singleton with proper function methods
 export const toast = {
   success: (description: string, title?: string) =>
     sonnerToast.success(title || "", { description }),

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useStandardizedToast } from "@/hooks/use-standardized-toast";
 
 const Login = () => {
   const { session, signIn, signUp, user } = useAuth();
@@ -24,6 +24,7 @@ const Login = () => {
     agreeToTerms: true,
   });
   const { trackPageView, trackEvent } = useAnalytics();
+  const toast = useStandardizedToast();
 
   useEffect(() => {
     trackPageView("login_page");
@@ -58,21 +59,15 @@ const Login = () => {
       } else {
         // Register mode
         if (formData.password !== formData.confirmPassword) {
-          toast({
-            title: "Erro de senha",
-            description: "As senhas não correspondem",
-            variant: "destructive",
-          });
+          toast.error("As senhas não correspondem", "Erro de senha");
           return;
         }
 
         if (!formData.agreeToTerms) {
-          toast({
-            title: "Termos de uso",
-            description:
-              "Você precisa concordar com os termos de uso para se registrar",
-            variant: "destructive",
-          });
+          toast.error(
+            "Você precisa concordar com os termos de uso para se registrar",
+            "Termos de uso"
+          );
           return;
         }
 
@@ -87,23 +82,17 @@ const Login = () => {
           throw error;
         }
 
-        toast({
-          title: "Registro bem-sucedido",
-          description:
-            "Sua conta foi criada. Por favor, verifique seu e-mail para confirmar o registro.",
-          variant: "default",
-        });
+        toast.success(
+          "Sua conta foi criada. Por favor, verifique seu e-mail para confirmar o registro.",
+          "Registro bem-sucedido"
+        );
 
         trackEvent("register_success", { email: formData.email });
         setMode("login");
       }
     } catch (error) {
       console.error("Authentication error:", error);
-      toast({
-        title: "Erro de autenticação",
-        description: String(error.message),
-        variant: "destructive",
-      });
+      toast.error(String(error.message), "Erro de autenticação");
       trackEvent("authentication_error", { error: error.message });
     } finally {
       setLoading(false);
@@ -121,7 +110,7 @@ const Login = () => {
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 lg:p-20">
         <div className="w-full max-w-md">
           <div className="mb-10">
-            <AllyLogo variant="full" className="h-10 mb-12" />
+            <AllyLogo className="h-10 mb-12" />
             <h1 className="text-3xl font-semibold mb-2">
               {mode === "login" ? "Bem-vindo(a) de volta" : "Criar sua conta"}
             </h1>

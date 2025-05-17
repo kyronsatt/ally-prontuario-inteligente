@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -9,7 +10,9 @@ import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/context/AuthContext";
 import { usePatient } from "@/context/PatientContext";
 import { useAppointment } from "@/context/AppointmentContext";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useStandardizedToast } from "@/hooks/use-standardized-toast";
+
+export type RecordingStatus = "NOT_STARTED" | "RECORDING" | "PAUSED" | "STOPPED";
 
 interface TranscriptionContextProps {
   transcription: string;
@@ -17,6 +20,7 @@ interface TranscriptionContextProps {
   isRecording: boolean;
   startRecording: () => void;
   stopRecording: () => void;
+  pauseRecording: () => void;  // Added missing property
   appointmentType: string | null;
   setAppointmentType: (type: string | null) => void;
   isCreatingAppointment: boolean;
@@ -24,6 +28,9 @@ interface TranscriptionContextProps {
   appointmentId: string | null;
   setIsCreatingAppointment: (isCreating: boolean) => void;
   resetContext: () => void;
+  duration: number;  // Added missing property
+  recordingStatus: RecordingStatus;  // Added missing property
+  isTranscribing: boolean;  // Added missing property
 }
 
 const TranscriptionContext = createContext<TranscriptionContextProps | undefined>(
@@ -48,6 +55,11 @@ export const TranscriptionProvider: React.FC<{
   const [appointmentType, setAppointmentType] = useState<string | null>(null);
   const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
   const [appointmentId, setAppointmentId] = useState<string | null>(null);
+  const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>("NOT_STARTED");
+  const [duration, setDuration] = useState(0);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const toast = useStandardizedToast();
+  
   const { user } = useAuth();
   const { patient } = usePatient();
   const { setAppointment } = useAppointment();
@@ -58,19 +70,50 @@ export const TranscriptionProvider: React.FC<{
 
   const startRecording = () => {
     setIsRecording(true);
+    setRecordingStatus("RECORDING");
+  };
+
+  const pauseRecording = () => {
+    setRecordingStatus(prevStatus => 
+      prevStatus === "RECORDING" ? "PAUSED" : "RECORDING"
+    );
   };
 
   const stopRecording = () => {
     setIsRecording(false);
+    setRecordingStatus("STOPPED");
+    setIsTranscribing(true);
+    
+    // Simulate transcription process - this would be replaced with actual API call
+    setTimeout(() => {
+      setIsTranscribing(false);
+    }, 3000);
   };
+
+  useEffect(() => {
+    let interval: number | null = null;
+    
+    if (recordingStatus === "RECORDING") {
+      interval = window.setInterval(() => {
+        setDuration(prev => prev + 1);
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval !== null) clearInterval(interval);
+    };
+  }, [recordingStatus]);
 
   const resetContext = useCallback(() => {
     setTranscription("");
     setIsRecording(false);
+    setRecordingStatus("NOT_STARTED");
     setAppointmentType(null);
     setIsCreatingAppointment(false);
     setAppointmentId(null);
     setAppointment(null);
+    setDuration(0);
+    setIsTranscribing(false);
   }, [setAppointment]);
 
   const createAppointment = async () => {
@@ -138,6 +181,7 @@ export const TranscriptionProvider: React.FC<{
     isRecording,
     startRecording,
     stopRecording,
+    pauseRecording,
     appointmentType,
     setAppointmentType,
     isCreatingAppointment,
@@ -145,6 +189,9 @@ export const TranscriptionProvider: React.FC<{
     appointmentId,
     setIsCreatingAppointment,
     resetContext,
+    duration,
+    recordingStatus,
+    isTranscribing
   };
 
   return (

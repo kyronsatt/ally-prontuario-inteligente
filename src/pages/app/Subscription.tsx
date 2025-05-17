@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useStandardizedToast } from "@/hooks/use-standardized-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PlanDetails {
@@ -24,6 +23,7 @@ const Subscription: React.FC = () => {
   const [plan, setPlan] = useState<PlanDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [processingAction, setProcessingAction] = useState(false);
+  const toast = useStandardizedToast();
 
   useEffect(() => {
     if (!user) return;
@@ -44,11 +44,7 @@ const Subscription: React.FC = () => {
         }, 800);
       } catch (error) {
         console.error("Error fetching subscription:", error);
-        toast({
-          title: "Erro ao carregar informações da assinatura",
-          description: "Por favor, tente novamente mais tarde.",
-          variant: "destructive"
-        });
+        toast.error("Por favor, tente novamente mais tarde.", "Erro ao carregar informações da assinatura");
         setLoading(false);
       }
     };
@@ -60,26 +56,16 @@ const Subscription: React.FC = () => {
     setProcessingAction(true);
     try {
       // This would be replaced with the Stripe checkout logic
-      toast({
-        title: "Redirecionando para o checkout",
-        description: "Você será redirecionado para a página de pagamento.",
-      });
+      toast.info("Você será redirecionado para a página de pagamento.", "Redirecionando para o checkout");
       
       // Simulate redirect delay
       setTimeout(() => {
-        toast({
-          title: "Funcionalidade em desenvolvimento",
-          description: "A integração com pagamentos será implementada em breve.",
-        });
+        toast.info("A integração com pagamentos será implementada em breve.", "Funcionalidade em desenvolvimento");
         setProcessingAction(false);
       }, 1500);
     } catch (error) {
       console.error("Error upgrading plan:", error);
-      toast({
-        title: "Erro ao processar upgrade",
-        description: "Por favor, tente novamente mais tarde.",
-        variant: "destructive"
-      });
+      toast.error("Por favor, tente novamente mais tarde.", "Erro ao processar upgrade");
       setProcessingAction(false);
     }
   };
@@ -88,26 +74,16 @@ const Subscription: React.FC = () => {
     setProcessingAction(true);
     try {
       // This would be replaced with the Stripe Customer Portal logic
-      toast({
-        title: "Redirecionando para o portal de gerenciamento",
-        description: "Você será redirecionado para gerenciar sua assinatura.",
-      });
+      toast.info("Você será redirecionado para gerenciar sua assinatura.", "Redirecionando para o portal de gerenciamento");
       
       // Simulate redirect delay
       setTimeout(() => {
-        toast({
-          title: "Funcionalidade em desenvolvimento",
-          description: "O portal de gerenciamento será implementado em breve.",
-        });
+        toast.info("O portal de gerenciamento será implementado em breve.", "Funcionalidade em desenvolvimento");
         setProcessingAction(false);
       }, 1500);
     } catch (error) {
       console.error("Error managing subscription:", error);
-      toast({
-        title: "Erro ao acessar gerenciamento",
-        description: "Por favor, tente novamente mais tarde.",
-        variant: "destructive"
-      });
+      toast.error("Por favor, tente novamente mais tarde.", "Erro ao acessar gerenciamento");
       setProcessingAction(false);
     }
   };

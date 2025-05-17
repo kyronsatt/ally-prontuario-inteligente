@@ -160,6 +160,22 @@ const AppointmentSummary: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        if (!anamnese && appointmentId) {
+          retrieveAnamnese(appointmentId);
+        } else if (!anamnese && transcription) {
+          generateAnamnese(transcription.raw_text);
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+
+    loadData();
+  }, [appointment, anamnese]);
+
   if (isGeneratingAnamnese || isRetrievingAnamnese) {
     const action = isGeneratingAnamnese ? "Finalizando" : "Acessando";
     return (
