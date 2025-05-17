@@ -1,3 +1,4 @@
+
 import React, { ReactElement, useEffect, useState } from "react";
 import {
   Check,
@@ -147,7 +148,9 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
     };
 
     const handleDiscardChanges = async (sectionId: string) => {
-      onUpdateSection(sectionId, originalAnamnese[sectionId]);
+      if (onUpdateSection && originalAnamnese) {
+        onUpdateSection(sectionId, originalAnamnese[sectionId]);
+      }
       setEditingSection(null);
     };
 
@@ -182,6 +185,7 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
           <div className="flex flex-wrap gap-3 w-full mb-8">
             {sections.map(({ id: sectionId, icon: Icon, acronym }) => (
               <a
+                key={sectionId}
                 href={`#${sectionId}`}
                 className="rounded-md hover:bg-ally-blue/10 hover:scale-110 transition-all cursor-pointer bg-ally-blue/5 border border-ally-blue/40 flex gap-2 items-center justify-center p-2 text-ally-blue"
               >

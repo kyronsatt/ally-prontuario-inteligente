@@ -22,7 +22,7 @@ import ClinicalInsights from "@/components/organisms/clinical-insights";
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { appointment, setAppointment } = useAppointment();
+  const { appointment } = useAppointment();
   const {
     anamnese,
     isGeneratingAnamnese,
@@ -34,7 +34,7 @@ const AppointmentSummary: React.FC = () => {
   const { transcription } = useTranscription();
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [editedAnamnese, setEditedAnamnese] = useState<IAnamnese | undefined>(
-    anamnese
+    anamnese || undefined
   );
   const [isSaving, setIsSaving] = useState(false);
   const reportContentRef = useRef<HTMLDivElement>(null);
@@ -43,13 +43,13 @@ const AppointmentSummary: React.FC = () => {
   const appointmentId = searchParams.get("appointmentId");
 
   useEffect(() => {
-    if (!anamnese && appointmentId) {
+    if (anamnese === null && appointmentId) {
       retrieveAnamnese(appointmentId);
-    } else if (!anamnese && transcription) {
+    } else if (anamnese === null && transcription) {
       // Handle the case where transcription might be a string or an object with raw_text
       const transcriptionText = typeof transcription === 'string' 
         ? transcription 
-        : (transcription as any)?.raw_text || '';
+        : transcription?.raw_text || '';
       
       generateAnamnese(transcriptionText);
     }
@@ -219,7 +219,7 @@ const AppointmentSummary: React.FC = () => {
               type={appointment?.type}
             />
             <div className="mt-4">
-              <ClinicalInsights insights={anamnese?.insights} />
+              <ClinicalInsights insights={anamnese?.insights || []} />
             </div>
           </div>
           
@@ -275,7 +275,7 @@ const AppointmentSummary: React.FC = () => {
           appointmentDate={formattedDate}
           type={appointment?.type}
         />
-        <ClinicalInsights insights={anamnese?.insights} />
+        <ClinicalInsights insights={anamnese?.insights || []} />
       </div>
       <div>
         <AppointmentReport
