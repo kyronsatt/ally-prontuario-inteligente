@@ -1,13 +1,6 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Brain,
-  Check,
-  Shield,
-  ShieldCheck,
-  Activity,
-} from "lucide-react";
+import { Brain, Check, Shield, ShieldCheck, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -58,7 +51,8 @@ const BenefitsSection: React.FC = () => {
   };
 
   const getTabClassName = (tab: string) => {
-    const baseClass = "py-2 md:py-3 px-3 md:px-4 rounded-lg text-center transition-all text-xs md:text-sm";
+    const baseClass =
+      "py-2 md:py-3 px-3 md:px-4 rounded-lg text-center transition-all text-xs md:text-sm";
     return activeTab === tab
       ? `${baseClass} bg-ally-blue/5 text-ally-blue border-[1px] border-ally-blue/70`
       : `${baseClass} bg-ally-light/50 text-ally-gray hover:bg-ally-light border-[1px] border-gray-200`;
@@ -87,7 +81,7 @@ const BenefitsSection: React.FC = () => {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6 md:mb-8 bg-transparent overflow-x-auto flex-wrap">
+            <TabsList className="grid grid-cols-3 gap-2 mb-6 md:mb-8 bg-transparent flex-wrap">
               {Object.entries(tabContent).map(([key, tab]) => (
                 <TabsTrigger
                   key={key}
@@ -102,7 +96,7 @@ const BenefitsSection: React.FC = () => {
                       "inline mr-0 p-1",
                       activeTab === key ? "text-ally-blue" : "text-ally-gray"
                     )}
-                    size={isMobile ? 16 : 20}
+                    size={20}
                   />
                   <span className="hidden sm:inline">{tab.tabTitle}</span>
                 </TabsTrigger>
@@ -119,7 +113,10 @@ const BenefitsSection: React.FC = () => {
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
                       <h3 className="text-xl md:text-2xl font-semibold mb-4 flex items-center">
-                        <tab.icon className="text-ally-blue inline mr-2" size={isMobile ? 20 : 24} />
+                        <tab.icon
+                          className="text-ally-blue inline mr-2"
+                          size={isMobile ? 20 : 24}
+                        />
                         {tab.title}
                       </h3>
                       <p className="mb-6 text-md font-light">

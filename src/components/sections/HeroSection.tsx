@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -49,9 +48,10 @@ const HeroContent: React.FC = () => (
 
 const HeroImage: React.FC = () => (
   <div
-    className="md:w-1/2 flex justify-center md:justify-end h-full fade-in-section"
+    className="md:w-1/2 flex relative justify-center md:justify-end h-full fade-in-section overflow-visible"
     style={{ "--delay": "300ms" } as React.CSSProperties}
   >
+    {/* <div className="w-full h-full scale-90 bg-gradient-to-b from-ally-blue to-[#00e6e6] absolute rounded-full left-0 blur-3xl" /> */}
     <img
       src="/assets/mockups/mockup-escuta.png"
       alt="Ally Med - Painel de Escuta"

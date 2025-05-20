@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import {
   Heart,
@@ -35,14 +34,12 @@ const SpecialtyCard: React.FC<SpecialtyCardProps> = ({
   description,
 }) => {
   const isMobile = useIsMobile();
-  
+
   return (
     <Card className="h-full border border-ally-blue/50 bg-gradient-to-r from-ally-blue/15 to-[#00e6e630] rounded-2xl">
       <CardHeader className="pb-0 text-center overflow-clip bg-transparent">
         <div className="flex justify-center">
-          <div className="py-3 rounded-full text-ally-blue/20">
-            {icon}
-          </div>
+          <div className="py-3 rounded-full text-ally-blue/20">{icon}</div>
         </div>
         <CardTitle className="text-lg md:text-xl font-bold text-ally-blue">
           {title}
@@ -147,14 +144,12 @@ const SpecialtiesSection: React.FC = () => {
             }}
             setApi={setCarouselApi}
           >
-            <CarouselContent className="flex">
+            <CarouselContent className="flex mx-4 md:mx-0">
               {specialties.map((specialty, index) => (
                 <CarouselItem
                   key={index}
-                  className={`pl-4 ${
-                    isMobile
-                      ? "basis-full sm:basis-1/2"
-                      : "md:basis-1/3 lg:basis-1/4"
+                  className={`pl-2 md:pl-4 ${
+                    isMobile ? "basis-1/2" : "md:basis-1/3 lg:basis-1/4"
                   }`}
                 >
                   <div className="p-1 h-full">
