@@ -53,13 +53,7 @@ const AppointmentSummary: React.FC = () => {
 
       generateAnamnese(transcriptionText);
     }
-  }, [
-    anamnese,
-    appointmentId,
-    transcription,
-    retrieveAnamnese,
-    generateAnamnese,
-  ]);
+  }, [anamnese, appointmentId, transcription]);
 
   useEffect(() => {
     if (anamnese && !editedAnamnese) {
@@ -193,63 +187,63 @@ const AppointmentSummary: React.FC = () => {
     );
   }
 
-  // Mobile layout
-  if (isMobile) {
-    return (
-      <div ref={reportContentRef} className="max-w-full mx-auto pb-20">
-        <div className="flex items-center mb-6">
-          <Button
-            onClick={() => navigate("/app")}
-            variant="ghost"
-            className="mr-2"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
-          </Button>
-        </div>
+  // // Mobile layout
+  // if (isMobile) {
+  //   return (
+  //     <div ref={reportContentRef} className="max-w-full mx-auto pb-20">
+  //       <div className="flex items-center mb-6">
+  //         <Button
+  //           onClick={() => navigate("/app")}
+  //           variant="ghost"
+  //           className="mr-2"
+  //         >
+  //           <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
+  //         </Button>
+  //       </div>
 
-        <h1 className="text-3xl font-semibold mb-4 gradient-text">Anamnese</h1>
+  //       <h1 className="text-3xl font-semibold mb-4 gradient-text">Anamnese</h1>
 
-        {/* Main content */}
-        <div className="space-y-6">
-          {/* Patient info and insights at the top */}
-          <div className="bg-gray-50 border border-gray-200 p-3 rounded-xl">
-            <PatientInfoCard
-              patientName={
-                appointment?.patient?.name ??
-                anamnese?.patient?.name ??
-                "Paciente não identificado"
-              }
-              appointmentDate={formattedDate}
-              type={appointment?.type}
-            />
-            <div className="mt-4">
-              <ClinicalInsights insights={anamnese?.insights || []} />
-            </div>
-          </div>
+  //       {/* Main content */}
+  //       <div className="space-y-6">
+  //         {/* Patient info and insights at the top */}
+  //         <div className="bg-gray-50 ">
+  //           <PatientInfoCard
+  //             patientName={
+  //               appointment?.patient?.name ??
+  //               anamnese?.patient?.name ??
+  //               "Paciente não identificado"
+  //             }
+  //             appointmentDate={formattedDate}
+  //             type={appointment?.type}
+  //           />
+  //           <div className="mt-4">
+  //             <ClinicalInsights insights={anamnese?.insights || []} />
+  //           </div>
+  //         </div>
 
-          {/* Action buttons */}
-          <div className="flex justify-end gap-2">
-            <ActionButtons onDownload={handleDownload} />
-          </div>
+  //         {/* Action buttons */}
+  //         <div className="flex justify-end gap-2">
+  //           <ActionButtons onDownload={handleDownload} />
+  //         </div>
 
-          {/* Anamnese content */}
-          <div className="mt-4">
-            <AppointmentReport
-              anamnese={editedAnamnese}
-              unsavedChanges={unsavedChanges}
-              isSaving={isSaving}
-              saveChanges={handleSaveChanges}
-              onUpdateSection={handleUpdateSection}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  //         {/* Anamnese content */}
+  //         <div className="mt-4">
+  //           <AppointmentReport
+  //             anamnese={editedAnamnese}
+  //             unsavedChanges={unsavedChanges}
+  //             isSaving={isSaving}
+  //             saveChanges={handleSaveChanges}
+  //             onUpdateSection={handleUpdateSection}
+  //           />
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Desktop layout
   return (
-    <div ref={reportContentRef} className="max-w-5xl mx-auto pb-20">
+    <div ref={reportContentRef} className="w-full lg:max-w-5xl mx-auto pb-20">
       <div className="flex items-center mb-6">
         <Button
           onClick={() => navigate("/app")}
@@ -269,7 +263,7 @@ const AppointmentSummary: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex gap-3 h-fit mb-10 bg-gray-50 border border-gray-200 p-3 rounded-xl">
+      <div className="flex flex-col lg:flex-row gap-7 h-fit">
         <PatientInfoCard
           patientName={
             appointment?.patient?.name ??
@@ -281,7 +275,10 @@ const AppointmentSummary: React.FC = () => {
         />
         <ClinicalInsights insights={anamnese?.insights || []} />
       </div>
-      <div>
+      <div className="flex flex-col mt-7">
+        {/* <div className="flex border-b pb-1 pl-1 border-gray-200 gap-2 mt-12 mb-8 w-full">
+          <span className="text-gray-300 font-semibold">Resultados</span>
+        </div> */}
         <AppointmentReport
           anamnese={editedAnamnese}
           unsavedChanges={unsavedChanges}

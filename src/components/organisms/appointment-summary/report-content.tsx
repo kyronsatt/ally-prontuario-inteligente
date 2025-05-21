@@ -174,26 +174,8 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
     };
 
     return (
-      <div className="w-full grid grid-cols-8 gap-10 mt-10">
-        <div className="print:hidden hidden lg:flex flex-col gap-1 col-span-2">
-          <p className="text-md text-gray-300 ml-2">
-            Ir para
-            <LucideArrowRight className="w-4 inline ml-1" />
-          </p>
-          <Separator className="mb-4" />
-          <div className="flex flex-wrap gap-3 w-full mb-8">
-            {sections.map(({ id: sectionId, icon: Icon, acronym }) => (
-              <a
-                key={sectionId}
-                href={`#${sectionId}`}
-                className="rounded-md hover:bg-ally-blue/10 hover:scale-110 transition-all cursor-pointer bg-ally-blue/5 border border-ally-blue/40 flex gap-2 items-center justify-center p-2 text-ally-blue"
-              >
-                {<Icon className="h-5" />} {acronym}
-              </a>
-            ))}
-          </div>
-        </div>
-        <div className="space-y-6 animate-fade-in print:space-y-4 col-span-full lg:col-span-6">
+      <div className="w-full grid grid-cols-8 gap-10">
+        <div className="space-y-6 animate-fade-in print:space-y-4 col-span-full">
           {sections.map(({ title, content, id: sectionId, icon: Icon }) => (
             <Card
               id={sectionId}
@@ -232,7 +214,7 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
                   )
                 )}
               </CardHeader>
-              <CardContent className="pt-4">
+              <CardContent className="p-2">
                 <RichTextEditor
                   id={sectionId}
                   content={content}
