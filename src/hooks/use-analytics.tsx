@@ -1,8 +1,7 @@
-
 import { useEffect, useCallback } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import { envs } from "@/envs";
-import { useStandardizedToast as toast } from "@/hooks/use-standardized-toast";
+import { toast } from "@/hooks/use-standardized-toast";
 
 // Initialize outside of the hook to avoid re-initialization
 let initialized = false;
@@ -37,7 +36,7 @@ export function useAnalytics() {
       try {
         amplitude.track(eventName, {
           timestamp: new Date().toISOString(),
-          ...eventProperties
+          ...eventProperties,
         });
         console.log(`Event tracked: ${eventName}`, eventProperties);
       } catch (error) {

@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useState,
@@ -6,13 +5,16 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/context/AuthContext";
 import { usePatient } from "@/context/PatientContext";
 import { useAppointment } from "@/context/AppointmentContext";
 import { useStandardizedToast } from "@/hooks/use-standardized-toast";
 
-export type RecordingStatus = "NOT_STARTED" | "RECORDING" | "PAUSED" | "STOPPED";
+export type RecordingStatus =
+  | "NOT_STARTED"
+  | "RECORDING"
+  | "PAUSED"
+  | "STOPPED";
 
 interface TranscriptionContextProps {
   transcription: string;
@@ -33,9 +35,9 @@ interface TranscriptionContextProps {
   isTranscribing: boolean;
 }
 
-const TranscriptionContext = createContext<TranscriptionContextProps | undefined>(
-  undefined
-);
+const TranscriptionContext = createContext<
+  TranscriptionContextProps | undefined
+>(undefined);
 
 export const useTranscription = () => {
   const context = useContext(TranscriptionContext);
@@ -55,11 +57,12 @@ export const TranscriptionProvider: React.FC<{
   const [appointmentType, setAppointmentType] = useState<string | null>(null);
   const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
   const [appointmentId, setAppointmentId] = useState<string | null>(null);
-  const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>("NOT_STARTED");
+  const [recordingStatus, setRecordingStatus] =
+    useState<RecordingStatus>("NOT_STARTED");
   const [duration, setDuration] = useState(0);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const toast = useStandardizedToast();
-  
+
   const { user } = useAuth();
   const { patient } = usePatient();
   const { setAppointment } = useAppointment();
@@ -74,7 +77,7 @@ export const TranscriptionProvider: React.FC<{
   };
 
   const pauseRecording = () => {
-    setRecordingStatus(prevStatus => 
+    setRecordingStatus((prevStatus) =>
       prevStatus === "RECORDING" ? "PAUSED" : "RECORDING"
     );
   };
@@ -83,7 +86,7 @@ export const TranscriptionProvider: React.FC<{
     setIsRecording(false);
     setRecordingStatus("STOPPED");
     setIsTranscribing(true);
-    
+
     // Simulate transcription process - this would be replaced with actual API call
     setTimeout(() => {
       setIsTranscribing(false);
@@ -92,13 +95,13 @@ export const TranscriptionProvider: React.FC<{
 
   useEffect(() => {
     let interval: number | null = null;
-    
+
     if (recordingStatus === "RECORDING") {
       interval = window.setInterval(() => {
-        setDuration(prev => prev + 1);
+        setDuration((prev) => prev + 1);
       }, 1000);
     }
-    
+
     return () => {
       if (interval !== null) clearInterval(interval);
     };
@@ -191,7 +194,7 @@ export const TranscriptionProvider: React.FC<{
     resetContext,
     duration,
     recordingStatus,
-    isTranscribing
+    isTranscribing,
   };
 
   return (

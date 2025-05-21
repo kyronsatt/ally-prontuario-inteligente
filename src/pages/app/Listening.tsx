@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ShieldIcon } from "lucide-react";
@@ -7,7 +6,6 @@ import { useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
 import { useAnamnese } from "@/context/AnamneseContext";
 import { useTranscription } from "@/context/TranscriptionContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 import { toast } from "@/hooks/use-toast";
 
@@ -20,7 +18,6 @@ import AppointmentNotes from "@/components/organisms/appointment-notes";
 
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const { appointment } = useAppointment();
   const {
     startRecording,
@@ -44,7 +41,7 @@ const ListeningPage: React.FC = () => {
     if (!appointment || !patient) {
       navigate("/app/novo-atendimento");
     }
-  }, [patient, appointment, navigate]);
+  }, [patient, appointment]);
 
   useEffect(() => {
     if (recordingStatus === "NOT_STARTED" && !isTranscribing) {
@@ -52,7 +49,13 @@ const ListeningPage: React.FC = () => {
     } else if (recordingStatus === "STOPPED" && transcription) {
       navigate("/app/resumo");
     }
-  }, [recordingStatus, transcription, isTranscribing, navigate, startRecording]);
+  }, [
+    recordingStatus,
+    transcription,
+    isTranscribing,
+    navigate,
+    startRecording,
+  ]);
 
   useEffect(() => {
     const fetchAnamneseIfReturn = async () => {
@@ -71,7 +74,7 @@ const ListeningPage: React.FC = () => {
     };
 
     fetchAnamneseIfReturn();
-  }, [appointment?.type, patient?.id, retrieveLastAnamnese]);
+  }, [appointment?.type, patient?.id]);
 
   const handleStopRecording = async () => {
     await stopRecording();

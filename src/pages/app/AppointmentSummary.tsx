@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
@@ -49,22 +48,22 @@ const AppointmentSummary: React.FC = () => {
     } else if (anamnese === null && transcription) {
       // Handle the case where transcription might be a string or an object with text
       let transcriptionText = "";
-      
+
       if (typeof transcription === "string") {
         transcriptionText = transcription;
       } else if (transcription && typeof transcription === "object") {
         // Try to extract text content from the transcription object
         // This assumes that the transcription object has some text content property
-        transcriptionText = 
-          transcription.text || 
-          transcription.content || 
-          transcription.transcription || 
+        transcriptionText =
+          transcription.text ||
+          transcription.content ||
+          transcription.transcription ||
           JSON.stringify(transcription);
       }
 
       generateAnamnese(transcriptionText);
     }
-  }, [anamnese, appointmentId, transcription, generateAnamnese, retrieveAnamnese]);
+  }, [anamnese, appointmentId, transcription]);
 
   useEffect(() => {
     if (anamnese && !editedAnamnese) {
