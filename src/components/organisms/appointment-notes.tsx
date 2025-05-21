@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { CheckCheck, InfoIcon, Trash2 } from "lucide-react";
+import { CheckCheck, NotepadText, Trash2 } from "lucide-react";
 
 interface AppointmentNotesProps {
   notes: string;
@@ -23,13 +23,14 @@ const AppointmentNotes: React.FC<AppointmentNotesProps> = ({
   };
 
   return (
-    <Card className="h-1/3 border-ally-blue/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl text-ally-blue">
+    <Card className="flex flex-col h-fit lg:h-1/3 border-ally-blue/30">
+      <CardHeader className="py-2">
+        <CardTitle className="flex gap-2 items-center text-md lg:text-lg text-ally-blue">
+          <NotepadText size={16} />
           Anotações Adicionais
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 overflow-auto py-6">
+      <CardContent className="h-full overflow-y-auto py-3">
         <Textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -37,8 +38,8 @@ const AppointmentNotes: React.FC<AppointmentNotesProps> = ({
           className="resize-none placeholder:italic border-ally-blue/30 focus-visible:ring-ally-blue bg-gray-50 focus:bg-white"
         />
 
-        <div className="mt-4 flex justify-between items-start">
-          <div className="flex items-start space-x-2 text-xs text-gray-500 max-w-[80%]">
+        <div className="mt-4 flex flex-col gap-2 lg:gap-0 lg:flex-row justify-between items-start">
+          <div className="flex items-start space-x-2 text-xs text-gray-500 w-full lg:max-w-[80%]">
             <CheckCheck className="h-4 w-4 flex-shrink-0" />
             <p>
               Não se preocupe em preencher: a Ally não depende dessas anotações.
@@ -50,7 +51,7 @@ const AppointmentNotes: React.FC<AppointmentNotesProps> = ({
             size="sm"
             disabled={!notes || notes === ""}
             onClick={handleClearNotes}
-            className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"
+            className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 w-full lg:w-fit"
           >
             <Trash2 className="h-4 w-4 mr-1" />
             Limpar

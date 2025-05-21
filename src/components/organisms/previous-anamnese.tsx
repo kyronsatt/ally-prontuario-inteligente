@@ -1,12 +1,11 @@
-
 import React from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import moment from "moment";
+import { Calendar, HistoryIcon, XCircleIcon } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IAnamnese } from "@/context/AnamneseContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, CheckCircle2 } from "lucide-react";
-import moment from "moment";
-import ClinicalInsights from "./clinical-insights";
+import { Badge } from "../ui/badge";
 
 interface PreviousAnamneseProps {
   anamnese: IAnamnese | null;
@@ -30,13 +29,14 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
   if (!anamnese) {
     return (
       <Card className="h-fit max-h-[50%] border-ally-blue/30">
-        <CardHeader>
-          <CardTitle className="text-xl text-ally-blue">
+        <CardHeader className="py-2">
+          <CardTitle className="flex gap-2 items-center text-md lg:text-lg text-ally-blue">
+            <HistoryIcon size={16} />
             Última Anamnese
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex py-8 gap-3 items-center text-gray-500">
-          <CheckCircle2 size={20} className="opacity-90" />
+        <CardContent className="flex py-4 gap-3 items-start text-gray-500">
+          <XCircleIcon size={24} className="opacity-90" />
           <p>Não há registros de anamneses anteriores para este paciente.</p>
         </CardContent>
       </Card>
@@ -71,21 +71,24 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
 
   return (
     <Card className="h-2/3 flex flex-col border-ally-blue/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex justify-between text-xl text-ally-blue">
+      <CardHeader className="py-2 flex flex-row justify-between items-center text-ally-blue">
+        <CardTitle className="flex gap-2 items-center text-md lg:text-lg">
+          <HistoryIcon size={16} />
           <p>Última Anamnese</p>
-          <p className="items-center flex gap-1 text-[16px] font-light opacity-80">
-            <Calendar size={16} className="inline" />{" "}
-            {formattedDateOfLastAnamnese}
-          </p>
         </CardTitle>
+        <Badge
+          variant="outline"
+          className="items-center flex gap-1 text-sm font-light opacity-80 text-ally-gray"
+        >
+          <Calendar size={16} /> {formattedDateOfLastAnamnese}
+        </Badge>
       </CardHeader>
 
       <CardContent className="flex-1 overflow-auto px-4 py-6">
         <div className="space-y-4 pb-4">
           {sections.map((section) => (
             <div key={section.title} className="border-b border-gray-200 pb-3">
-              <h3 className="font-medium text-ally-blue mb-1">
+              <h3 className="font-medium text-md text-ally-blue mb-1">
                 {section.title}
               </h3>
               <div
@@ -97,8 +100,8 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
         </div>
 
         {anamnese.insights && anamnese.insights.length > 0 && (
-          <div className="mt-6 border-t border-gray-200 pt-4">
-            <h3 className="font-medium text-ally-blue mb-1">
+          <div className="mt-0">
+            <h3 className="font-medium text-md text-ally-blue mb-3">
               Insights Clínicos
             </h3>
             <div className="space-y-2">

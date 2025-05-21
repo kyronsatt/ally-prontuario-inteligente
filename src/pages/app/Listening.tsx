@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ShieldIcon } from "lucide-react";
@@ -14,11 +13,9 @@ import { toast } from "@/hooks/use-toast";
 import PatientInfo from "@/components/organisms/patient-info";
 import Timer from "@/components/molecules/timer";
 import ListeningControls from "@/components/organisms/listening-controls";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import PreviousAnamnese from "@/components/organisms/previous-anamnese";
 import AppointmentNotes from "@/components/organisms/appointment-notes";
-import { Separator } from "@/components/ui/separator";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
@@ -73,7 +70,7 @@ const ListeningPage: React.FC = () => {
     };
 
     fetchAnamneseIfReturn();
-  }, [appointment?.type, patient?.id, retrieveLastAnamnese]);
+  }, [appointment?.type, patient?.id]);
 
   const handleStopRecording = async () => {
     await stopRecording();
@@ -96,70 +93,10 @@ const ListeningPage: React.FC = () => {
     );
   }
 
-  // Mobile layout
-  if (isMobile) {
-    return (
-      <div className="w-full max-w-full h-full">
-        {/* Recording panel - Always visible at the top */}
-        <div className="bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-xl p-4 mb-4 shadow-lg">
-          <div className="text-center mb-4">
-            <h1 className="text-xl font-bold text-white mb-1">
-              Escutando Consulta
-            </h1>
-            <PatientInfo
-              name={patient?.name || ""}
-              type={appointment?.type}
-            />
-          </div>
-          
-          <div className="flex flex-col items-center justify-center gap-4 mb-4">
-            <Timer
-              duration={duration}
-              isPaused={recordingStatus === "PAUSED"}
-            />
-            <ListeningControls
-              recordingStatus={recordingStatus}
-              onTogglePause={pauseRecording}
-              onFinish={handleStopRecording}
-            />
-          </div>
-          
-          <Card className="bg-transparent border-none shadow-none mt-2">
-            <CardContent className="p-2 flex justify-center">
-              <div className="flex items-start space-x-2">
-                <ShieldIcon className="h-4 w-4 text-white/50 mt-1" />
-                <p className="text-xs text-white/70">
-                  Escutando com segurança. A gravação não será armazenada.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Previous anamnese */}
-        <div className="mb-4">
-          <PreviousAnamnese
-            anamnese={previousAnamnese}
-            isLoading={isRetrievingAnamnese}
-          />
-        </div>
-
-        {/* Appointment Notes */}
-        <div className="mb-4">
-          <AppointmentNotes
-            notes={appointmentNotes}
-            setNotes={setAppointmentNotes}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop layout
   return (
-    <div className="w-full max-w-full h-full max-h-[100vh]">
-      <div className="grid grid-cols-10 gap-4 h-full">
-        <div className="col-span-6 flex flex-col gap-10 max-h-[100vh] overflow-y-auto pr-2">
+    <div className="w-full max-w-full h-full pb-5 overflow-y-auto">
+      <div className="flex flex-col-reverse lg:flex-row h-full gap-8 lg:gap-4 overflow-y-auto pr-1 lg:pr-0 -mx-0 overflow-x-clip">
+        <div className="w-full lg:w-[60%] flex flex-col-reverse mt-12 lg:mt-0 lg:flex-col gap-5 pb-5 h-[100vh]">
           <PreviousAnamnese
             anamnese={previousAnamnese}
             isLoading={isRetrievingAnamnese}
@@ -170,12 +107,15 @@ const ListeningPage: React.FC = () => {
           />
         </div>
 
-        <div className="col-span-4 h-full">
-          <div className="relative bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-xl pt-8 px-4 h-full overflow-hidden shadow-lg shadow-black/10">
-            <div className="relative z-10 flex flex-col justify-between h-full">
-              <div className="h-full flex flex-col">
-                <div className="text-center mt-6 mb-16 px-4">
-                  <h1 className="text-3xl font-extrabold text-white mb-1">
+        <div
+          id="listening-panel"
+          className="w-full lg:w-[40%] h-full max-h-[70vh] lg:max-h-full"
+        >
+          <div className="relative bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-xl px-4 h-full w-full overflow-y-auto overflow-x-clip shadow-lg shadow-black/10">
+            <div className="relative z-10 flex flex-col justify-between h-full w-full">
+              <div className="w-full h-full flex flex-col">
+                <div className="text-center mb-8">
+                  <h1 className="text-xl font-extrabold text-white pt-5 pb-4 border-b border-white/20">
                     Escutando Consulta
                   </h1>
                   <PatientInfo
@@ -183,7 +123,7 @@ const ListeningPage: React.FC = () => {
                     type={appointment?.type}
                   />
                 </div>
-                <div className="flex flex-col items-center justify-center gap-20 h-full">
+                <div className="flex flex-col items-center justify-center gap-10 h-full">
                   <Timer
                     duration={duration}
                     isPaused={recordingStatus === "PAUSED"}
@@ -195,18 +135,18 @@ const ListeningPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="mt-8">
+              <div className="mt-8 border-t border-white/20">
                 <Card className="bg-transparent border-none shadow-none">
-                  <CardContent className="p-6 flex justify-center">
+                  <CardContent className="pt-4 px-2 flex justify-center">
                     <div className="flex items-start space-x-4">
-                      <div className="bg-ally-light/0 px-2 rounded-full">
-                        <ShieldIcon className="h-12 w-12 text-white/50" />
+                      <div className="bg-ally-light/0 rounded-full pt-1">
+                        <ShieldIcon className="h-5 w-5 text-white/50" />
                       </div>
                       <div>
-                        <h3 className="text-lg text-white font-medium mb-1">
+                        <h3 className="text-sm text-white font-medium mb-1">
                           Escutando com segurança
                         </h3>
-                        <p className="text-sm text-white/70">
+                        <p className="text-[10px] text-white/70">
                           A gravação não será armazenada e todos os dados são
                           movimentados e armazendo sob criptografia.
                         </p>

@@ -184,7 +184,7 @@
 
 ::-webkit-scrollbar-thumb {
   border-radius: 12px;
-  background: #efefef;
+  background: #efefef80;
 }
 
 /* Mobile touch improvements */

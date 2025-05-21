@@ -1,4 +1,3 @@
-
 import React from "react";
 import { cn } from "@/lib/utils";
 
@@ -8,14 +7,15 @@ interface PatientInfoProps {
   className?: string;
 }
 
-const PatientInfo: React.FC<PatientInfoProps> = ({ 
-  name, 
-  type,
-  className
-}) => {
+const PatientInfo: React.FC<PatientInfoProps> = ({ name, type, className }) => {
   return (
-    <div className={cn("text-white w-full flex gap-2 justify-center items-center", className)}>
-      <p className="text-xl font-medium">{name}</p>
+    <div
+      className={cn(
+        "text-white w-full flex flex-col gap-1 my-5 justify-center items-center",
+        className
+      )}
+    >
+      <p className="text-md font-medium">{name}</p>
       <PatientTypeTag type={type} />
     </div>
   );

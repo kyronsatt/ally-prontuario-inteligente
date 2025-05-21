@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Mic, PauseCircle } from "lucide-react";
 import { RecordingStatus } from "@/context/TranscriptionContext";
@@ -17,9 +16,9 @@ const ListeningControls: React.FC<ListeningControlsProps> = ({
   onFinish,
 }) => {
   const isPaused = recordingStatus === "PAUSED";
-  
+
   return (
-    <div className="flex space-x-4 px-8 w-full justify-between">
+    <div className="flex space-x-4 px-2 lg:px-8 w-full justify-between">
       <TogglePauseButton isPaused={isPaused} onClick={onTogglePause} />
       <FinishButton onClick={onFinish} />
     </div>
@@ -31,16 +30,19 @@ interface TogglePauseButtonProps {
   onClick: () => void;
 }
 
-const TogglePauseButton: React.FC<TogglePauseButtonProps> = ({ isPaused, onClick }) => (
+const TogglePauseButton: React.FC<TogglePauseButtonProps> = ({
+  isPaused,
+  onClick,
+}) => (
   <Button
     onClick={onClick}
     className={cn(
-      "px-6 py-6 rounded-full",
+      "rounded-full w-full",
       isPaused
         ? "bg-white text-ally-blue hover:bg-white/90"
         : "bg-white/20 text-white border border-white/50 hover:bg-white/30"
     )}
-    size="lg"
+    size="default"
     variant="outline"
   >
     {isPaused ? (
@@ -64,8 +66,8 @@ interface FinishButtonProps {
 const FinishButton: React.FC<FinishButtonProps> = ({ onClick }) => (
   <Button
     onClick={onClick}
-    className="bg-white text-ally-blue hover:bg-white/90 px-6 py-6 rounded-full w-full"
-    size="lg"
+    className="bg-white text-ally-blue hover:bg-white/90 rounded-full w-full"
+    size="default"
     variant="outline"
   >
     Finalizar
