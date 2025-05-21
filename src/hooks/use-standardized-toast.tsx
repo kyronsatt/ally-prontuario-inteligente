@@ -1,85 +1,87 @@
 
-import { toast as sonnerToast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 
-// Define toast object to expose the standardized toast functions
-export const toast = {
-  success: (description: string, title?: string) => {
-    sonnerToast.success(title || "", { description });
-    return null;
-  },
-  error: (description: string, title?: string) => {
-    sonnerToast.error(title || "", { description });
-    return null;
-  },
-  info: (description: string, title?: string) => {
-    sonnerToast.info(title || "", { description });
-    return null;
-  },
-  warning: (description: string, title?: string) => {
-    sonnerToast.warning(title || "", { description });
-    return null;
-  },
-  default: (description: string, title?: string) => {
-    sonnerToast(title || "", { description });
-    return null;
-  }
+export interface UseStandardizedToastReturn {
+  success: (description?: string, title?: string) => void;
+  error: (description?: string, title?: string) => void;
+  info: (description?: string, title?: string) => void;
+  warning: (description?: string, title?: string) => void;
+}
+
+export const useStandardizedToast = (): UseStandardizedToastReturn => {
+  const { toast } = useToast();
+
+  const success = (description?: string, title = "Sucesso") => {
+    toast({
+      title,
+      description,
+      variant: "default",
+    });
+  };
+
+  const error = (description?: string, title = "Erro") => {
+    toast({
+      title,
+      description,
+      variant: "destructive",
+    });
+  };
+
+  const info = (description?: string, title = "Informação") => {
+    toast({
+      title,
+      description,
+      variant: "default",
+    });
+  };
+
+  const warning = (description?: string, title = "Atenção") => {
+    toast({
+      title,
+      description,
+      variant: "default",
+    });
+  };
+
+  return {
+    success,
+    error,
+    info,
+    warning,
+  };
 };
 
-export const useStandardizedToast = () => {
-  const { toast: radixToast } = useToast();
-
-  // Create standardized toast functions that work with both Sonner and Radix UI
-  return {
-    success: (description: string, title?: string) => {
-      sonnerToast.success(title || "", { description });
-      if (radixToast) {
-        radixToast({
-          title: title,
-          description: description,
-          variant: "default",
-        });
-      }
-    },
-    error: (description: string, title?: string) => {
-      sonnerToast.error(title || "", { description });
-      if (radixToast) {
-        radixToast({
-          title: title,
-          description: description,
-          variant: "destructive",
-        });
-      }
-    },
-    info: (description: string, title?: string) => {
-      sonnerToast.info(title || "", { description });
-      if (radixToast) {
-        radixToast({
-          title: title,
-          description: description,
-          variant: "default",
-        });
-      }
-    },
-    warning: (description: string, title?: string) => {
-      sonnerToast.warning(title || "", { description });
-      if (radixToast) {
-        radixToast({
-          title: title,
-          description: description,
-          variant: "default",
-        });
-      }
-    },
-    default: (description: string, title?: string) => {
-      sonnerToast(title || "", { description });
-      if (radixToast) {
-        radixToast({
-          title: title,
-          description: description,
-          variant: "default",
-        });
-      }
-    }
-  };
+export const toast = {
+  success: (description?: string, title = "Sucesso") => {
+    const { toast } = useToast();
+    toast({
+      title,
+      description,
+      variant: "default",
+    });
+  },
+  error: (description?: string, title = "Erro") => {
+    const { toast } = useToast();
+    toast({
+      title,
+      description,
+      variant: "destructive",
+    });
+  },
+  info: (description?: string, title = "Informação") => {
+    const { toast } = useToast();
+    toast({
+      title,
+      description,
+      variant: "default",
+    });
+  },
+  warning: (description?: string, title = "Atenção") => {
+    const { toast } = useToast();
+    toast({
+      title,
+      description,
+      variant: "default",
+    });
+  },
 };

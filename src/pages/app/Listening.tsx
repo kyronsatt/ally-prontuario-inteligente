@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ShieldIcon } from "lucide-react";
@@ -51,7 +52,7 @@ const ListeningPage: React.FC = () => {
     } else if (recordingStatus === "STOPPED" && transcription) {
       navigate("/app/resumo");
     }
-  }, [recordingStatus, transcription, isTranscribing, navigate]);
+  }, [recordingStatus, transcription, isTranscribing, navigate, startRecording]);
 
   useEffect(() => {
     const fetchAnamneseIfReturn = async () => {
@@ -70,7 +71,7 @@ const ListeningPage: React.FC = () => {
     };
 
     fetchAnamneseIfReturn();
-  }, [appointment?.type, patient?.id]);
+  }, [appointment?.type, patient?.id, retrieveLastAnamnese]);
 
   const handleStopRecording = async () => {
     await stopRecording();

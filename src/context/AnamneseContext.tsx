@@ -2,48 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-standardized-toast";
-
-// Define interfaces for context types
-export interface InsightItem {
-  id?: string;
-  label: string;
-  content: string;
-  type: string;
-}
-
-export interface IAnamnese {
-  id?: string;
-  appointment_id?: string;
-  transcription_id?: string;
-  created_at?: string;
-  patient_id?: string;
-  insights?: InsightItem[];
-  patient?: {
-    id?: string;
-    name?: string;
-  };
-  identification: string;
-  main_complaint: string;
-  current_illness_history: string;
-  past_medical_history: string;
-  social_history: string;
-  family_history: string;
-  physical_exams: string;
-  complementary_exams: string;
-  diagnostic_hypotheses: string;
-  therapeutic_approach: string;
-  [key: string]: any; // For dynamic access to properties
-}
-
-interface AnamneseEntry {
-  id?: string;
-  title: string;
-  content: string;
-  type: string;
-  created_at?: string;
-  appointment_id?: string;
-}
+import { useStandardizedToast } from "@/hooks/use-standardized-toast";
+import { IAnamnese, AnamneseEntry, InsightItem } from "@/types/anamnese";
 
 interface AnamneseContextProps {
   anamnese: IAnamnese | null;
@@ -59,7 +19,6 @@ interface AnamneseContextProps {
   addAnamneseEntry: (entry: AnamneseEntry) => void;
   updateAnamneseEntry: (id: string, content: string) => void;
   submitAnamnese: () => Promise<void>;
-  // Added these methods to fix the AppointmentSummary errors
   isGeneratingAnamnese: boolean;
   generateAnamnese: (transcription: string) => Promise<void>;
   retrieveAnamnese: (appointmentId: string) => Promise<void>;
@@ -93,6 +52,7 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
   const [isGeneratingAnamnese, setIsGeneratingAnamnese] = useState<boolean>(false);
   const [isSubmittingAnamnese, setIsSubmittingAnamnese] = useState<boolean>(false);
   const params = useParams();
+  const toast = useStandardizedToast();
 
   // For handling anamnese entries
   useEffect(() => {
@@ -111,7 +71,13 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
         if (error) throw error;
 
         if (data && data.length > 0) {
-          setAnamneseEntries(data as any);
+          setAnamneseEntries(data.map((entry: any) => ({
+            id: entry.id,
+            title: entry.title || "",
+            content: entry.content || "",
+            type: entry.type || "",
+            appointment_id: entry.appointment_id
+          })));
         }
       } catch (error: any) {
         console.error("Error fetching anamnese:", error.message);
@@ -124,7 +90,7 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
     if (params.appointmentId) {
       fetchAnamnese();
     }
-  }, [params.appointmentId]);
+  }, [params.appointmentId, toast]);
 
   const addAnamneseEntry = (entry: AnamneseEntry) => {
     setAnamneseEntries((prev) => [...prev, entry]);
@@ -166,15 +132,18 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
 
           if (error) throw error;
         } else {
-          // Insert new entry
-          const { error } = await supabase.from("anamnese").insert([
-            {
-              title: entry.title,
-              content: entry.content,
-              type: entry.type,
-              appointment_id: params.appointmentId,
-            },
-          ]);
+          // Insert new entry with required fields
+          const { error } = await supabase
+            .from("anamnese")
+            .insert([
+              {
+                title: entry.title,
+                content: entry.content,
+                type: entry.type,
+                appointment_id: params.appointmentId,
+                created_by: "user" // Add a default value or get from auth context
+              }
+            ]);
 
           if (error) throw error;
         }
@@ -205,7 +174,7 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setPreviousAnamnese(data[0] as any);
+        setPreviousAnamnese(data[0] as IAnamnese);
       }
     } catch (error: any) {
       console.error("Error retrieving last anamnese:", error.message);
@@ -258,7 +227,7 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
       if (error) throw error;
 
       if (data) {
-        setAnamnese(data as any);
+        setAnamnese(data as IAnamnese);
       }
     } catch (error: any) {
       console.error("Error retrieving anamnese:", error.message);
@@ -272,9 +241,15 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
     try {
       setIsSubmittingAnamnese(true);
       
+      // Convert insights to a format compatible with Supabase's JSON column
+      const formattedUpdate = { ...anamneseUpdate };
+      if (formattedUpdate.insights) {
+        formattedUpdate.insights = JSON.stringify(formattedUpdate.insights) as any;
+      }
+      
       const { error } = await supabase
         .from("anamnese")
-        .update(anamneseUpdate)
+        .update(formattedUpdate)
         .eq("id", id);
 
       if (error) throw error;

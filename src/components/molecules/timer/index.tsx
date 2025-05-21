@@ -1,39 +1,32 @@
+
 import React from "react";
-import "./style.css"; // Import the custom wave animation
+import { useTimer } from "@/hooks/use-timer";
+import { cn } from "@/lib/utils";
 
 interface TimerProps {
   duration: number;
   isPaused: boolean;
+  className?: string;
 }
 
-const Timer: React.FC<TimerProps> = ({ duration, isPaused }) => {
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
+const Timer: React.FC<TimerProps> = ({ duration, isPaused, className }) => {
+  const { formattedTime } = useTimer({ duration, isPaused });
 
   return (
-    <div className="relative w-fit h-fit flex items-center justify-center">
-      {/* Sound wave effect */}
-      {!isPaused ? (
-        <>
-          <div className="absolute inset-0 animate-wave rounded-full border-2 border-white opacity-70" />
-          <div className="absolute inset-1 animate-wave-slower rounded-full border-2 border-white opacity-50" />
-          <div className="absolute inset-2 animate-wave-slowest rounded-full border-2 border-white opacity-30" />
-        </>
-      ) : (
-        <div className="absolute inset-0 rounded-full border-2 border-gray-400 opacity-30" />
-      )}
-
-      {/* Timer Circle */}
-      <div className="relative z-10 w-52 h-52 border-4 outline-4 outline-offset-[5px] outline-double outline-white/50 border-white rounded-full flex flex-col items-center justify-center shadow-inner shadow-ally-blue">
-        <span className="text-white text-3xl font-bold">
-          {formatTime(duration)}
-        </span>
+    <div className={cn("flex flex-col items-center", className)}>
+      <div className="bg-white/20 px-16 py-4 rounded-full shadow-lg backdrop-blur-sm border border-white/30">
+        <p
+          className={cn(
+            "font-mono text-4xl font-semibold tracking-wide text-white",
+            isPaused ? "opacity-80" : ""
+          )}
+        >
+          {formattedTime}
+        </p>
       </div>
+      <p className="text-white/80 text-sm mt-2">
+        {isPaused ? "Gravação pausada" : "Gravando áudio"}
+      </p>
     </div>
   );
 };
