@@ -21,35 +21,33 @@ const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
   type,
 }) => {
   return (
-    <Card className="flex flex-col h-[21rem] w-full lg:w-[30%]">
-      <CardHeader className="border-none shadow-none">
-        <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
+    <Card className="flex flex-col h-[18rem] lg:h-[21rem] w-full lg:w-[30%]">
+      <CardHeader className="border-none shadow-none py-4 bg-gradient-to-r from-ally-blue to-[#00e6e6]">
+        <CardTitle className="text-lg text-white flex items-center gap-2">
           <ListIcon className="h-5 w-5" /> Informações
         </CardTitle>
       </CardHeader>
       <CardContent className="h-full">
         <div className="flex flex-col items-start gap-4 pt-6">
           <div>
-            <CardDescription className="text-sm text-ally-gray">
+            <CardDescription className="text-sm font-thin text-ally-gray">
               Paciente
             </CardDescription>
-            <p className="text-lg font-semibold text-ally-blue">
-              {patientName}
-            </p>
+            <p className="text-lg font-medium text-ally-blue">{patientName}</p>
           </div>
           <div>
-            <CardDescription className="text-sm text-ally-gray">
+            <CardDescription className="text-sm font-thin text-ally-gray">
               Data do atendimento
             </CardDescription>
-            <p className="text-lg font-semibold text-ally-blue">
+            <p className="text-lg font-medium text-ally-blue">
               {appointmentDate}
             </p>
           </div>
           <div>
-            <CardDescription className="text-sm text-ally-gray">
+            <CardDescription className="text-sm font-thin text-ally-gray">
               Tipo de Consulta
             </CardDescription>
-            <p className="text-lg font-semibold text-ally-blue">
+            <p className="text-lg font-medium text-ally-blue">
               {type === "NEW" ? "Nova" : "Retorno"}
             </p>
           </div>

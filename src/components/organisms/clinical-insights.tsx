@@ -49,8 +49,8 @@ const ClinicalInsights: React.FC<ClinicalInsightsProps> = ({ insights }) => {
   if (!insights || insights.length === 0) {
     return (
       <Card className="h-[21rem] w-full lg:w-[70%]">
-        <CardHeader>
-          <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
+        <CardHeader className="py-4 bg-gradient-to-r from-ally-blue to-[#00e6e6]">
+          <CardTitle className="text-lg text-white flex items-center gap-2">
             <Brain className="h-5 w-5" /> Insights Clínicos
           </CardTitle>
         </CardHeader>
@@ -64,8 +64,8 @@ const ClinicalInsights: React.FC<ClinicalInsightsProps> = ({ insights }) => {
 
   return (
     <Card className="flex flex-col h-[21rem] w-full lg:w-[70%]">
-      <CardHeader>
-        <CardTitle className="text-xl text-ally-blue flex items-center gap-2">
+      <CardHeader className="py-4 bg-gradient-to-r from-ally-blue to-[#00e6e6]">
+        <CardTitle className="text-lg text-white flex items-center gap-2">
           <Brain className="h-5 w-5" /> Insights Clínicos
         </CardTitle>
       </CardHeader>
