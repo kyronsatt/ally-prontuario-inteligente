@@ -40,7 +40,7 @@ const PricingSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 max-w-5xl mx-6 lg:mx-12">
           {/* Free Plan */}
           <div className="bg-white p-6 md:p-8 rounded-2xl border border-gray-200 shadow-sm flex flex-col h-full hover:scale-105 transition-all">
             <div className="flex-1">

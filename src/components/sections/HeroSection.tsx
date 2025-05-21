@@ -1,7 +1,6 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 const HeroSection: React.FC = () => {
   return (
@@ -12,8 +11,6 @@ const HeroSection: React.FC = () => {
           <HeroImage />
         </div>
       </div>
-
-      <DecorativeShape />
     </section>
   );
 };
@@ -58,10 +55,6 @@ const HeroImage: React.FC = () => (
       className="h-full w-full object-contain md:scale-125"
     />
   </div>
-);
-
-const DecorativeShape: React.FC = () => (
-  <div className="absolute -bottom-32 -right-32 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-br from-ally-blue/5 to-ally-light rounded-full blur-3xl -z-10" />
 );
 
 export default HeroSection;
