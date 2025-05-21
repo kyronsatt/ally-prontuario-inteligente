@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -238,39 +237,52 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
   const retrieveAnamnese = async (appointmentId: string) => {
     try {
       setIsRetrievingAnamnese(true);
-      // This should be implemented to retrieve the anamnese for the appointment
-      const { data, error } = await supabase
+
+      // Get anamnese with the specified appointment_id
+      const { data: anamneseData, error: anamneseError } = await supabase
         .from("anamnese")
-        .select("*")
+        .select("*, patient:patient_id(id, name)")
         .eq("appointment_id", appointmentId)
         .single();
 
-      if (error) throw error;
-
-      if (data) {
-        // Convert JSON insights to InsightItem[]
-        const insights = Array.isArray(data.insights) 
-          ? data.insights.map((item: any) => ({
-              id: item.id || "",
-              label: item.label || "",
-              content: item.content || "",
-              type: item.type || ""
-            }))
-          : [];
-
-        // Convert database record to IAnamnese
-        const convertedAnamnese: IAnamnese = {
-          ...data,
-          insights
-        };
-        
-        setAnamnese(convertedAnamnese);
+      if (anamneseError || !anamneseData) {
+        console.error("Error retrieving anamnese:", anamneseError);
+        setAnamnese(null);
+        setIsRetrievingAnamnese(false);
+        return { success: false, data: null };
       }
-    } catch (error: any) {
-      console.error("Error retrieving anamnese:", error.message);
-      toast.error("Erro ao buscar anamnese");
-    } finally {
+
+      // Process insights data from JSON to object if needed
+      let processedAnamnese: IAnamnese;
+      if (typeof anamneseData.insights === "string") {
+        try {
+          const parsedInsights = JSON.parse(anamneseData.insights);
+          processedAnamnese = {
+            ...anamneseData,
+            insights: parsedInsights as InsightItem[]
+          } as IAnamnese;
+        } catch (e) {
+          processedAnamnese = {
+            ...anamneseData,
+            insights: [] as InsightItem[]
+          } as IAnamnese;
+        }
+      } else {
+        // Handle insights as an array or empty array if null/undefined
+        processedAnamnese = {
+          ...anamneseData,
+          insights: Array.isArray(anamneseData.insights) ? anamneseData.insights : []
+        } as IAnamnese;
+      }
+
+      setAnamnese(processedAnamnese);
       setIsRetrievingAnamnese(false);
+      return { success: true, data: processedAnamnese };
+    } catch (error) {
+      console.error("Error retrieving anamnese:", error);
+      setAnamnese(null);
+      setIsRetrievingAnamnese(false);
+      return { success: false, data: null };
     }
   };
 
@@ -303,6 +315,30 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
       return { success: false };
     } finally {
       setIsSubmittingAnamnese(false);
+    }
+  };
+
+  // Add anamnese_entries to the Supabase database tables
+  const inserAnamneseEntry = async (entry: AnamneseDBEntry): Promise<{ success: boolean; data: any; error: any }> => {
+    try {
+      // Convert the entry to the expected format for Supabase
+      const dbEntry = {
+        appointment_id: entry.appointment_id,
+        title: entry.title || "",
+        type: entry.type || "",
+        // Use stringified content for text fields
+        content: JSON.stringify(entry.content || ""),
+        created_by: entry.created_by || "",
+      };
+
+      const { data, error } = await supabase
+        .from("anamnese_entries")
+        .insert(dbEntry);
+
+      return { success: !error, data, error };
+    } catch (error) {
+      console.error("Error inserting anamnese entry:", error);
+      return { success: false, data: null, error };
     }
   };
 

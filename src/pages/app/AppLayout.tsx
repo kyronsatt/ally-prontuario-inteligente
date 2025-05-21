@@ -1,15 +1,24 @@
 
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { PanelLeft } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/organisms/app-sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 const AppLayout: React.FC = () => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const { trackPageView } = useAnalytics();
+  
+  // Track page views when route changes
+  useEffect(() => {
+    const pageName = location.pathname.split('/').pop() || 'dashboard';
+    trackPageView(pageName);
+  }, [location.pathname, trackPageView]);
   
   return (
     <SidebarProvider>

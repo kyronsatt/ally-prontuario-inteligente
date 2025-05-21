@@ -1,7 +1,8 @@
+
 import { useEffect, useCallback } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import { envs } from "@/envs";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useStandardizedToast as toast } from "@/hooks/use-standardized-toast";
 
 // Initialize outside of the hook to avoid re-initialization
 let initialized = false;
@@ -10,7 +11,7 @@ type EventProperties = Record<string, unknown>;
 
 export function useAnalytics() {
   useEffect(() => {
-    if (!initialized && envs.PRODUCTION === true) {
+    if (!initialized && envs.AMPLITUDE_API_KEY) {
       try {
         amplitude.init(envs.AMPLITUDE_API_KEY, {
           defaultTracking: {
@@ -31,10 +32,13 @@ export function useAnalytics() {
 
   const trackEvent = useCallback(
     (eventName: string, eventProperties?: EventProperties) => {
-      if (!envs.PRODUCTION) return;
+      if (!initialized) return;
 
       try {
-        amplitude.track(eventName, eventProperties);
+        amplitude.track(eventName, {
+          timestamp: new Date().toISOString(),
+          ...eventProperties
+        });
         console.log(`Event tracked: ${eventName}`, eventProperties);
       } catch (error) {
         console.error("Error tracking event:", error);

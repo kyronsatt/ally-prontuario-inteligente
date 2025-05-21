@@ -47,11 +47,20 @@ const AppointmentSummary: React.FC = () => {
     if (anamnese === null && appointmentId) {
       retrieveAnamnese(appointmentId);
     } else if (anamnese === null && transcription) {
-      // Handle the case where transcription might be a string or an object with raw_text
-      const transcriptionText =
-        typeof transcription === "string"
-          ? transcription
-          : transcription?.raw_text || "";
+      // Handle the case where transcription might be a string or an object with text
+      let transcriptionText = "";
+      
+      if (typeof transcription === "string") {
+        transcriptionText = transcription;
+      } else if (transcription && typeof transcription === "object") {
+        // Try to extract text content from the transcription object
+        // This assumes that the transcription object has some text content property
+        transcriptionText = 
+          transcription.text || 
+          transcription.content || 
+          transcription.transcription || 
+          JSON.stringify(transcription);
+      }
 
       generateAnamnese(transcriptionText);
     }

@@ -27,6 +27,7 @@ import { AllyLogo } from "@/components/atoms/ally-logo";
 import { useAuth } from "@/context/AuthContext";
 import { useStandardizedToast } from "@/hooks/use-standardized-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAnalytics } from "@/hooks/use-analytics";
 import SidebarMenuItemComponent from "@/components/molecules/sidebar/menu-item";
 
 export function AppSidebar() {
@@ -36,10 +37,12 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const { openMobile, setOpenMobile } = useSidebar();
   const toast = useStandardizedToast();
+  const { trackEvent, trackUserEvent } = useAnalytics();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      trackUserEvent('logout');
       toast.success(
         "Você foi desconectado do sistema.",
         "Sessão encerrada com sucesso"
@@ -47,12 +50,27 @@ export function AppSidebar() {
       navigate("/login");
     } catch (error) {
       console.error("Error signing out:", error);
+      trackEvent('error_occurred', {
+        error_type: 'logout_error',
+        error_message: 'Failed to sign out'
+      });
       toast.error(
         "Não foi possível encerrar sua sessão. Tente novamente.",
         "Erro ao sair"
       );
     }
   };
+
+  // Track page views
+  useEffect(() => {
+    if (location.pathname) {
+      const pageName = location.pathname.split('/').pop() || 'home';
+      trackEvent('page_view', {
+        page_name: pageName,
+        full_path: location.pathname
+      });
+    }
+  }, [location.pathname, trackEvent]);
 
   // Close mobile sidebar when route changes
   useEffect(() => {
