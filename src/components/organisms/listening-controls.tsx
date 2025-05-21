@@ -18,7 +18,7 @@ const ListeningControls: React.FC<ListeningControlsProps> = ({
   const isPaused = recordingStatus === "PAUSED";
 
   return (
-    <div className="flex space-x-4 px-2 lg:px-8 w-full justify-between">
+    <div className="flex flex-col xl:flex-row gap-2 px-2 xl:px-4 w-full justify-between">
       <TogglePauseButton isPaused={isPaused} onClick={onTogglePause} />
       <FinishButton onClick={onFinish} />
     </div>

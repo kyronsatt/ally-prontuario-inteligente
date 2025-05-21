@@ -15,7 +15,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ name, type, className }) => {
         className
       )}
     >
-      <p className="text-md font-medium">{name}</p>
+      <p className="text-sm xl:text-md font-medium">{name}</p>
       <PatientTypeTag type={type} />
     </div>
   );
@@ -26,7 +26,7 @@ interface PatientTypeTagProps {
 }
 
 const PatientTypeTag: React.FC<PatientTypeTagProps> = ({ type }) => (
-  <p className="text-sm font-semibold rounded-full bg-white/10 border border-white py-1 px-4 w-fit">
+  <p className="text-sm font-semibold rounded-full bg-white/10 border border-white py-1 px-2 w-fit">
     {type === "NEW" ? "Primeiro atendimento" : "Paciente de retorno"}
   </p>
 );
