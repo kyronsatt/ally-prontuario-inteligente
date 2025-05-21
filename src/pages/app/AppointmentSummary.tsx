@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
@@ -8,7 +9,8 @@ import jsPDF from "jspdf";
 
 import { useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
-import { IAnamnese, useAnamnese } from "@/context/AnamneseContext";
+import { useAnamnese } from "@/context/AnamneseContext";
+import { IAnamnese } from "@/types/anamnese";
 import { useTranscription } from "@/context/TranscriptionContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -53,7 +55,7 @@ const AppointmentSummary: React.FC = () => {
 
       generateAnamnese(transcriptionText);
     }
-  }, [anamnese, appointmentId, transcription]);
+  }, [anamnese, appointmentId, transcription, generateAnamnese, retrieveAnamnese]);
 
   useEffect(() => {
     if (anamnese && !editedAnamnese) {

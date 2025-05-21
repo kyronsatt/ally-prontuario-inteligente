@@ -1,9 +1,10 @@
+
 import React from "react";
 import moment from "moment";
 import { Calendar, HistoryIcon, XCircleIcon } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IAnamnese } from "@/context/AnamneseContext";
+import { IAnamnese } from "@/types/anamnese";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../ui/badge";
 

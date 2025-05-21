@@ -18,6 +18,8 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";

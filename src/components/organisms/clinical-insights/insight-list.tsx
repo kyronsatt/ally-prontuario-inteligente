@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { InsightItem } from "@/context/AnamneseContext";
+import { InsightItem } from "@/types/anamnese";
 import { getInsightIcon, getInsightColor } from "./insight-utils";
 
 interface InsightListProps {

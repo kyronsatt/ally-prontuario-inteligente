@@ -3,7 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useStandardizedToast } from "@/hooks/use-standardized-toast";
-import { IAnamnese, AnamneseEntry, InsightItem } from "@/types/anamnese";
+import { IAnamnese, AnamneseEntry, InsightItem, AnamneseDBEntry } from "@/types/anamnese";
+import { Json } from "@/integrations/supabase/types";
 
 interface AnamneseContextProps {
   anamnese: IAnamnese | null;
@@ -71,13 +72,16 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
         if (error) throw error;
 
         if (data && data.length > 0) {
-          setAnamneseEntries(data.map((entry: any) => ({
+          // Convert DB data to AnamneseEntry format
+          const entries = data.map((entry: AnamneseDBEntry) => ({
             id: entry.id,
             title: entry.title || "",
             content: entry.content || "",
             type: entry.type || "",
             appointment_id: entry.appointment_id
-          })));
+          }));
+          
+          setAnamneseEntries(entries);
         }
       } catch (error: any) {
         console.error("Error fetching anamnese:", error.message);
@@ -174,7 +178,24 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setPreviousAnamnese(data[0] as IAnamnese);
+        // Convert JSON insights to InsightItem[]
+        const anamneseData = data[0];
+        const insights = Array.isArray(anamneseData.insights) 
+          ? anamneseData.insights.map((item: any) => ({
+              id: item.id || "",
+              label: item.label || "",
+              content: item.content || "",
+              type: item.type || ""
+            }))
+          : [];
+
+        // Convert database record to IAnamnese
+        const convertedAnamnese: IAnamnese = {
+          ...anamneseData,
+          insights
+        };
+        
+        setPreviousAnamnese(convertedAnamnese);
       }
     } catch (error: any) {
       console.error("Error retrieving last anamnese:", error.message);
@@ -227,7 +248,23 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
       if (error) throw error;
 
       if (data) {
-        setAnamnese(data as IAnamnese);
+        // Convert JSON insights to InsightItem[]
+        const insights = Array.isArray(data.insights) 
+          ? data.insights.map((item: any) => ({
+              id: item.id || "",
+              label: item.label || "",
+              content: item.content || "",
+              type: item.type || ""
+            }))
+          : [];
+
+        // Convert database record to IAnamnese
+        const convertedAnamnese: IAnamnese = {
+          ...data,
+          insights
+        };
+        
+        setAnamnese(convertedAnamnese);
       }
     } catch (error: any) {
       console.error("Error retrieving anamnese:", error.message);
@@ -242,9 +279,11 @@ export const AnamneseProvider: React.FC<AnamneseProviderProps> = ({
       setIsSubmittingAnamnese(true);
       
       // Convert insights to a format compatible with Supabase's JSON column
-      const formattedUpdate = { ...anamneseUpdate };
+      const formattedUpdate: Record<string, any> = { ...anamneseUpdate };
+      
+      // Convert InsightItem[] to JSON compatible format
       if (formattedUpdate.insights) {
-        formattedUpdate.insights = JSON.stringify(formattedUpdate.insights) as any;
+        formattedUpdate.insights = formattedUpdate.insights as any;
       }
       
       const { error } = await supabase

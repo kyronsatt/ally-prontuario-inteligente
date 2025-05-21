@@ -1,34 +1,28 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Check,
   FileText,
-  Loader,
   Loader2,
   PenBox,
   X,
-  Brain,
-  LucideIcon,
-  LucideUser,
+  LucideProps,
+  LucideFingerprint,
   LucideAngry,
   LucideThermometer,
   LucideHeartPulse,
   LucideUsers2,
   LucideHouse,
-  LucideFingerprint,
+  LucideUser,
   LucideTestTube2,
   LucidePill,
   LucideStethoscope,
-  LucideProps,
-  LucideCircleArrowRight,
-  LucideArrowRight,
 } from "lucide-react";
 
 import RichTextEditor from "@/components/molecules/rich-text-editor";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import { IAnamnese } from "@/context/AnamneseContext";
+import { IAnamnese } from "@/types/anamnese";
 import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
 
 interface AppointmentReportProps {
   anamnese?: IAnamnese;

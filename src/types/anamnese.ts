@@ -1,4 +1,6 @@
 
+import { Json } from "@/integrations/supabase/types";
+
 export interface InsightItem {
   id?: string;
   label: string;
@@ -37,4 +39,14 @@ export interface AnamneseEntry {
   type: string;
   created_at?: string;
   appointment_id?: string;
+}
+
+export interface AnamneseDBEntry {
+  id?: string;
+  appointment_id?: string;
+  title?: string;
+  content?: string;
+  type?: string;
+  created_at?: string;
+  created_by?: string;
 }
