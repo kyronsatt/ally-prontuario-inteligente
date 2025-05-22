@@ -172,10 +172,9 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const retrievedAnamnese = await response.json();
-      console.log("[retrieveAnamnese] Anamnese obtida", retrievedAnamnese);
+      console.log("[retrieveAnamnese] Anamnese retrieved", retrievedAnamnese);
 
       setAnamnese(retrievedAnamnese);
-      toast.success("Relatório carregado com sucesso.", "Anamnese obtida");
     } catch (e) {
       console.error("[retrieveAnamnese] Erro:", e);
       toast.warning(null, "Erro ao recuperar anamnese");

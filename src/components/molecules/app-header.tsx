@@ -40,7 +40,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       </div>
       <div className={hideBackButton ? "pl-0" : "pl-2"}>
         {title && (
-          <h1 className="text-4xl lg:text-5xl font-semibold mb-2 gradient-text">
+          <h1 className="text-6xl whitespace-pre-wrap max-w-[90%] font-semibold mb-2 gradient-text">
             {title}
           </h1>
         )}

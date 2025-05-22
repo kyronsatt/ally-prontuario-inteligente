@@ -155,8 +155,8 @@ const AppointmentSummary: React.FC = () => {
 
   if (isRetrievingAnamnese) {
     return (
-      <div className="max-w-5xl mx-auto text-center py-16">
-        <div className="flex flex-col items-center justify-center space-y-4">
+      <div className="max-w-5xl mx-auto text-center h-full py-16">
+        <div className="flex flex-col items-center justify-center h-full space-y-4">
           <div className="rounded-full bg-blue-50 p-4">
             <Loader2 className="h-12 w-12 text-ally-blue animate-spin" />
           </div>
