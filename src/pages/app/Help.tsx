@@ -9,6 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { AppHeader } from "@/components/molecules/app-header";
 
 const Help: React.FC = () => {
   const navigate = useNavigate();
@@ -42,11 +43,8 @@ const Help: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Button variant="ghost" className="mb-6" onClick={() => navigate("/app")}>
-        <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao dashboard
-      </Button>
-
+    <div className="app-template mx-auto">
+      <AppHeader title="Ajuda" />
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Central de Ajuda</CardTitle>

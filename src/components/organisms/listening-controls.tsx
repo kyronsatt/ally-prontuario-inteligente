@@ -1,5 +1,5 @@
 import React from "react";
-import { Mic, PauseCircle } from "lucide-react";
+import { Mic, PauseCircle, StopCircle } from "lucide-react";
 import { RecordingStatus } from "@/context/TranscriptionContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -70,7 +70,10 @@ const FinishButton: React.FC<FinishButtonProps> = ({ onClick }) => (
     size="default"
     variant="outline"
   >
-    Finalizar
+    <div className="flex items-center space-x-2">
+      <StopCircle className="h-5 w-5" />
+      <span>Finalizar</span>
+    </div>
   </Button>
 );
 

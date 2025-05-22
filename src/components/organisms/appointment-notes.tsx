@@ -23,7 +23,7 @@ const AppointmentNotes: React.FC<AppointmentNotesProps> = ({
   };
 
   return (
-    <Card className="flex flex-col h-fit lg:h-1/3 border-ally-blue/30">
+    <Card className="flex flex-col h-full border-ally-blue/30">
       <CardHeader className="py-2">
         <CardTitle className="flex gap-2 items-center text-md lg:text-lg text-ally-blue">
           <NotepadText size={16} />
@@ -39,7 +39,7 @@ const AppointmentNotes: React.FC<AppointmentNotesProps> = ({
         />
 
         <div className="mt-4 flex flex-col gap-2 lg:gap-0 lg:flex-row justify-between items-start">
-          <div className="flex items-start space-x-2 text-xs text-gray-500 w-full lg:max-w-[80%]">
+          <div className="flex items-start space-x-2 text-xs text-gray-400 w-full lg:max-w-[80%]">
             <CheckCheck className="h-4 w-4 flex-shrink-0" />
             <p>
               Não se preocupe em preencher: a Ally não depende dessas anotações.

@@ -18,6 +18,7 @@ import ActionButtons from "@/components/molecules/appointment-summary/action-but
 import PatientInfoCard from "@/components/organisms/appointment-summary/patient-info-card";
 import AppointmentReport from "@/components/organisms/appointment-summary/report-content";
 import ClinicalInsights from "@/components/organisms/clinical-insights";
+import { AppHeader } from "@/components/molecules/app-header";
 
 const AppointmentSummary: React.FC = () => {
   const navigate = useNavigate();
@@ -198,25 +199,11 @@ const AppointmentSummary: React.FC = () => {
   }
 
   return (
-    <div ref={reportContentRef} className="w-full lg:max-w-5xl mx-auto pb-20">
-      <div className="flex items-center mb-6">
-        <Button
-          onClick={() => navigate("/app")}
-          variant="ghost"
-          className="mr-2"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
-        </Button>
-      </div>
-
-      <div className="flex justify-between items-center my-12">
-        <h1 className="text-4xl md:text-6xl font-semibold mb-2 gradient-text">
-          Anamnese
-        </h1>
-        <div className="flex flex-col sm:flex-row justify-end gap-4">
-          <ActionButtons onDownload={handleDownload} />
-        </div>
-      </div>
+    <div ref={reportContentRef} className="app-template pb-20">
+      <AppHeader title="Anamnese" />
+      {/* <div className="flex flex-col sm:flex-row justify-end gap-4 my-8">
+        <ActionButtons onDownload={handleDownload} />
+      </div> */}
 
       <div className="flex flex-col lg:flex-row gap-7 h-fit">
         <PatientInfoCard

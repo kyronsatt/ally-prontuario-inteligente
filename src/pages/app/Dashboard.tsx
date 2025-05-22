@@ -2,18 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Plus,
-  Clock,
-  TrendingUp,
-  ChartBar,
-  Loader2,
-} from "lucide-react";
+import { Plus, Clock, TrendingUp, ChartBar, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useStandardizedToast } from "@/hooks/use-standardized-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { AppHeader } from "@/components/molecules/app-header";
 
 interface AppointmentStats {
   total_appointments: number;
@@ -138,18 +133,15 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto w-full mt-12">
-      {/* Welcome Banner */}
+    <div className="app-template mt-0">
       <div className="text-ally-dark mb-20">
-        <h1 className="text-4xl md:text-6xl font-semibold mb-2 gradient-text">
-          Dashboard
-        </h1>
-        <p className="text-ally-gray">
-          Bem vindo(a), Dr(a). O que deseja fazer hoje?
-        </p>
+        <AppHeader
+          title="Dashboard"
+          description="Bem vindo(a), Dr(a). O que deseja fazer hoje?"
+          hideBackButton
+        />
       </div>
 
-      {/* Action Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Button
           variant="default"
@@ -174,7 +166,6 @@ const Dashboard: React.FC = () => {
 
       <Separator className="my-8" />
 
-      {/* Productivity Stats */}
       <div className="mb-8">
         <h2 className="text-2xl font-medium mb-4 text-ally-dark">
           Análise de produtividade

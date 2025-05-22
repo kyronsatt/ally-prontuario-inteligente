@@ -35,8 +35,8 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
             Última Anamnese
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex py-4 gap-3 items-start text-gray-500">
-          <XCircleIcon size={24} className="opacity-90" />
+        <CardContent className="flex py-4 gap-3 items-start text-gray-500 text-xs">
+          <XCircleIcon size={20} className="opacity-90" />
           <p>Não há registros de anamneses anteriores para este paciente.</p>
         </CardContent>
       </Card>
@@ -70,7 +70,7 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
   );
 
   return (
-    <Card className="h-2/3 flex flex-col border-ally-blue/30">
+    <Card className="h-full flex flex-col border-ally-blue/30">
       <CardHeader className="py-2 flex flex-row justify-between items-center text-ally-blue">
         <CardTitle className="flex gap-2 items-center text-md lg:text-lg">
           <HistoryIcon size={16} />

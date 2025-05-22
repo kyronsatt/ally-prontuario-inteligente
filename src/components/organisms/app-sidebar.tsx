@@ -131,7 +131,7 @@ export function AppSidebar() {
 
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <NavLink
                   to="/app/subscription"
@@ -143,7 +143,7 @@ export function AppSidebar() {
                   <span>Assinatura</span>
                 </NavLink>
               </SidebarMenuButton>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
 
             <SidebarMenuItem>
               <SidebarMenuButton asChild>

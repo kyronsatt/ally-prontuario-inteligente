@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/components/ui/sonner";
 import { User, Settings as SettingsIcon, LogOut, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { AppHeader } from "@/components/molecules/app-header";
 
 interface UserProfile {
   id: string;
@@ -79,9 +80,8 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Configurações</h1>
-
+    <div className="app-template">
+      <AppHeader title="Configurações" />
       <div className="grid gap-8">
         {/* Perfil do usuário */}
         <Card>

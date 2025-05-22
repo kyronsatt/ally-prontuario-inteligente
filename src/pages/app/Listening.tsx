@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ShieldIcon } from "lucide-react";
 
@@ -32,12 +32,19 @@ const AuxPanels: React.FC<{
   appointmentNotes,
   setAppointmentNotes,
 }) => (
-  <div className="w-full lg:w-[60%] flex flex-col-reverse lg:flex-col gap-5 pb-5 h-full">
-    <PreviousAnamnese
-      anamnese={previousAnamnese}
-      isLoading={isRetrievingAnamnese}
-    />
-    <AppointmentNotes notes={appointmentNotes} setNotes={setAppointmentNotes} />
+  <div className="w-full lg:w-[60%] flex flex-col h-full">
+    <div className="h-full min-h-[65%] mb-5 overflow-clip">
+      <PreviousAnamnese
+        anamnese={previousAnamnese}
+        isLoading={isRetrievingAnamnese}
+      />
+    </div>
+    <div className="h-fit min-h-[30%] overflow-clip">
+      <AppointmentNotes
+        notes={appointmentNotes}
+        setNotes={setAppointmentNotes}
+      />
+    </div>
   </div>
 );
 const ListeningPanel: React.FC<{
@@ -55,17 +62,17 @@ const ListeningPanel: React.FC<{
   pauseRecording,
   handleStopRecording,
 }) => (
-  <div className="w-full lg:w-[40%] h-full">
-    <div className="relative bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-xl px-4 h-full lg:max-h-full max-h-[80vh] w-full overflow-y-auto overflow-x-clip shadow-lg shadow-black/10">
+  <div className="w-full lg:min-w-[30%] max-w-lg h-full">
+    <div className="relative bg-gradient-to-br from-ally-blue to-[#00e6e6] rounded-xl px-4 h-full w-full overflow-y-auto overflow-x-clip shadow-lg shadow-black/10">
       <div className="relative z-10 flex flex-col justify-between h-full w-full">
-        <div className="w-full h-fit flex flex-col">
+        <div className="w-full h-full flex flex-col">
           <div className="text-center mb-8">
-            <h1 className="text-md xl:text-xl font-extrabold text-white pt-5 pb-4 border-b border-white/20">
+            <h1 className="text-md xl:text-2xl 2xl:text-4xl font-extrabold text-white pt-5 pb-4 xl:pt-6 2xl:py-8 border-b border-white/20">
               Escutando Consulta
             </h1>
             <PatientInfo name={patientName} type={appointmentType} />
           </div>
-          <div className="flex flex-col items-center justify-center gap-10 h-full">
+          <div className="flex flex-col items-center justify-around gap-10 h-full">
             <Timer
               duration={duration}
               isPaused={recordingStatus === "PAUSED"}
@@ -82,13 +89,13 @@ const ListeningPanel: React.FC<{
             <CardContent className="pt-4 px-2 flex justify-center">
               <div className="flex items-start space-x-4">
                 <div className="bg-ally-light/0 rounded-full pt-1">
-                  <ShieldIcon className="h-5 w-5 text-white/50" />
+                  <ShieldIcon className="h-5 xl:h-6 w-5 xl:w-6 text-white/50" />
                 </div>
                 <div>
-                  <h3 className="text-sm text-white font-medium mb-1">
+                  <h3 className="text-sm xl:text-md 2xl:text-lg text-white font-medium mb-1">
                     Escutando com segurança
                   </h3>
-                  <p className="text-[10px] text-white/70">
+                  <p className="text-xs 2xl:text-md text-white/70">
                     A gravação não será armazenada e todos os dados são
                     movimentados e armazenados sob criptografia.
                   </p>
@@ -202,14 +209,8 @@ const ListeningPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-full h-full pb-5 overflow-y-auto">
-      <div className="flex flex-row gap-4 h-full pr-1">
-        <AuxPanels
-          previousAnamnese={previousAnamnese}
-          isRetrievingAnamnese={isRetrievingAnamnese}
-          appointmentNotes={appointmentNotes}
-          setAppointmentNotes={setAppointmentNotes}
-        />
+    <div className="w-full max-w-full h-full p-8 overflow-y-auto">
+      <div className="flex flex-row gap-4 h-full max-h-[70vh] sm:max-h-[80vh] md:max-h-full">
         <ListeningPanel
           patientName={patient?.name || ""}
           appointmentType={appointment?.type}
@@ -217,6 +218,12 @@ const ListeningPage: React.FC = () => {
           recordingStatus={recordingStatus}
           pauseRecording={pauseRecording}
           handleStopRecording={handleStopRecording}
+        />
+        <AuxPanels
+          previousAnamnese={previousAnamnese}
+          isRetrievingAnamnese={isRetrievingAnamnese}
+          appointmentNotes={appointmentNotes}
+          setAppointmentNotes={setAppointmentNotes}
         />
       </div>
     </div>

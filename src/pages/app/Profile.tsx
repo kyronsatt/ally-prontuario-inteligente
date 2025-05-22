@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
+import { AppHeader } from "@/components/molecules/app-header";
 
 interface ProfileData {
   first_name: string;
@@ -98,10 +99,8 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Button variant="ghost" className="mb-6" onClick={() => navigate("/app")}>
-        <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao dashboard
-      </Button>
+    <div className="app-template">
+      <AppHeader />
 
       <Card>
         <CardHeader>

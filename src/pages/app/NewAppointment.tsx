@@ -15,6 +15,7 @@ import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePatient, PatientCreationPayload } from "@/context/PatientContext";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { AppHeader } from "@/components/molecules/app-header";
 
 const NewAppointment: React.FC = () => {
   const { user } = useAuth();
@@ -170,89 +171,6 @@ const NewAppointment: React.FC = () => {
     navigate("/app");
   };
 
-  const CoreContent = () => (
-    <CardContent className="space-y-6">
-      <div className="space-y-4 mb-12">
-        <h3 className="text-lg font-medium">Qual o tipo de atendimento?</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <RadioGroupItem
-            id="NEW"
-            value="NEW"
-            label="Paciente Novo"
-            onChange={handleTypeChange}
-            selectedValue={appointmentType || ""}
-          />
-          <RadioGroupItem
-            id="RETURN"
-            value="RETURN"
-            label="Retorno de Paciente"
-            onChange={handleTypeChange}
-            selectedValue={appointmentType || ""}
-          />
-        </div>
-      </div>
-
-      {appointmentType && (
-        <div className="space-y-4 pt-4 border-t">
-          <h3 className="text-lg font-medium">
-            {appointmentType === "NEW"
-              ? "Informações do novo paciente"
-              : "Buscar paciente"}
-          </h3>
-
-          {appointmentType === "NEW" ? (
-            <FormProvider {...methods}>
-              <form
-                onSubmit={methods.handleSubmit(
-                  handleSubmitNewPatient,
-                  (formErrors) => {
-                    console.error("Validation errors:", formErrors);
-                    trackEvent("patient_form_validation_error", {
-                      errors: Object.keys(formErrors),
-                    });
-                    toast.error(
-                      "Preencha todos os campos obrigatórios.",
-                      "Formulário incompleto"
-                    );
-                  }
-                )}
-                className="space-y-4"
-              >
-                <PatientForm />
-                <Button
-                  type="submit"
-                  className="w-full bg-ally-blue hover:bg-ally-blue/90"
-                  size="lg"
-                  onClick={() =>
-                    trackButtonClick("start_new_patient_appointment")
-                  }
-                >
-                  Iniciar atendimento
-                </Button>
-              </form>
-            </FormProvider>
-          ) : (
-            <div>
-              <PatientSelect
-                patients={patients}
-                selectedPatientId={selectedPatientId}
-                onPatientChange={handlePatientChange}
-              />
-              <Button
-                disabled={!selectedPatientId || isWaiting}
-                onClick={handleStartReturnAppointment}
-                className="mt-12 w-full bg-ally-blue hover:bg-ally-blue/90"
-                size="lg"
-              >
-                Iniciar atendimento
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
-    </CardContent>
-  );
-
   const LoadingContent = () => (
     <div className="max-w-2xl mx-auto text-center py-16">
       <div className="flex flex-col items-center justify-center space-y-4">
@@ -264,25 +182,15 @@ const NewAppointment: React.FC = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Button variant="ghost" className="mb-6" onClick={handleNavigateBack}>
-        <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
-      </Button>
-      <h1 className="text-4xl md:text-6xl mt-6 font-semibold mb-2 gradient-text">
-        Novo Atendimento
-      </h1>
+    <div className="app-template">
+      <AppHeader
+        title="Novo Atendimento"
+        description="Inicie um novo atendimento com um paciente."
+      />
 
       <Card className="bg-white border-gray-100 shadow-none pt-8 mt-12">
         {isWaiting ? (
-          <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <Loader2 className="h-16 w-16 text-ally-blue animate-spin" />
-              <h2 className="text-2xl font-bold">Preparando escuta...</h2>
-              <p className="text-gray-600">
-                Vamos iniciar a consulta em instantes.
-              </p>
-            </div>
-          </div>
+          <LoadingContent />
         ) : (
           <CardContent className="space-y-6">
             <div className="space-y-4 mb-12">

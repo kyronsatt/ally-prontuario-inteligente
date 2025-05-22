@@ -7,6 +7,7 @@ import { toast } from "@/components/ui/sonner";
 import { AppointmentHistory } from "@/components/organisms/appointment-history";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { AppHeader } from "@/components/molecules/app-header";
 
 const AppointmentHistoryPage: React.FC = () => {
   const location = useLocation();
@@ -44,24 +45,8 @@ const AppointmentHistoryPage: React.FC = () => {
   const handleRetry = () => window.location.reload();
 
   return (
-    <div className="max-w-5xl lg:mt-12 flex flex-col justify-self-center w-full">
-      <div className="text-ally-dark mb-10">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            className="w-fit"
-            onClick={() => window.history.back()}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />{" "}
-            <span className="hidden sm:block">Voltar ao painel</span>
-          </Button>
-
-          <SidebarTrigger className="z-[999] sm:hidden" />
-        </div>
-        <h1 className="text-4xl md:text-6xl mt-6 font-semibold mb-2 gradient-text">
-          Histórico
-        </h1>
-      </div>
+    <div className="app-template flex flex-col justify-self-center w-full">
+      <AppHeader title="Histórico" />
 
       {loading ? (
         <div className="text-center p-6">Carregando...</div>
