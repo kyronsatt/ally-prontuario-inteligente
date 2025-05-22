@@ -113,11 +113,11 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
 
       recorderRef.current = recorder;
       recorder.startRecording();
+
       setStatus("RECORDING");
       setDuration(0);
-      timerRef.current = setInterval(() => {
-        setDuration((prev) => prev + 1);
-      }, 1000);
+      startTimer();
+
       toast.success("Gravação iniciada", "Fale normalmente com o paciente.");
     } catch (err) {
       toast.error(null, "Erro ao iniciar gravação de áudio");
@@ -133,6 +133,8 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
     if (status === "RECORDING") {
       recorder.pauseRecording();
       setStatus("PAUSED");
+      stopTimer();
+
       toast.info(
         "A Ally pausou o registro da consulta temporariamente.",
         "Escuta pausada"
@@ -140,6 +142,8 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
     } else if (status === "PAUSED") {
       recorder.resumeRecording();
       setStatus("RECORDING");
+      startTimer();
+
       toast.info("A Ally voltou a registrar sua consulta.", "Escuta retomada");
     }
   };
@@ -155,7 +159,7 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       recorder.stopRecording(async () => {
-        clearInterval(timerRef.current!);
+        stopTimer();
         setStatus("STOPPED");
 
         const blob = recorder.getBlob();
@@ -180,6 +184,20 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       });
     });
+  };
+
+  // Adicione esta função utilitária dentro do componente
+  const startTimer = () => {
+    timerRef.current = setInterval(() => {
+      setDuration((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
   useEffect(() => {

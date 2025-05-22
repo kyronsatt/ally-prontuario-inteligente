@@ -220,7 +220,10 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       toast.success("Relatório carregado com sucesso.", "Anamnese recuperada!");
     } catch (error) {
       console.error("[retrieveLastAnamnese] Erro:", error);
-      toast.error("Erro ao recuperar anamnese");
+      toast.info(
+        "Mas isso não afetará o atendimento atual.",
+        "Última anamnese não encontrada"
+      );
     } finally {
       setIsRetrievingAnamnese(false);
       console.log("[retrieveLastAnamnese] Finalizado.");

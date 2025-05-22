@@ -6,7 +6,7 @@ export function CustomToaster() {
       position="bottom-right"
       duration={5000}
       visibleToasts={3}
-      expand
+      expand={false}
       richColors
       offset={32}
       mobileOffset={16}
