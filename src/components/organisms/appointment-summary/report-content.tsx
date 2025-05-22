@@ -45,7 +45,7 @@ const AppointmentReport: React.FC<AppointmentReportProps> = ({
   useEffect(() => {
     if (!unsavedChanges && !isSaving) setOriginalAnamnese(anamnese);
   }, [anamnese, originalAnamnese, isSaving, unsavedChanges]);
-
+  console.log("qnqmnq", anamnese);
   if (anamnese) {
     const sections: Array<{
       title: string;

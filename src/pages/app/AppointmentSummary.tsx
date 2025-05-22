@@ -22,7 +22,6 @@ const AppointmentSummary: React.FC = () => {
   const { appointment } = useAppointment();
   const {
     anamnese,
-    isGeneratingAnamnese,
     generateAnamnese,
     retrieveAnamnese,
     isRetrievingAnamnese,
@@ -30,9 +29,7 @@ const AppointmentSummary: React.FC = () => {
   } = useAnamnese();
   const { transcription } = useTranscription();
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
-  const [editedAnamnese, setEditedAnamnese] = useState<IAnamnese | undefined>(
-    anamnese || undefined
-  );
+  const [editedAnamnese, setEditedAnamnese] = useState<IAnamnese | undefined>();
   const [isSaving, setIsSaving] = useState(false);
   const reportContentRef = useRef<HTMLDivElement>(null);
 
@@ -42,16 +39,6 @@ const AppointmentSummary: React.FC = () => {
   useEffect(() => {
     if (anamnese === null && appointmentId) {
       retrieveAnamnese(appointmentId);
-    } else if (anamnese === null && transcription) {
-      const transcriptionText = transcription.raw_text;
-      if (!transcriptionText) {
-        toast.error(
-          "Houve um erro ao transcrever a consulta.",
-          "Não foi possível gerar a anamnese"
-        );
-        return;
-      }
-      generateAnamnese(transcriptionText);
     }
   }, [anamnese, appointmentId, transcription]);
 
@@ -169,19 +156,16 @@ const AppointmentSummary: React.FC = () => {
     }
   };
 
-  if (isGeneratingAnamnese || isRetrievingAnamnese) {
-    const action = isGeneratingAnamnese ? "Finalizando" : "Acessando";
+  if (isRetrievingAnamnese) {
     return (
       <div className="max-w-5xl mx-auto text-center py-16">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="rounded-full bg-blue-50 p-4">
             <Loader2 className="h-12 w-12 text-ally-blue animate-spin" />
           </div>
-          <h2 className="text-2xl font-bold">{action} anamnese...</h2>
+          <h2 className="text-2xl font-bold">Acessando anamnese...</h2>
           <p className="text-gray-600">
-            {isGeneratingAnamnese
-              ? "Quase pronto! Estamos finalizando a anamnese da sua consulta."
-              : "Aguarde um instante! Estamos obtendo a anamnese."}
+            Aguarde um instante! Estamos obtendo a anamnese.
           </p>
         </div>
       </div>

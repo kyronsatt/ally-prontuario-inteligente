@@ -107,7 +107,8 @@ const ListeningPanel: React.FC<{
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
   const { appointment } = useAppointment();
-  const { isTranscribing, transcription } = useTranscription();
+  const { isTranscribing, transcription, transcribeAudio } = useTranscription();
+  const { generateAnamnese, isGeneratingAnamnese } = useAnamnese();
   const {
     startRecording,
     stopRecording,
@@ -133,11 +134,16 @@ const ListeningPage: React.FC = () => {
     }
   }, [patient, appointment]);
 
+  const handleGenerateAnamnese = async (transcription: string) => {
+    await generateAnamnese(transcription);
+    navigate("/app/resumo?appointmentId=" + appointment.id);
+  };
+
   useEffect(() => {
     if (status === "NOT_STARTED" && !isTranscribing) {
       startRecording();
     } else if (status === "STOPPED" && transcription) {
-      navigate("/app/resumo");
+      handleGenerateAnamnese(transcription.raw_text);
     }
   }, [status, transcription, isTranscribing]);
 
@@ -160,7 +166,7 @@ const ListeningPage: React.FC = () => {
   }, [appointment?.type, patient?.id]);
 
   const handleStopRecording = async () => {
-    await stopRecording();
+    await stopRecording(transcribeAudio);
   };
 
   if (isTranscribing) {
@@ -174,6 +180,22 @@ const ListeningPage: React.FC = () => {
           </p>
           <p className="text-gray-500 text-sm">
             Isso pode levar alguns instantes. Por favor, aguarde.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isGeneratingAnamnese) {
+    return (
+      <div className="max-w-5xl mx-auto text-center py-16">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="rounded-full bg-blue-50 p-4">
+            <Loader2 className="h-12 w-12 text-ally-blue animate-spin" />
+          </div>
+          <h2 className="text-2xl font-bold">Estruturando anamnese...</h2>
+          <p className="text-gray-600">
+            Quase pronto! Estamos finalizando a anamnese da sua consulta.
           </p>
         </div>
       </div>

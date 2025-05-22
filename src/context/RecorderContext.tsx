@@ -14,7 +14,9 @@ interface RecorderContextProps {
   duration: number;
   startRecording: () => Promise<void>;
   pauseRecording: () => void;
-  stopRecording: () => Promise<Blob | null>;
+  stopRecording: (
+    onStop?: (blob: Blob, duration: number) => Promise<void>
+  ) => Promise<Blob | null>;
 }
 
 const RecorderContext = createContext<RecorderContextProps | undefined>(
@@ -139,26 +141,38 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const stopRecording = (
-    onStop?: (blob: Blob, duration: number) => void
+    onStop?: (blob: Blob, duration: number) => Promise<void>
   ): Promise<Blob | null> => {
     return new Promise((resolve) => {
       const recorder = recorderRef.current;
-      if (!recorder) return resolve(null);
+      if (!recorder) {
+        console.warn("[Recorder] No active recorder to stop.");
+        return resolve(null);
+      }
 
-      recorder.stopRecording(() => {
+      recorder.stopRecording(async () => {
         clearInterval(timerRef.current!);
         setStatus("STOPPED");
 
         const blob = recorder.getBlob();
-
         recorder.destroy();
         recorderRef.current = null;
 
-        if (blob && duration && onStop) {
-          onStop(blob, duration);
-        }
+        try {
+          console.log("[Recorder] Recording stopped.");
+          console.log("[Recorder] Blob size (bytes):", blob?.size);
+          console.log("[Recorder] Duration (s):", duration);
 
-        resolve(blob);
+          if (blob && duration && onStop) {
+            onStop(blob, duration);
+          }
+
+          resolve(blob);
+        } catch (error) {
+          console.error("Erro ao calcular duração do áudio:", error);
+          toast.error("Erro ao calcular duração do áudio.");
+          resolve(blob);
+        }
       });
     });
   };

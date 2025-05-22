@@ -1,6 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", {
@@ -29,17 +28,17 @@ Deno.serve(async (req) => {
       .from("anamnese")
       .select(
         `
-    *,
-    patient:patients (*)
-  `
+          *,
+          patient:patients (*)
+        `
       )
       .eq("appointment_id", appointmentId)
-      .order("created_at", { ascending: false })
+      .order("created_at", {
+        ascending: false,
+      })
       .limit(1)
       .single();
-
     if (error) throw error;
-
     if (!data.insights) {
       data.insights = [];
     }
