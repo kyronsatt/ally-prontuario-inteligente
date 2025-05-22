@@ -25,6 +25,7 @@ import Subscription from "./pages/app/Subscription";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import { RecorderProvider } from "./context/RecorderContext";
 
 const App: React.FC = () => {
   return (
@@ -61,11 +62,13 @@ const App: React.FC = () => {
                     <Route
                       path="escuta"
                       element={
-                        <TranscriptionProvider>
-                          <AnamneseProvider>
-                            <Listening />
-                          </AnamneseProvider>
-                        </TranscriptionProvider>
+                        <RecorderProvider>
+                          <TranscriptionProvider>
+                            <AnamneseProvider>
+                              <Listening />
+                            </AnamneseProvider>
+                          </TranscriptionProvider>
+                        </RecorderProvider>
                       }
                     />
                     <Route

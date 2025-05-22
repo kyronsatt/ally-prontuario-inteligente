@@ -5,10 +5,7 @@ import { Loader2, ShieldIcon } from "lucide-react";
 import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
 import { useAnamnese } from "@/context/AnamneseContext";
-import {
-  RecordingStatus,
-  useTranscription,
-} from "@/context/TranscriptionContext";
+import { useTranscription } from "@/context/TranscriptionContext";
 
 import { toast } from "@/hooks/use-toast";
 
@@ -20,6 +17,7 @@ import PreviousAnamnese from "@/components/organisms/previous-anamnese";
 import AppointmentNotes from "@/components/organisms/appointment-notes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { IAnamnese } from "@/types";
+import { RecordingStatus, useRecorder } from "@/context/RecorderContext";
 
 const AuxPanels: React.FC<{
   previousAnamnese: IAnamnese;
@@ -51,7 +49,7 @@ const ListeningPanel: React.FC<{
   patientName: string;
   appointmentType?: AppointmentType;
   duration: number;
-  recordingStatus: RecordingStatus;
+  status: RecordingStatus;
   pauseRecording: () => void;
   handleStopRecording: () => void;
 }> = ({
@@ -112,15 +110,15 @@ const ListeningPanel: React.FC<{
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
   const { appointment } = useAppointment();
+  const { isTranscribing, transcription } = useTranscription();
   const {
     startRecording,
     stopRecording,
     pauseRecording,
     duration,
-    recordingStatus,
-    isTranscribing,
-    transcription,
-  } = useTranscription();
+    status: status,
+  } = useRecorder();
+
   const { patient } = usePatient();
   const {
     previousAnamnese,
@@ -139,12 +137,12 @@ const ListeningPage: React.FC = () => {
   }, [patient, appointment]);
 
   useEffect(() => {
-    if (recordingStatus === "NOT_STARTED" && !isTranscribing) {
+    if (status === "NOT_STARTED" && !isTranscribing) {
       startRecording();
-    } else if (recordingStatus === "STOPPED" && transcription) {
+    } else if (status === "STOPPED" && transcription) {
       navigate("/app/resumo");
     }
-  }, [recordingStatus, transcription, isTranscribing]);
+  }, [status, transcription, isTranscribing]);
 
   useEffect(() => {
     const fetchAnamneseIfReturn = async () => {
@@ -199,7 +197,7 @@ const ListeningPage: React.FC = () => {
             patientName={patient?.name || ""}
             appointmentType={appointment?.type}
             duration={duration}
-            recordingStatus={recordingStatus}
+            status={status}
             pauseRecording={pauseRecording}
             handleStopRecording={handleStopRecording}
           />
@@ -215,7 +213,7 @@ const ListeningPage: React.FC = () => {
           patientName={patient?.name || ""}
           appointmentType={appointment?.type}
           duration={duration}
-          recordingStatus={recordingStatus}
+          status={status}
           pauseRecording={pauseRecording}
           handleStopRecording={handleStopRecording}
         />
