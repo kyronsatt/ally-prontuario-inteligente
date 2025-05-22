@@ -38,9 +38,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         )}
         <SidebarTrigger className="sm:hidden" />
       </div>
-      <div className="pl-2">
+      <div className={hideBackButton ? "pl-0" : "pl-2"}>
         {title && (
-          <h1 className="text-3xl lg:text-4xl xl:text-5xl font-semibold mb-2 gradient-text">
+          <h1 className="text-4xl lg:text-5xl font-semibold mb-2 gradient-text">
             {title}
           </h1>
         )}

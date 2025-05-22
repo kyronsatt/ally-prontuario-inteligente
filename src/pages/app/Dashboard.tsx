@@ -131,10 +131,9 @@ const Dashboard: React.FC = () => {
     trackButtonClick("appointment_history");
     navigate("/app/historico");
   };
-
   return (
     <div className="app-template mt-0">
-      <div className="text-ally-dark mb-20">
+      <div className="text-ally-dark mb-12">
         <AppHeader
           title="Dashboard"
           description="Bem vindo(a), Dr(a). O que deseja fazer hoje?"
@@ -142,12 +141,12 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className={"flex flex-col lg:flex-row w-full gap-6 mb-8"}>
         <Button
           variant="default"
           onClick={handleNewAppointmentClick}
           size="lg"
-          className="h-20 text-xl flex items-center justify-center gap-3 transition-all hover:opacity-90"
+          className="h-16 text-lg xl:text-xl lg:w-1/2 w-full flex items-center justify-center gap-3 transition-all hover:opacity-90"
         >
           <Plus className="h-6 w-6" />
           Novo Atendimento
@@ -157,7 +156,7 @@ const Dashboard: React.FC = () => {
           onClick={handleHistoryClick}
           variant="secondary"
           size="lg"
-          className="h-20 text-xl flex items-center justify-center gap-3 transition-all"
+          className="h-16 text-lg xl:text-xl lg:w-1/2 w-full flex items-center justify-center gap-3 transition-all"
         >
           <Clock className="h-6 w-6" />
           Histórico de Atendimentos

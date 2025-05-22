@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ShieldIcon } from "lucide-react";
+import {
+  Loader,
+  Loader2,
+  LoaderCircle,
+  LoaderPinwheel,
+  ShieldIcon,
+} from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
 import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
@@ -183,16 +189,35 @@ const ListeningPage: React.FC = () => {
 
   if (isTranscribing) {
     return (
-      <div className="max-w-2xl mx-auto text-center py-16">
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <Loader2 className="h-16 w-16 text-ally-blue animate-spin" />
-          <h2 className="text-2xl font-bold">Processando áudio...</h2>
-          <p className="text-gray-600">
-            Estamos transcrevendo e analisando o áudio da consulta.
-          </p>
-          <p className="text-gray-500 text-sm">
-            Isso pode levar alguns instantes. Por favor, aguarde.
-          </p>
+      <div className="max-w-2xl mx-auto text-center h-full px-5 py-16">
+        <div className="flex flex-col h-full items-center justify-center space-y-4">
+          <a
+            href="https://storyset.com/online"
+            className="flex justify-center w-full"
+          >
+            <img
+              src="/assets/illustration/new-entry.svg"
+              className="w-3/4 md:w-2/3 mb-12 md:mb-8"
+              alt="Online illustrations by Storyset"
+            />
+          </a>
+
+          <div className="flex flex-col items-center space-y-5">
+            <div className="flex items-center space-x-2 rounded-full bg-blue-50 p-2">
+              <LoaderCircle className="h-8 w-8 text-ally-blue animate-spin" />
+              <h2 className="text-xl font-bold pr-4 text-ally-dark">
+                Processando áudio...
+              </h2>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-gray-600">
+                Estamos transcrevendo o áudio da consulta.
+              </p>
+              <p className="text-gray-500 text-sm">
+                Isso pode levar alguns instantes. Por favor, aguarde.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -200,15 +225,35 @@ const ListeningPage: React.FC = () => {
 
   if (isGeneratingAnamnese) {
     return (
-      <div className="max-w-5xl mx-auto text-center py-16">
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="rounded-full bg-blue-50 p-4">
-            <Loader2 className="h-12 w-12 text-ally-blue animate-spin" />
+      <div className="max-w-2xl mx-auto text-center h-full px-5 py-16">
+        <div className="flex flex-col h-full items-center justify-center space-y-4">
+          <a
+            href="https://storyset.com/people"
+            className="flex justify-center w-full"
+          >
+            <img
+              src="/assets/illustration/form-fill.svg"
+              className="w-3/4 md:w-2/3 mb-12 md:mb-8"
+              alt="People illustrations by Storyset"
+            />
+          </a>
+
+          <div className="flex flex-col items-center space-y-5">
+            <div className="flex items-center space-x-2 rounded-full bg-blue-50 p-2">
+              <LoaderCircle className="h-8 w-8 text-ally-blue animate-spin" />
+              <h2 className="text-xl font-bold pr-4 text-ally-dark">
+                Estruturando anamnese...
+              </h2>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-gray-600">
+                Estamos finalizando a anamnese da sua consulta.
+              </p>
+              <p className="text-gray-500 text-sm">
+                Quase pronto! Por favor, aguarde.
+              </p>
+            </div>
           </div>
-          <h2 className="text-2xl font-bold">Estruturando anamnese...</h2>
-          <p className="text-gray-600">
-            Quase pronto! Estamos finalizando a anamnese da sua consulta.
-          </p>
         </div>
       </div>
     );
@@ -216,7 +261,7 @@ const ListeningPage: React.FC = () => {
 
   if (isMobile) {
     return (
-      <div className="w-full max-w-full h-full pb-5 overflow-y-auto">
+      <div className="w-full max-w-full h-full p-5 overflow-y-auto">
         <div className="flex flex-col-reverse gap-8 px-2 pt-4">
           <AuxPanels
             previousAnamnese={previousAnamnese}
