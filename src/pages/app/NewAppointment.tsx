@@ -42,7 +42,6 @@ const NewAppointment: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(isLoadingPatients, patients);
     if (user?.id && !isLoadingPatients && !patients) {
       getPatientsByUser(user.id);
     }

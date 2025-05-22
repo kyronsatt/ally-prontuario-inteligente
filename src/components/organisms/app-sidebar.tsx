@@ -1,4 +1,3 @@
-
 import React from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -53,19 +52,28 @@ export function AppSidebar() {
     }
   };
 
-  // Close mobile sidebar when route changes
+  const prevPathnameRef = React.useRef(location.pathname);
+
   React.useEffect(() => {
-    if (isMobile && openMobile) {
+    if (
+      isMobile &&
+      openMobile &&
+      prevPathnameRef.current !== location.pathname
+    ) {
       setOpenMobile(false);
     }
+
+    prevPathnameRef.current = location.pathname;
   }, [location.pathname, isMobile, openMobile, setOpenMobile]);
 
-  const logoClassName = isMobile ? 'scale-75' : '';
+  const logoClassName = isMobile ? "scale-75" : "";
 
   return (
     <Sidebar variant="floating">
       <SidebarHeader className="relative border-b border-border py-2 md:py-4 px-1 md:px-2 flex items-center justify-between">
-        <div className={`flex items-center gap-2 px-2 md:px-4 pb-4 md:pb-6 pt-6 md:pt-10 ${logoClassName}`}>
+        <div
+          className={`flex items-center gap-2 px-2 md:px-4 pb-4 md:pb-6 pt-6 md:pt-10 ${logoClassName}`}
+        >
           <AllyLogo />
         </div>
         <SidebarTrigger className="fixed top-0 left-0 m-2 md:m-5" />

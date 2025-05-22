@@ -1,14 +1,15 @@
 import React, { useEffect, Suspense } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { SidebarProvider } from "./components/ui/sidebar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { PatientProvider } from "./context/PatientContext";
 import { AppointmentProvider } from "./context/AppointmentContext";
 import { TranscriptionProvider } from "./context/TranscriptionContext";
 import { AnamneseProvider } from "./context/AnamneseContext";
-import { ThemeProvider } from "next-themes";
-import { Toaster } from "sonner";
+
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AppLayout from "./pages/app/AppLayout";
@@ -46,7 +47,9 @@ const App: React.FC = () => {
                     path="/app"
                     element={
                       <ProtectedRoute>
-                        <AppLayout />
+                        <SidebarProvider>
+                          <AppLayout />
+                        </SidebarProvider>
                       </ProtectedRoute>
                     }
                   >

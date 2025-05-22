@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 import { AppointmentHistory } from "@/components/organisms/appointment-history";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const AppointmentHistoryPage: React.FC = () => {
   const location = useLocation();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const queryParams = new URLSearchParams(location.search);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -45,15 +44,20 @@ const AppointmentHistoryPage: React.FC = () => {
   const handleRetry = () => window.location.reload();
 
   return (
-    <div className="max-w-5xl mt-12 flex flex-col justify-self-center w-full">
+    <div className="max-w-5xl lg:mt-12 flex flex-col justify-self-center w-full">
       <div className="text-ally-dark mb-10">
-        <Button
-          variant="ghost"
-          className="mb-6 w-fit"
-          onClick={() => window.history.back()}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao painel
-        </Button>
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            className="w-fit"
+            onClick={() => window.history.back()}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />{" "}
+            <span className="hidden sm:block">Voltar ao painel</span>
+          </Button>
+
+          <SidebarTrigger className="z-[999] sm:hidden" />
+        </div>
         <h1 className="text-4xl md:text-6xl mt-6 font-semibold mb-2 gradient-text">
           Histórico
         </h1>
