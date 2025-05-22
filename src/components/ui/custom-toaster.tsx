@@ -4,7 +4,7 @@ export function CustomToaster() {
   return (
     <Toaster
       position="bottom-right"
-      duration={5000}
+      duration={3000}
       visibleToasts={3}
       expand={false}
       richColors
