@@ -71,11 +71,12 @@ export function AppSidebar() {
   return (
     <Sidebar variant="floating">
       <SidebarHeader className="relative border-b border-border py-2 md:py-4 px-1 md:px-2 flex items-center justify-between">
-        <div
-          className={`flex items-center gap-2 px-2 md:px-4 pb-4 md:pb-6 pt-6 md:pt-10 ${logoClassName}`}
+        <a
+          href="/app"
+          className={`flex items-center gap-2 px-2 md:px-4 pb-4 md:pb-6 pt-6 md:pt-10 hover:opacity-80 transition-all ${logoClassName}`}
         >
           <AllyLogo />
-        </div>
+        </a>
         <SidebarTrigger className="fixed top-0 left-0 m-2 md:m-5" />
       </SidebarHeader>
 
