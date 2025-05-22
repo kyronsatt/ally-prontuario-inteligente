@@ -40,7 +40,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       </div>
       <div className="pl-2">
         {title && (
-          <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold mb-2 gradient-text">
+          <h1 className="text-3xl lg:text-4xl xl:text-5xl font-semibold mb-2 gradient-text">
             {title}
           </h1>
         )}
