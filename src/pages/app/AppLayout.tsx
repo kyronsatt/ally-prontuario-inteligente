@@ -24,8 +24,8 @@ const AppLayout: React.FC = () => {
       <div className="min-h-screen flex w-full bg-gray-50">
         <AppSidebar />
         <SidebarInset>
-          <div className="relative py-2 md:py-4 px-1 md:px-2 h-svh shadow-none bg-gray-50">
-            <div className="border border-gray-200 rounded-xl md:rounded-2xl bg-white h-full overflow-auto">
+          <div className="relative p-0 md:py-4 md:px-2 h-svh shadow-none bg-gray-50">
+            <div className="md:border border-gray-200 md:rounded-2xl bg-white h-full overflow-auto">
               <Outlet />
             </div>
           </div>
