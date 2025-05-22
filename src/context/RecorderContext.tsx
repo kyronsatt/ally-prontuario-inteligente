@@ -150,7 +150,6 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
         setStatus("STOPPED");
 
         const blob = recorder.getBlob();
-        const duration = recorder.getRecordRTC().getLengthInSeconds(); // in seconds
 
         recorder.destroy();
         recorderRef.current = null;
