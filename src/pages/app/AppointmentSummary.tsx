@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
-import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -13,16 +12,13 @@ import { IAnamnese } from "@/types/anamnese";
 import { useTranscription } from "@/context/TranscriptionContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import { Button } from "@/components/ui/button";
-import ActionButtons from "@/components/molecules/appointment-summary/action-buttons";
 import PatientInfoCard from "@/components/organisms/appointment-summary/patient-info-card";
 import AppointmentReport from "@/components/organisms/appointment-summary/report-content";
 import ClinicalInsights from "@/components/organisms/clinical-insights";
 import { AppHeader } from "@/components/molecules/app-header";
+import { toast } from "@/hooks/use-standardized-toast";
 
 const AppointmentSummary: React.FC = () => {
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const { appointment } = useAppointment();
   const {
     anamnese,
@@ -47,21 +43,14 @@ const AppointmentSummary: React.FC = () => {
     if (anamnese === null && appointmentId) {
       retrieveAnamnese(appointmentId);
     } else if (anamnese === null && transcription) {
-      // Handle the case where transcription might be a string or an object with text
-      let transcriptionText = "";
-
-      if (typeof transcription === "string") {
-        transcriptionText = transcription;
-      } else if (transcription && typeof transcription === "object") {
-        // Try to extract text content from the transcription object
-        // This assumes that the transcription object has some text content property
-        transcriptionText =
-          transcription.text ||
-          transcription.content ||
-          transcription.transcription ||
-          JSON.stringify(transcription);
+      const transcriptionText = transcription.raw_text;
+      if (!transcriptionText) {
+        toast.error(
+          "Houve um erro ao transcrever a consulta.",
+          "Não foi possível gerar a anamnese"
+        );
+        return;
       }
-
       generateAnamnese(transcriptionText);
     }
   }, [anamnese, appointmentId, transcription]);
@@ -80,9 +69,10 @@ const AppointmentSummary: React.FC = () => {
       return;
     }
 
-    toast("Gerando PDF...", {
-      description: "Por favor, aguarde enquanto criamos seu documento.",
-    });
+    toast.info(
+      "Por favor, aguarde enquanto criamos seu documento.",
+      "Gerando PDF..."
+    );
 
     try {
       const element = reportContentRef.current;
