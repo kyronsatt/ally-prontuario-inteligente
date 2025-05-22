@@ -1,18 +1,21 @@
-
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { createClient } from "jsr:@supabase/supabase-js";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "authorization, x-client-info, apikey, content-type",
-      },
+      status: 200,
+      headers: corsHeaders,
     });
   }
+
   try {
     const { patient_id } = await req.json();
     const supabaseClient = createClient(
@@ -41,31 +44,25 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (error) throw error;
-    
-    // Ensure insights is an array even if it's null in the database
+
     if (data && !data.insights) {
       data.insights = [];
     }
-    
+
     return new Response(JSON.stringify(data || null), {
+      status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+        ...corsHeaders,
       },
-      status: 200,
     });
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: error.message,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-        status: 400,
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 400,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+    });
   }
 });

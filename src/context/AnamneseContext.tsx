@@ -172,10 +172,10 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const retrievedAnamnese = await response.json();
-      console.log("[retrieveAnamnese] Anamnese recuperada:", retrievedAnamnese);
+      console.log("[retrieveAnamnese] Anamnese obtida", retrievedAnamnese);
 
       setAnamnese(retrievedAnamnese);
-      toast.success("Relatório carregado com sucesso.", "Anamnese recuperada!");
+      toast.success("Relatório carregado com sucesso.", "Anamnese obtida");
     } catch (e) {
       console.error("[retrieveAnamnese] Erro:", e);
       toast.warning(null, "Erro ao recuperar anamnese");
@@ -194,13 +194,14 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const response = await fetch(
-        `${envs.SUPABASE_HOST}/retrieve-last-anamnese?patient_id=${patientId}`,
+        `${envs.SUPABASE_HOST}/functions/v1/retrieve-last-anamnese`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ patient_id: patientId }),
         }
       );
 
@@ -217,7 +218,7 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       setPreviousAnamnese(retrievedAnamnese);
-      toast.success("Relatório carregado com sucesso.", "Anamnese recuperada!");
+      toast.success("Relatório carregado com sucesso.", "Anamnese obtida");
     } catch (error) {
       console.error("[retrieveLastAnamnese] Erro:", error);
       toast.info(
