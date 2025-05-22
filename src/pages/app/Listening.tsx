@@ -56,7 +56,7 @@ const ListeningPanel: React.FC<{
   patientName,
   appointmentType,
   duration,
-  recordingStatus,
+  status,
   pauseRecording,
   handleStopRecording,
 }) => (
@@ -71,12 +71,9 @@ const ListeningPanel: React.FC<{
             <PatientInfo name={patientName} type={appointmentType} />
           </div>
           <div className="flex flex-col items-center justify-around gap-10 h-full">
-            <Timer
-              duration={duration}
-              isPaused={recordingStatus === "PAUSED"}
-            />
+            <Timer duration={duration} isPaused={status === "PAUSED"} />
             <ListeningControls
-              recordingStatus={recordingStatus}
+              recordingStatus={status}
               onTogglePause={pauseRecording}
               onFinish={handleStopRecording}
             />

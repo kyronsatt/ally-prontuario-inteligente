@@ -1,7 +1,7 @@
-
 import React from "react";
-import { RecordingStatus } from "@/context/TranscriptionContext";
+
 import ListeningControls from "@/components/molecules/listening-controls";
+import { RecordingStatus } from "@/context/RecorderContext";
 
 interface ListeningControlsContainerProps {
   recordingStatus: RecordingStatus;
@@ -9,7 +9,9 @@ interface ListeningControlsContainerProps {
   onFinish: () => void;
 }
 
-const ListeningControlsContainer: React.FC<ListeningControlsContainerProps> = (props) => {
+const ListeningControlsContainer: React.FC<ListeningControlsContainerProps> = (
+  props
+) => {
   return <ListeningControls {...props} />;
 };
 

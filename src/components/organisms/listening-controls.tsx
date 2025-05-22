@@ -1,8 +1,9 @@
 import React from "react";
 import { Mic, PauseCircle, StopCircle } from "lucide-react";
-import { RecordingStatus } from "@/context/TranscriptionContext";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { RecordingStatus } from "@/context/RecorderContext";
 
 interface ListeningControlsProps {
   recordingStatus: RecordingStatus;

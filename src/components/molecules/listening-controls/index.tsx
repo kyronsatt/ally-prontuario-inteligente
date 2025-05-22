@@ -1,8 +1,8 @@
-
 import React from "react";
-import { RecordingStatus } from "@/context/TranscriptionContext";
+
 import TogglePauseButton from "./toggle-pause-button";
 import FinishButton from "./finish-button";
+import { RecordingStatus } from "@/context/RecorderContext";
 
 interface ListeningControlsProps {
   recordingStatus: RecordingStatus;

@@ -138,7 +138,9 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const stopRecording = (): Promise<Blob | null> => {
+  const stopRecording = (
+    onStop?: (blob: Blob, duration: number) => void
+  ): Promise<Blob | null> => {
     return new Promise((resolve) => {
       const recorder = recorderRef.current;
       if (!recorder) return resolve(null);
@@ -148,8 +150,15 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
         setStatus("STOPPED");
 
         const blob = recorder.getBlob();
+        const duration = recorder.getRecordRTC().getLengthInSeconds(); // in seconds
+
         recorder.destroy();
         recorderRef.current = null;
+
+        if (blob && duration && onStop) {
+          onStop(blob, duration);
+        }
+
         resolve(blob);
       });
     });
