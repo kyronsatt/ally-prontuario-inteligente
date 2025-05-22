@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import RadioGroupItem from "@/components/molecules/radio-group-item";
 import PatientSelect from "@/components/molecules/patient-select";
 import PatientForm from "@/components/molecules/patient-form";
 
-import { toast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePatient, PatientCreationPayload } from "@/context/PatientContext";
@@ -18,6 +18,7 @@ import { useAnalytics } from "@/hooks/use-analytics";
 import { AppHeader } from "@/components/molecules/app-header";
 
 const NewAppointment: React.FC = () => {
+  const toast = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { trackPageView, trackButtonClick, trackEvent } = useAnalytics();
@@ -80,7 +81,7 @@ const NewAppointment: React.FC = () => {
           patient_id: patientId,
           error: "Patient data missing",
         });
-        toast.error("Erro ao iniciar atendimento.");
+        toast.error(null, "Erro ao iniciar atendimento.");
         return;
       }
 
@@ -96,7 +97,7 @@ const NewAppointment: React.FC = () => {
         patient_id: patientId,
         error: error instanceof Error ? error.message : "Unknown error",
       });
-      toast.error("Erro ao iniciar atendimento.");
+      toast.error(null, "Erro ao iniciar atendimento.");
     }
   };
 
@@ -118,7 +119,7 @@ const NewAppointment: React.FC = () => {
         trackEvent("create_patient_failed", {
           error: "No patient ID returned",
         });
-        toast.error("Erro ao criar o paciente.");
+        toast.error(null, "Erro ao criar o paciente.");
         return;
       }
 
@@ -132,7 +133,7 @@ const NewAppointment: React.FC = () => {
       trackEvent("create_patient_error", {
         error: error instanceof Error ? error.message : "Unknown error",
       });
-      toast.error("Erro ao criar o paciente.");
+      toast.error(null, "Erro ao criar o paciente.");
     } finally {
       setIsWaiting(false);
     }
@@ -140,12 +141,12 @@ const NewAppointment: React.FC = () => {
 
   const handleStartReturnAppointment = async () => {
     if (!appointmentType || appointmentType !== "RETURN") {
-      toast.warning("Selecione o tipo de atendimento como 'Retorno'.");
+      toast.warning(null, "Selecione o tipo de atendimento como 'Retorno'.");
       return;
     }
 
     if (!selectedPatientId) {
-      toast.warning("Selecione um paciente existente.");
+      toast.warning(null, "Selecione um paciente existente.");
       return;
     }
 

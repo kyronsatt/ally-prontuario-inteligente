@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AllyLogo } from "@/components/atoms/ally-logo";
 import { useAuth } from "@/context/AuthContext";
-import { useStandardizedToast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAnalytics } from "@/hooks/use-analytics";
 import SidebarMenuItemComponent from "@/components/molecules/sidebar/menu-item";
@@ -36,13 +35,13 @@ export function AppSidebar() {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { openMobile, setOpenMobile } = useSidebar();
-  const toast = useStandardizedToast();
+  const toast = useToast();
   const { trackEvent, trackUserEvent } = useAnalytics();
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      trackUserEvent('logout');
+      trackUserEvent("logout");
       toast.success(
         "Você foi desconectado do sistema.",
         "Sessão encerrada com sucesso"
@@ -50,9 +49,9 @@ export function AppSidebar() {
       navigate("/login");
     } catch (error) {
       console.error("Error signing out:", error);
-      trackEvent('error_occurred', {
-        error_type: 'logout_error',
-        error_message: 'Failed to sign out'
+      trackEvent("error_occurred", {
+        error_type: "logout_error",
+        error_message: "Failed to sign out",
       });
       toast.error(
         "Não foi possível encerrar sua sessão. Tente novamente.",
@@ -64,10 +63,10 @@ export function AppSidebar() {
   // Track page views
   useEffect(() => {
     if (location.pathname) {
-      const pageName = location.pathname.split('/').pop() || 'home';
-      trackEvent('page_view', {
+      const pageName = location.pathname.split("/").pop() || "home";
+      trackEvent("page_view", {
         page_name: pageName,
-        full_path: location.pathname
+        full_path: location.pathname,
       });
     }
   }, [location.pathname, trackEvent]);
@@ -79,13 +78,15 @@ export function AppSidebar() {
     }
   }, [location.pathname, isMobile, openMobile, setOpenMobile]);
 
-  const logoClassName = isMobile ? 'scale-75' : '';
+  const logoClassName = isMobile ? "scale-75" : "";
   const iconSize = isMobile ? 18 : 24;
 
   return (
     <Sidebar variant="floating">
       <SidebarHeader className="relative border-b border-border py-2 md:py-4 px-1 md:px-2 flex items-center justify-between">
-        <div className={`flex items-center gap-2 px-2 md:px-4 pb-4 md:pb-6 pt-6 md:pt-10 ${logoClassName}`}>
+        <div
+          className={`flex items-center gap-2 px-2 md:px-4 pb-4 md:pb-6 pt-6 md:pt-10 ${logoClassName}`}
+        >
           <AllyLogo />
         </div>
         <SidebarTrigger className="fixed top-0 left-0 m-2 md:m-5" />

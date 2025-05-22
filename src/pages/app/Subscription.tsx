@@ -4,12 +4,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { useStandardizedToast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PlanDetails {
   active: boolean;
-  type: 'free' | 'pro';
+  type: "free" | "pro";
   subscription_end?: string;
   subscription_id?: string;
   trial_end?: string;
@@ -23,11 +23,11 @@ const Subscription: React.FC = () => {
   const [plan, setPlan] = useState<PlanDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [processingAction, setProcessingAction] = useState(false);
-  const toast = useStandardizedToast();
+  const toast = useToast();
 
   useEffect(() => {
     if (!user) return;
-    
+
     const fetchSubscription = async () => {
       try {
         setLoading(true);
@@ -36,15 +36,18 @@ const Subscription: React.FC = () => {
         setTimeout(() => {
           setPlan({
             active: true,
-            type: 'free',
+            type: "free",
             monthly_consultations_limit: 10,
-            consultations_used: 3
+            consultations_used: 3,
           });
           setLoading(false);
         }, 800);
       } catch (error) {
         console.error("Error fetching subscription:", error);
-        toast.error("Por favor, tente novamente mais tarde.", "Erro ao carregar informações da assinatura");
+        toast.error(
+          "Por favor, tente novamente mais tarde.",
+          "Erro ao carregar informações da assinatura"
+        );
         setLoading(false);
       }
     };
@@ -56,16 +59,25 @@ const Subscription: React.FC = () => {
     setProcessingAction(true);
     try {
       // This would be replaced with the Stripe checkout logic
-      toast.info("Você será redirecionado para a página de pagamento.", "Redirecionando para o checkout");
-      
+      toast.info(
+        "Você será redirecionado para a página de pagamento.",
+        "Redirecionando para o checkout"
+      );
+
       // Simulate redirect delay
       setTimeout(() => {
-        toast.info("A integração com pagamentos será implementada em breve.", "Funcionalidade em desenvolvimento");
+        toast.info(
+          "A integração com pagamentos será implementada em breve.",
+          "Funcionalidade em desenvolvimento"
+        );
         setProcessingAction(false);
       }, 1500);
     } catch (error) {
       console.error("Error upgrading plan:", error);
-      toast.error("Por favor, tente novamente mais tarde.", "Erro ao processar upgrade");
+      toast.error(
+        "Por favor, tente novamente mais tarde.",
+        "Erro ao processar upgrade"
+      );
       setProcessingAction(false);
     }
   };
@@ -74,16 +86,25 @@ const Subscription: React.FC = () => {
     setProcessingAction(true);
     try {
       // This would be replaced with the Stripe Customer Portal logic
-      toast.info("Você será redirecionado para gerenciar sua assinatura.", "Redirecionando para o portal de gerenciamento");
-      
+      toast.info(
+        "Você será redirecionado para gerenciar sua assinatura.",
+        "Redirecionando para o portal de gerenciamento"
+      );
+
       // Simulate redirect delay
       setTimeout(() => {
-        toast.info("O portal de gerenciamento será implementado em breve.", "Funcionalidade em desenvolvimento");
+        toast.info(
+          "O portal de gerenciamento será implementado em breve.",
+          "Funcionalidade em desenvolvimento"
+        );
         setProcessingAction(false);
       }, 1500);
     } catch (error) {
       console.error("Error managing subscription:", error);
-      toast.error("Por favor, tente novamente mais tarde.", "Erro ao acessar gerenciamento");
+      toast.error(
+        "Por favor, tente novamente mais tarde.",
+        "Erro ao acessar gerenciamento"
+      );
       setProcessingAction(false);
     }
   };
@@ -92,7 +113,9 @@ const Subscription: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <Loader2 className="h-12 w-12 animate-spin text-ally-blue mb-4" />
-        <p className="text-lg text-ally-gray">Carregando informações da assinatura...</p>
+        <p className="text-lg text-ally-gray">
+          Carregando informações da assinatura...
+        </p>
       </div>
     );
   }
@@ -115,63 +138,90 @@ const Subscription: React.FC = () => {
         <CardHeader className="bg-ally-blue/10 pb-6">
           <CardTitle className="flex items-center justify-between">
             <span className="text-2xl">
-              Plano atual: <span className="font-bold text-ally-blue">{plan?.type === 'pro' ? 'Pro' : 'Free'}</span>
+              Plano atual:{" "}
+              <span className="font-bold text-ally-blue">
+                {plan?.type === "pro" ? "Pro" : "Free"}
+              </span>
             </span>
-            {plan?.type === 'pro' && (
-              <span className="bg-green-500 text-white text-xs px-4 py-1 rounded-full uppercase font-medium">Ativo</span>
+            {plan?.type === "pro" && (
+              <span className="bg-green-500 text-white text-xs px-4 py-1 rounded-full uppercase font-medium">
+                Ativo
+              </span>
             )}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          {plan?.type === 'free' ? (
+          {plan?.type === "free" ? (
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <p className="text-sm text-ally-gray mb-1">Limite de consultas</p>
-                  <p className="text-lg font-medium">{plan.consultations_used}/{plan.monthly_consultations_limit} utilizadas este mês</p>
+                  <p className="text-sm text-ally-gray mb-1">
+                    Limite de consultas
+                  </p>
+                  <p className="text-lg font-medium">
+                    {plan.consultations_used}/{plan.monthly_consultations_limit}{" "}
+                    utilizadas este mês
+                  </p>
                 </div>
                 <div className="w-40 h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-ally-blue rounded-full" 
-                    style={{ width: `${(plan.consultations_used! / plan.monthly_consultations_limit!) * 100}%` }}
+                  <div
+                    className="h-full bg-ally-blue rounded-full"
+                    style={{
+                      width: `${
+                        (plan.consultations_used! /
+                          plan.monthly_consultations_limit!) *
+                        100
+                      }%`,
+                    }}
                   ></div>
                 </div>
               </div>
-              
-              <Button 
-                className="w-full" 
+
+              <Button
+                className="w-full"
                 onClick={upgradeToProPlan}
                 disabled={processingAction}
               >
                 {processingAction ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processando</>
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                    Processando
+                  </>
                 ) : (
-                  'Fazer upgrade para o plano Pro'
+                  "Fazer upgrade para o plano Pro"
                 )}
               </Button>
             </div>
           ) : (
             <div>
               <div className="mb-6">
-                <p className="text-sm text-ally-gray mb-1">Status da assinatura</p>
+                <p className="text-sm text-ally-gray mb-1">
+                  Status da assinatura
+                </p>
                 <p className="text-lg font-medium">
-                  {plan.trial_end ? 
-                    `Período de teste gratuito (termina em ${new Date(plan.trial_end).toLocaleDateString()})` : 
-                    `Ativa até ${new Date(plan.subscription_end!).toLocaleDateString()}`
-                  }
+                  {plan.trial_end
+                    ? `Período de teste gratuito (termina em ${new Date(
+                        plan.trial_end
+                      ).toLocaleDateString()})`
+                    : `Ativa até ${new Date(
+                        plan.subscription_end!
+                      ).toLocaleDateString()}`}
                 </p>
               </div>
-              
-              <Button 
-                variant="outline" 
-                className="w-full" 
+
+              <Button
+                variant="outline"
+                className="w-full"
                 onClick={manageBilling}
                 disabled={processingAction}
               >
                 {processingAction ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processando</>
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                    Processando
+                  </>
                 ) : (
-                  'Gerenciar assinatura'
+                  "Gerenciar assinatura"
                 )}
               </Button>
             </div>
@@ -194,12 +244,16 @@ const Subscription: React.FC = () => {
             <tr className="border-b">
               <td className="py-4 px-6">Consultas mensais</td>
               <td className="py-4 px-6 text-center">10</td>
-              <td className="py-4 px-6 text-center bg-ally-blue/5">Ilimitadas</td>
+              <td className="py-4 px-6 text-center bg-ally-blue/5">
+                Ilimitadas
+              </td>
             </tr>
             <tr className="border-b">
               <td className="py-4 px-6">Geração de documentos clínicos</td>
               <td className="py-4 px-6 text-center">Básica</td>
-              <td className="py-4 px-6 text-center bg-ally-blue/5">Completa com IA</td>
+              <td className="py-4 px-6 text-center bg-ally-blue/5">
+                Completa com IA
+              </td>
             </tr>
             <tr className="border-b">
               <td className="py-4 px-6">Insights clínicos personalizados</td>
@@ -211,7 +265,9 @@ const Subscription: React.FC = () => {
               </td>
             </tr>
             <tr className="border-b">
-              <td className="py-4 px-6">Integração com histórico de consultas</td>
+              <td className="py-4 px-6">
+                Integração com histórico de consultas
+              </td>
               <td className="py-4 px-6 text-center">
                 <span className="text-red-500">✕</span>
               </td>

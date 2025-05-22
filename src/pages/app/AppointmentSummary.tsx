@@ -16,17 +16,14 @@ import PatientInfoCard from "@/components/organisms/appointment-summary/patient-
 import AppointmentReport from "@/components/organisms/appointment-summary/report-content";
 import ClinicalInsights from "@/components/organisms/clinical-insights";
 import { AppHeader } from "@/components/molecules/app-header";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const AppointmentSummary: React.FC = () => {
+  const toast = useToast();
+
   const { appointment } = useAppointment();
-  const {
-    anamnese,
-    generateAnamnese,
-    retrieveAnamnese,
-    isRetrievingAnamnese,
-    updateAnamnese,
-  } = useAnamnese();
+  const { anamnese, isRetrievingAnamnese, retrieveAnamnese, updateAnamnese } =
+    useAnamnese();
   const { transcription } = useTranscription();
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [editedAnamnese, setEditedAnamnese] = useState<IAnamnese | undefined>();
@@ -52,7 +49,7 @@ const AppointmentSummary: React.FC = () => {
 
   const handleDownload = async () => {
     if (!reportContentRef.current) {
-      toast.error("Não foi possível gerar o PDF");
+      toast.error(null, "Não foi possível gerar o PDF");
       return;
     }
 
@@ -106,10 +103,10 @@ const AppointmentSummary: React.FC = () => {
         )}.pdf`
       );
 
-      toast.success("PDF gerado com sucesso!");
+      toast.success(null, "PDF gerado com sucesso!");
     } catch (error) {
       console.error("Error generating PDF:", error);
-      toast.error("Erro ao gerar o PDF");
+      toast.error(null, "Erro ao gerar o PDF");
     }
   };
 

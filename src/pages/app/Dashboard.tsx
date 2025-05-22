@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Clock, TrendingUp, ChartBar, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { useStandardizedToast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useAnalytics } from "@/hooks/use-analytics";
@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const toast = useStandardizedToast();
+  const toast = useToast();
 
   useEffect(() => {
     trackPageView("dashboard");

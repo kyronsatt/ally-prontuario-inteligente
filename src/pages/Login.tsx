@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useStandardizedToast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const { session, signIn, signUp, user } = useAuth();
@@ -24,7 +24,7 @@ const Login = () => {
     agreeToTerms: true,
   });
   const { trackPageView, trackEvent } = useAnalytics();
-  const toast = useStandardizedToast();
+  const toast = useToast();
 
   useEffect(() => {
     trackPageView("login_page");

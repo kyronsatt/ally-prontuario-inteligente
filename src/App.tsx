@@ -1,6 +1,5 @@
-import React, { useEffect, Suspense } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
 
 import { SidebarProvider } from "./components/ui/sidebar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -9,6 +8,9 @@ import { PatientProvider } from "./context/PatientContext";
 import { AppointmentProvider } from "./context/AppointmentContext";
 import { TranscriptionProvider } from "./context/TranscriptionContext";
 import { AnamneseProvider } from "./context/AnamneseContext";
+import { RecorderProvider } from "./context/RecorderContext";
+
+import { CustomToaster } from "./components/ui/custom-toaster";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -25,7 +27,6 @@ import Subscription from "./pages/app/Subscription";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
-import { RecorderProvider } from "./context/RecorderContext";
 
 const App: React.FC = () => {
   return (
@@ -94,7 +95,7 @@ const App: React.FC = () => {
           </AppointmentProvider>
         </PatientProvider>
       </AuthProvider>
-      <Toaster position="top-right" richColors closeButton />
+      <CustomToaster />
     </BrowserRouter>
   );
 };

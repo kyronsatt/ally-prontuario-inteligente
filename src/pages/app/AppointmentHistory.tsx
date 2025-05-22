@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/sonner";
+
 import { AppointmentHistory } from "@/components/organisms/appointment-history";
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { AppHeader } from "@/components/molecules/app-header";
+import { useToast } from "@/hooks/use-toast";
 
 const AppointmentHistoryPage: React.FC = () => {
-  const location = useLocation();
+  const toast = useToast();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

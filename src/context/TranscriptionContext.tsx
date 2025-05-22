@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext";
 import { useAppointment } from "./AppointmentContext";
 import { supabase } from "@/integrations/supabase/client";
 import { envs } from "@/envs";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface Transcription {
   id: string;
@@ -48,6 +48,7 @@ const TranscriptionContext = createContext<
 export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const toast = useToast();
   const { appointment } = useAppointment();
   const { session } = useAuth();
 
@@ -100,10 +101,10 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
       localStorage.removeItem("appointmentNotes");
       setTranscription(data);
-      toast.success("Transcrição concluída com sucesso!");
+      toast.success(null, "Transcrição concluída com sucesso!");
     } catch (error) {
       console.error("[Transcription] Erro durante a transcrição:", error);
-      toast.error("Erro ao transcrever áudio.");
+      toast.error(null, "Erro ao transcrever áudio.");
     } finally {
       setIsTranscribing(false);
       console.log("[Transcription] Transcrição finalizada.");

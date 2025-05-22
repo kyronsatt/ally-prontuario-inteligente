@@ -1,13 +1,17 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ShieldIcon } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 
 import { AppointmentType, useAppointment } from "@/context/AppointmentContext";
 import { usePatient } from "@/context/PatientContext";
 import { useAnamnese } from "@/context/AnamneseContext";
 import { useTranscription } from "@/context/TranscriptionContext";
+import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { IAnamnese } from "@/types";
 
-import { toast } from "@/hooks/use-toast";
+import { RecordingStatus, useRecorder } from "@/context/RecorderContext";
 
 import PatientInfo from "@/components/organisms/patient-info";
 import Timer from "@/components/molecules/timer";
@@ -15,9 +19,6 @@ import ListeningControls from "@/components/organisms/listening-controls";
 import { Card, CardContent } from "@/components/ui/card";
 import PreviousAnamnese from "@/components/organisms/previous-anamnese";
 import AppointmentNotes from "@/components/organisms/appointment-notes";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { IAnamnese } from "@/types";
-import { RecordingStatus, useRecorder } from "@/context/RecorderContext";
 
 const AuxPanels: React.FC<{
   previousAnamnese: IAnamnese;
@@ -31,13 +32,23 @@ const AuxPanels: React.FC<{
   setAppointmentNotes,
 }) => (
   <div className="w-full lg:w-[60%] flex flex-col h-full">
-    <div className="h-full min-h-[65%] mb-5 overflow-clip">
+    <div
+      className={twMerge(
+        "mb-5 overflow-clip",
+        previousAnamnese ? "h-full min-h-[65%]" : "h-fit"
+      )}
+    >
       <PreviousAnamnese
         anamnese={previousAnamnese}
         isLoading={isRetrievingAnamnese}
       />
     </div>
-    <div className="h-fit min-h-[30%] overflow-clip">
+    <div
+      className={twMerge(
+        "overflow-clip",
+        previousAnamnese ? "h-fit min-h-[30%]" : "h-full"
+      )}
+    >
       <AppointmentNotes
         notes={appointmentNotes}
         setNotes={setAppointmentNotes}
@@ -106,6 +117,8 @@ const ListeningPanel: React.FC<{
 
 const ListeningPage: React.FC = () => {
   const navigate = useNavigate();
+  const toast = useToast();
+
   const { appointment } = useAppointment();
   const { isTranscribing, transcription, transcribeAudio } = useTranscription();
   const { generateAnamnese, isGeneratingAnamnese } = useAnamnese();
@@ -140,12 +153,12 @@ const ListeningPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (status === "NOT_STARTED" && !isTranscribing) {
+    if (status === "NOT_STARTED" && !isTranscribing && appointment) {
       startRecording();
     } else if (status === "STOPPED" && transcription) {
       handleGenerateAnamnese(transcription.raw_text);
     }
-  }, [status, transcription, isTranscribing]);
+  }, [status, transcription, isTranscribing, appointment]);
 
   useEffect(() => {
     const fetchAnamneseIfReturn = async () => {
@@ -154,11 +167,10 @@ const ListeningPage: React.FC = () => {
           await retrieveLastAnamnese(patient.id);
         } catch (error) {
           console.error("Erro ao buscar a última anamnese:", error);
-          toast({
-            title: "Erro ao buscar última anamnese do pacinete",
-            description:
-              "Isso não impede o prosseguimento da consulta. Em um momento oportuno, notifique o suporte.",
-          });
+          toast.error(
+            "Isso não impede o prosseguimento da consulta. Em um momento oportuno, notifique o suporte.",
+            "Erro ao buscar última anamnese do pacinete"
+          );
         }
       }
     };

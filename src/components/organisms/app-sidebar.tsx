@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AllyLogo } from "@/components/atoms/ally-logo";
 import { useAuth } from "@/context/AuthContext";
-import { useStandardizedToast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function AppSidebar() {
@@ -33,7 +33,7 @@ export function AppSidebar() {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { openMobile, setOpenMobile } = useSidebar();
-  const toast = useStandardizedToast();
+  const toast = useToast();
 
   const handleSignOut = async () => {
     try {

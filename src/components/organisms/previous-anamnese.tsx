@@ -28,7 +28,7 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
 
   if (!anamnese) {
     return (
-      <Card className="h-fit max-h-[50%] border-ally-blue/30">
+      <Card className="h-full border-ally-blue/30">
         <CardHeader className="py-2">
           <CardTitle className="flex gap-2 items-center text-md lg:text-lg text-ally-blue">
             <HistoryIcon size={16} />

@@ -1,13 +1,14 @@
 // hooks/useRecorder.ts
 import { createContext, useContext, useRef, useState, useEffect } from "react";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc";
-import { toast } from "@/hooks/use-standardized-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export type RecordingStatus =
   | "NOT_STARTED"
   | "RECORDING"
   | "PAUSED"
-  | "STOPPED";
+  | "STOPPED"
+  | "ERROR";
 
 interface RecorderContextProps {
   status: RecordingStatus;
@@ -26,6 +27,7 @@ const RecorderContext = createContext<RecorderContextProps | undefined>(
 export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const toast = useToast();
   const [status, setStatus] = useState<RecordingStatus>("NOT_STARTED");
   const [duration, setDuration] = useState(0);
   const recorderRef = useRef<RecordRTC | null>(null);
@@ -51,7 +53,8 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
       return true;
     } else if (status === "denied") {
       toast.error(
-        "Permissão de uso do microfone negada anteriormente. Altere nas configurações do navegador."
+        "Permissão de uso do microfone negada anteriormente. Altere nas configurações do navegador.",
+        "Sem permissão de microfone"
       );
       return false;
     } else {
@@ -65,7 +68,8 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
       !navigator.mediaDevices?.getUserMedia
     ) {
       toast.error(
-        "Seu navegador não suporta acesso ao microfone. Tente outro."
+        "Seu navegador não suporta acesso ao microfone. Tente outro.",
+        "Navegador não suportado"
       );
       return;
     }
@@ -76,15 +80,15 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
       // Libere imediatamente após concedida, se só quer a permissão
       stream.getTracks().forEach((track) => track.stop());
 
-      toast.success("Permissão para o microfone concedida!");
+      toast.success(null, "Permissão para o microfone concedida!");
       return true;
     } catch (error) {
       if (error.name === "NotAllowedError") {
-        toast.error("Permissão para o microfone negada.");
+        toast.error(null, "Permissão para o microfone negada.");
       } else if (error.name === "NotFoundError") {
-        toast.error("Nenhum microfone disponível.");
+        toast.error(null, "Nenhum microfone disponível.");
       } else {
-        toast.error("Erro ao solicitar microfone.");
+        toast.error(null, "Erro ao solicitar microfone.");
       }
       console.error(error);
       return false;
@@ -116,9 +120,9 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
       }, 1000);
       toast.success("Gravação iniciada", "Fale normalmente com o paciente.");
     } catch (err) {
-      toast.error("Erro ao iniciar gravação de áudio");
+      toast.error(null, "Erro ao iniciar gravação de áudio");
       console.error("Erro ao iniciar gravação:", err);
-      setStatus("NOT_STARTED");
+      setStatus("ERROR");
     }
   };
 
@@ -155,10 +159,10 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
         setStatus("STOPPED");
 
         const blob = recorder.getBlob();
-        recorder.destroy();
-        recorderRef.current = null;
-
         try {
+          recorder.destroy();
+          recorderRef.current = null;
+
           console.log("[Recorder] Recording stopped.");
           console.log("[Recorder] Blob size (bytes):", blob?.size);
           console.log("[Recorder] Duration (s):", duration);
@@ -170,8 +174,9 @@ export const RecorderProvider: React.FC<{ children: React.ReactNode }> = ({
           resolve(blob);
         } catch (error) {
           console.error("Erro ao calcular duração do áudio:", error);
-          toast.error("Erro ao calcular duração do áudio.");
+          toast.error(null, "Erro ao calcular duração do áudio.");
           resolve(blob);
+          setStatus("ERROR");
         }
       });
     });

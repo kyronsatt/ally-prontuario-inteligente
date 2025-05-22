@@ -2,12 +2,12 @@ import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { envs } from "@/envs";
-import { toast } from "@/components/ui/sonner";
 
 import { useAppointment } from "./AppointmentContext";
 import { useAuth } from "./AuthContext";
 import { useTranscription } from "./TranscriptionContext";
 import { PatientData, usePatient } from "./PatientContext";
+import { useToast } from "@/hooks/use-toast";
 
 export interface InsightItem {
   type: "risk" | "finding" | "suggestion" | "red_flag";
@@ -64,6 +64,8 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { session } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
+
   const { appointment } = useAppointment();
   const { transcription } = useTranscription();
   const { patient } = usePatient();
@@ -131,14 +133,12 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("[generateAnamnese] Anamnese gerada:", anamneseResponse);
 
       setAnamnese(anamneseResponse);
-      toast("Anamnese pronta!", {
-        description: "Relatório gerado com sucesso.",
-      });
+      toast.success("Relatório gerado com sucesso.", "Anamnese pronta!");
 
       navigate(`/app/resumo?appointmentId=${appointment.id}`);
     } catch (e) {
       console.error("[generateAnamnese] Erro:", e);
-      toast("Erro ao gerar anamnese", { description: String(e) });
+      toast.error(String(e), "Erro ao gerar anamnese");
     } finally {
       setIsGeneratingAnamnese(false);
       console.log("[generateAnamnese] Finalizado.");
@@ -175,12 +175,10 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("[retrieveAnamnese] Anamnese recuperada:", retrievedAnamnese);
 
       setAnamnese(retrievedAnamnese);
-      toast("Anamnese recuperada!", {
-        description: "Relatório carregado com sucesso.",
-      });
+      toast.success("Relatório carregado com sucesso.", "Anamnese recuperada!");
     } catch (e) {
       console.error("[retrieveAnamnese] Erro:", e);
-      toast("Erro ao recuperar anamnese", { description: String(e) });
+      toast.warning(null, "Erro ao recuperar anamnese");
     } finally {
       setIsRetrievingAnamnese(false);
       console.log("[retrieveAnamnese] Finalizado.");
@@ -196,10 +194,11 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/retrieve-last-anamnese?patient_id=${patientId}`,
+        `${envs.SUPABASE_HOST}/retrieve-last-anamnese?patient_id=${patientId}`,
         {
-          method: "GET",
+          method: "POST",
           headers: {
+            Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
           },
         }
@@ -218,12 +217,10 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       setPreviousAnamnese(retrievedAnamnese);
-      toast("Anamnese recuperada!", {
-        description: "Relatório carregado com sucesso.",
-      });
+      toast.success("Relatório carregado com sucesso.", "Anamnese recuperada!");
     } catch (error) {
       console.error("[retrieveLastAnamnese] Erro:", error);
-      toast("Erro ao recuperar anamnese", { description: String(error) });
+      toast.error("Erro ao recuperar anamnese");
     } finally {
       setIsRetrievingAnamnese(false);
       console.log("[retrieveLastAnamnese] Finalizado.");
@@ -268,14 +265,15 @@ export const AnamneseProvider: React.FC<{ children: React.ReactNode }> = ({
       }));
 
       console.log("[updateAnamnese] Anamnese atualizada com sucesso.");
-      toast("Anamnese atualizada!", {
-        description: "As alterações foram salvas com sucesso.",
-      });
+      toast.success(
+        "As alterações foram salvas com sucesso.",
+        "Anamnese atualizada!"
+      );
 
       return { success: true };
     } catch (e) {
       console.error("[updateAnamnese] Erro:", e);
-      toast("Erro ao atualizar anamnese", { description: String(e) });
+      toast.error(String(e), "Erro ao atualizar anamnese");
       return { success: false };
     }
   };

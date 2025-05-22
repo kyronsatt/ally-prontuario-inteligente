@@ -7,7 +7,6 @@ import SpecialtiesSection from "@/components/sections/SpecialtiesSection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import PricingSection from "@/components/sections/PricingSection";
 import Footer from "@/components/layouts/Footer";
-import { Toaster } from "@/components/ui/toaster";
 
 import { useAnimationObserver } from "@/hooks/use-animation-observer";
 import { useAnalytics } from "@/hooks/use-analytics";
@@ -35,7 +34,6 @@ const Index = () => {
       </main>
 
       <Footer />
-      <Toaster />
     </div>
   );
 };

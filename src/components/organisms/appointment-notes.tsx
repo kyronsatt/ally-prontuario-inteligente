@@ -35,7 +35,7 @@ const AppointmentNotes: React.FC<AppointmentNotesProps> = ({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Use este espaço livremente. Suas anotações podem ajudar a Ally a entender melhor o contexto."
-          className="resize-none placeholder:italic border-ally-blue/30 focus-visible:ring-ally-blue bg-gray-50 focus:bg-white"
+          className="resize-y placeholder:italic border-ally-blue/30 focus-visible:ring-ally-blue bg-gray-50 focus:bg-white h-fit"
         />
 
         <div className="mt-4 flex flex-col gap-2 lg:gap-0 lg:flex-row justify-between items-start">

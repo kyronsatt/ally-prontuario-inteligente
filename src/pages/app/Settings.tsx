@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { User, LogOut, Loader2 } from "lucide-react";
+
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/components/ui/sonner";
-import { User, Settings as SettingsIcon, LogOut, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/molecules/app-header";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserProfile {
   id: string;
@@ -21,7 +23,9 @@ interface UserProfile {
 
 const Settings: React.FC = () => {
   const { user, signOut } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { CalendarClock, Loader2 } from "lucide-react";
-import { toast } from "@/hooks/use-standardized-toast";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/use-analytics";
 
@@ -109,11 +109,6 @@ const WaitlistForm: React.FC = () => {
         specialty: formData.specialty,
       });
 
-      toast.success(
-        "Em breve entraremos em contato para confirmar sua demonstração.",
-        "Demonstração agendada com sucesso!"
-      );
-
       setFormData({
         name: "",
         email: "",
@@ -134,11 +129,6 @@ const WaitlistForm: React.FC = () => {
         err instanceof Error
           ? err.message
           : "Ocorreu um erro ao processar seu agendamento."
-      );
-
-      toast.error(
-        "Não foi possível completar seu agendamento. Por favor, tente novamente.",
-        "Erro no agendamento"
       );
     } finally {
       setIsSubmitting(false);

@@ -1,9 +1,7 @@
 import { useEffect, useCallback } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import { envs } from "@/envs";
-import { toast } from "@/hooks/use-standardized-toast";
 
-// Initialize outside of the hook to avoid re-initialization
 let initialized = false;
 
 type EventProperties = Record<string, unknown>;
@@ -24,7 +22,6 @@ export function useAnalytics() {
         console.log("Amplitude initialized successfully");
       } catch (error) {
         console.error("Failed to initialize Amplitude:", error);
-        toast.error("Falha ao inicializar sistema de análise");
       }
     }
   }, []);

@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/sonner";
 import { AppHeader } from "@/components/molecules/app-header";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProfileData {
   first_name: string;
@@ -24,7 +24,7 @@ interface ProfileData {
 }
 
 const Profile: React.FC = () => {
-  const navigate = useNavigate();
+  const toast = useToast();
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(false);
