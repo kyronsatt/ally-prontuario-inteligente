@@ -1,18 +1,11 @@
-
 import React from "react";
-import {
-  Mic,
-  FileText,
-  LightbulbIcon,
-  Heart,
-  ArrowRight,
-} from "lucide-react";
+import { Mic, FileText, LightbulbIcon, Heart, ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const HowItWorksSection: React.FC = () => {
   const isMobile = useIsMobile();
-  
+
   const steps = [
     {
       icon: <Mic className="h-6 w-6 md:h-8 md:w-8" />,
@@ -45,8 +38,11 @@ const HowItWorksSection: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="section-spacing bg-gray-50 py-16 md:py-24">
-      <div className="container-ally px-4 md:px-8 lg:px-24">
+    <section
+      id="how-it-works"
+      className="section-spacing bg-gray-50 py-16 md:py-24"
+    >
+      <div className="container-ally">
         <div
           className="text-center max-w-3xl mx-auto mb-8 md:mb-12 fade-in-section"
           style={{ "--delay": "0ms" } as React.CSSProperties}
@@ -69,8 +65,12 @@ const HowItWorksSection: React.FC = () => {
               <div className="bg-ally-blue/10 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5 text-ally-blue">
                 {step.icon}
               </div>
-              <h3 className="text-lg md:text-xl font-medium mb-3">{step.title}</h3>
-              <p className="text-ally-gray text-sm md:text-base">{step.description}</p>
+              <h3 className="text-lg md:text-xl font-medium mb-3">
+                {step.title}
+              </h3>
+              <p className="text-ally-gray text-sm md:text-base">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
@@ -80,7 +80,10 @@ const HowItWorksSection: React.FC = () => {
           style={{ "--delay": "500ms" } as React.CSSProperties}
         >
           <a href="#pricing">
-            <Button size={isMobile ? "default" : "lg"} className="w-full sm:w-auto">
+            <Button
+              size={isMobile ? "default" : "lg"}
+              className="w-full sm:w-auto"
+            >
               Experimentar agora
               <ArrowRight size={14} className="ml-2" />
             </Button>

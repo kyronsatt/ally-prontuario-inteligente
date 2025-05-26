@@ -48,11 +48,11 @@ const HeroImage: React.FC = () => (
     className="md:w-2/3 md:-ml-[30vw] flex relative justify-center md:justify-end h-full fade-in-section overflow-visible"
     style={{ "--delay": "300ms" } as React.CSSProperties}
   >
-    {/* <div className="w-full h-full scale-90 bg-gradient-to-b from-ally-blue to-[#00e6e6] absolute rounded-full left-0 blur-3xl" /> */}
+    <div className="w-full h-full bg-black/10 absolute rounded-2xl left-0 blur-3xl" />
     <img
       src="/assets/mockups/mix/ally-devices-1.png"
       alt="Ally Med - Painel de Escuta"
-      className="h-full w-full object-contain"
+      className="h-full w-full object-contain z-50"
     />
   </div>
 );
