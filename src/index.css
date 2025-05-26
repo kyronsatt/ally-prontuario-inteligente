@@ -128,7 +128,7 @@
 /* Classes de utilidade para a página da Ally */
 @layer components {
   .container-ally {
-    @apply container max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-24;
+    @apply container max-w-7xl mx-auto px-10 md:px-12 lg:px-24;
   }
 
   .app-template {

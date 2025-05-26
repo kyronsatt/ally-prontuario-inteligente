@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="pt-32 md:pt-48 pb-16 md:pb-32 overflow-hidden">
-      <div className="container-ally h-full">
-        <div className="flex flex-col-reverse md:flex-row md:items-center justify-between h-full gap-8 md:gap-12">
-          <HeroContent />
+    <section className="pt-20 md:pt-32 pb-16 md:pb-28 overflow-hidden">
+      <div className="px-10 h-[60vh] md:h-full">
+        <div className="flex flex-col md:flex-row md:items-center justify-center h-full gap-8 md:gap-12 xl:gap-24">
           <HeroImage />
+          <HeroContent />
         </div>
       </div>
     </section>
@@ -17,14 +17,14 @@ const HeroSection: React.FC = () => {
 
 const HeroContent: React.FC = () => (
   <div
-    className="md:w-1/2 space-y-6 fade-in-section px-2 md:px-0"
+    className="md:w-1/3 space-y-6 fade-in-section"
     style={{ "--delay": "100ms" } as React.CSSProperties}
   >
-    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-2 leading-tight">
+    <h1 className="text-5xl xl:text-6xl font-bold mb-2 leading-tight">
       <span className="gradient-text">Ally</span> — da voz ao prontuário.
     </h1>
 
-    <p className="text-lg md:text-xl lg:text-2xl text-ally-gray font-extralight">
+    <p className="text-md lg:text-xl text-ally-gray font-extralight">
       Registre consultas automaticamente, sem digitar uma linha. Anamneses
       completas e estruturadas em segundos.
     </p>
@@ -45,14 +45,14 @@ const HeroContent: React.FC = () => (
 
 const HeroImage: React.FC = () => (
   <div
-    className="md:w-1/2 flex relative justify-center md:justify-end h-full fade-in-section overflow-visible"
+    className="md:w-2/3 md:-ml-[30vw] flex relative justify-center md:justify-end h-full fade-in-section overflow-visible"
     style={{ "--delay": "300ms" } as React.CSSProperties}
   >
     {/* <div className="w-full h-full scale-90 bg-gradient-to-b from-ally-blue to-[#00e6e6] absolute rounded-full left-0 blur-3xl" /> */}
     <img
-      src="/assets/mockups/mockup-escuta.png"
+      src="/assets/mockups/mix/ally-devices-1.png"
       alt="Ally Med - Painel de Escuta"
-      className="h-full w-full object-contain md:scale-125"
+      className="h-full w-full object-contain"
     />
   </div>
 );
