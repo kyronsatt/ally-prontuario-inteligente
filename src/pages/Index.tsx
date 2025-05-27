@@ -26,9 +26,9 @@ const Index = () => {
 
       <main className="flex-grow pt-16 overflow-x-clip">
         <HeroSection />
+        <HowItWorksSection />
         <AboutSection />
         <BenefitsSection />
-        <HowItWorksSection />
         <SpecialtiesSection />
         <PricingSection />
       </main>

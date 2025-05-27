@@ -54,12 +54,15 @@ const BenefitsSection: React.FC = () => {
     const baseClass =
       "py-2 md:py-3 px-3 md:px-4 rounded-lg text-center transition-all text-xs md:text-sm";
     return activeTab === tab
-      ? `${baseClass} bg-ally-blue/5 text-ally-blue border-[1px] border-ally-blue/70`
-      : `${baseClass} bg-ally-light/50 text-ally-gray hover:bg-ally-light border-[1px] border-gray-200`;
+      ? `${baseClass} bg-ally-blue/15 text-ally-blue border-[1px] border-ally-blue/70`
+      : `${baseClass} bg-ally-gray/15 text-ally-gray hover:bg-ally-light border-[1px] border-ally-gray/30`;
   };
 
   return (
-    <section id="benefits" className="section-spacing bg-white py-16 md:py-24">
+    <section
+      id="benefits"
+      className="section-spacing bg-ally-gray/5 py-16 md:py-24"
+    >
       <div className="container-ally px-4 md:px-8 lg:px-24">
         <div
           className="text-center max-w-3xl mx-auto mb-8 md:mb-16 fade-in-section"
@@ -86,14 +89,11 @@ const BenefitsSection: React.FC = () => {
                 <TabsTrigger
                   key={key}
                   value={key}
-                  className={cn(
-                    getTabClassName(key),
-                    activeTab === key ? "bg-ally-blue/10" : "bg-gray-100"
-                  )}
+                  className={cn(getTabClassName(key))}
                 >
                   <tab.icon
                     className={cn(
-                      "inline mr-0 p-1",
+                      "inline mr-2",
                       activeTab === key ? "text-ally-blue" : "text-ally-gray"
                     )}
                     size={20}
