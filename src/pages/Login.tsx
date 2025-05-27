@@ -306,7 +306,7 @@ const Login = () => {
                     onClick={() => setMode("register")}
                     className="text-ally-blue hover:underline font-medium"
                   >
-                    Registrar-se
+                    Registrar-se Gratuitamente
                   </button>
                 </p>
               ) : (
