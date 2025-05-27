@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const HeroSection: React.FC = () => {
@@ -34,10 +34,10 @@ const HeroContent: React.FC = () => (
     </p>
 
     <div className="pt-6">
-      <a href="#about">
+      <a href="#how-it-works">
         <Button size="lg" className="w-full md:w-auto">
           Ver como funciona na prática
-          <ArrowRight
+          <Sparkles
             className="ml-2 group-hover:translate-x-1 transition-transform"
             size={20}
           />
