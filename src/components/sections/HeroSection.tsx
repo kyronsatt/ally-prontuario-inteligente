@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="pt-20 md:pt-32 pb-16 md:pb-28 overflow-hidden relative">
+    <section className="pt-20 md:pt-24 pb-16 md:pb-28 overflow-hidden relative">
       <img
         className="absolute right-0 top-0 w-auto h-full scale-150 opacity-20"
         src="/assets/illustration/wave.svg"
