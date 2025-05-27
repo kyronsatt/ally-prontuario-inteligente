@@ -52,18 +52,18 @@ const BenefitsSection: React.FC = () => {
 
   const getTabClassName = (tab: string) => {
     const baseClass =
-      "py-2 md:py-3 px-3 md:px-4 rounded-lg text-center transition-all text-xs md:text-sm";
+      "py-2 md:py-3 px-3 md:px-4 rounded-lg text-center transition-all text-xs md:text-sm transition-all duration-300";
     return activeTab === tab
-      ? `${baseClass} bg-ally-blue/15 text-ally-blue border-[1px] border-ally-blue/70`
-      : `${baseClass} bg-ally-gray/15 text-ally-gray hover:bg-ally-light border-[1px] border-ally-gray/30`;
+      ? `${baseClass} bg-ally-blue/15 text-ally-blue border-[1px] border-ally-blue/70 ring-ally-blue/30 ring-1 ring-offset-2`
+      : `${baseClass} bg-ally-gray/15 text-ally-gray hover:bg-ally-gray/20 border-[1px] border-ally-gray/30 hover:ring-ally-gray/30 hover:ring-1 ring-offset-2`;
   };
 
   return (
     <section
       id="benefits"
-      className="section-spacing bg-ally-gray/5 py-16 md:py-24"
+      className="section-spacing bg-ally-gray/5 py-16 md:py-36"
     >
-      <div className="container-ally px-4 md:px-8 lg:px-24">
+      <div className="container-ally">
         <div
           className="text-center max-w-3xl mx-auto mb-8 md:mb-16 fade-in-section"
           style={{ "--delay": "100ms" } as React.CSSProperties}
@@ -107,7 +107,7 @@ const BenefitsSection: React.FC = () => {
               <TabsContent
                 key={key}
                 value={key}
-                className="pt-4 focus:outline-none"
+                className="pt-4 focus:outline-none fade-in-section"
               >
                 <div className="p-4 md:p-6">
                   <div className="grid md:grid-cols-2 gap-8 items-center">

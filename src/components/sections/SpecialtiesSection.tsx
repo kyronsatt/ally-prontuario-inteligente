@@ -36,7 +36,7 @@ const SpecialtyCard: React.FC<SpecialtyCardProps> = ({
   const isMobile = useIsMobile();
 
   return (
-    <Card className="h-full border border-ally-blue/50 bg-gradient-to-r from-ally-blue/15 to-[#00e6e630] rounded-2xl">
+    <Card className="h-full border border-ally-blue/50 bg-gradient-to-tr from-ally-blue/10 to-[#00e6e610] shadow-inner shadow-ally-blue/10 ring-ally-blue/20 ring-1 ring-offset-2 rounded-3xl">
       <CardHeader className="pb-0 text-center overflow-clip bg-transparent">
         <div className="flex justify-center">
           <div className="py-3 rounded-full text-ally-blue/20">{icon}</div>
@@ -111,7 +111,7 @@ const SpecialtiesSection: React.FC = () => {
   ];
 
   return (
-    <section id="specialties" className="py-16 md:py-24 bg-white relative">
+    <section id="specialties" className="py-16 md:py-36 bg-white relative">
       <div className="relative w-full px-4 md:px-0">
         <div
           className="text-center max-w-3xl mx-auto mb-8 md:mb-12 fade-in-section"

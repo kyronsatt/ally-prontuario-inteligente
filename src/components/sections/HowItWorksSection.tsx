@@ -1,6 +1,5 @@
 import React from "react";
-import { Mic, FileText, LightbulbIcon, Heart, ArrowRight } from "lucide-react";
-import { Button } from "../ui/button";
+import { Mic, FileText, LightbulbIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const HowItWorksSection: React.FC = () => {
@@ -37,11 +36,13 @@ const HowItWorksSection: React.FC = () => {
           {steps.map((step, index) => (
             <div
               key={index}
-              className="flex gap-5 items-start fade-in-section bg-white/0 p-6 rounded-lg"
+              className="flex gap-6 items-start fade-in-section bg-white/0 p-6 rounded-lg"
               style={{ "--delay": step.delay } as React.CSSProperties}
             >
-              <div className="bg-ally-blue/10 w-14 h-14 p-3 rounded-full flex items-center justify-center text-ally-blue">
-                {step.icon}
+              <div className="rounded-full ring-ally-blue/20 ring-1 ring-offset-4">
+                <div className="bg-ally-blue/10 w-12 h-12 p-3 rounded-full flex items-center justify-center text-ally-blue/80 ring-ally-blue/50 ring-1 ring-offset-2 shadow-inner shadow-ally-blue/10">
+                  {step.icon}
+                </div>
               </div>
               <div className="flex flex-col gap-2">
                 <h3 className="text-lg md:text-xl font-medium">{step.title}</h3>

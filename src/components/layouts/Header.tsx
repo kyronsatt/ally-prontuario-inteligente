@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { AllyLogo } from "@/components/atoms/ally-logo";
 import { Menu, X } from "lucide-react";
@@ -25,7 +24,9 @@ const Header: React.FC = () => {
     <header
       className={cn(
         "fixed top-0 left-0 w-full z-50 transition-all duration-300",
-        scrolled ? "bg-white/95 backdrop-blur-xl py-2 shadow-sm" : "bg-transparent py-4"
+        scrolled
+          ? "bg-white/30 backdrop-blur-xl py-2 shadow-sm"
+          : "bg-transparent py-4"
       )}
     >
       <div className="container-ally flex justify-between items-center">

@@ -28,8 +28,8 @@ const PricingSection: React.FC = () => {
   };
 
   return (
-    <section id="pricing" className="py-16 md:py-24 bg-gray-50">
-      <div className="container-ally px-4 md:px-8 lg:px-24">
+    <section id="pricing" className="py-16 md:py-36 bg-gray-50">
+      <div className="container-ally">
         <div className="text-center mb-10 md:mb-16">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4">
             Planos simples e transparentes
