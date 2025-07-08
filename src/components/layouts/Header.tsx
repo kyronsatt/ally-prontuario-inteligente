@@ -36,9 +36,10 @@ const Header: React.FC = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
-          <NavLink href="#about">Sobre</NavLink>
-          <NavLink href="#benefits">Benefícios</NavLink>
-          <NavLink href="#waitlist">Lista de espera</NavLink>
+          <NavLink href="/#about">Sobre</NavLink>
+          <NavLink href="/#benefits">Benefícios</NavLink>
+          <NavLink href="/blog">Blog</NavLink>
+          <NavLink href="/#waitlist">Lista de espera</NavLink>
           <a href="/login">
             <Button>Entrar</Button>
           </a>
@@ -66,9 +67,10 @@ const Header: React.FC = () => {
                 </Sheet>
               </div>
               <nav className="flex flex-col space-y-4">
-                <MobileNavLink href="#about">Sobre</MobileNavLink>
-                <MobileNavLink href="#benefits">Benefícios</MobileNavLink>
-                <MobileNavLink href="#waitlist">Lista de espera</MobileNavLink>
+                <MobileNavLink href="/#about">Sobre</MobileNavLink>
+                <MobileNavLink href="/#benefits">Benefícios</MobileNavLink>
+                <MobileNavLink href="/blog">Blog</MobileNavLink>
+                <MobileNavLink href="/#waitlist">Lista de espera</MobileNavLink>
                 <a href="/login" className="mt-4">
                   <Button className="w-full">Entrar</Button>
                 </a>

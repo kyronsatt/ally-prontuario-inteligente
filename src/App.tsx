@@ -27,6 +27,8 @@ import Subscription from "./pages/app/Subscription";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Blog from "./pages/Blog";
+import Post from "./pages/Post";
 
 const App: React.FC = () => {
   return (
@@ -39,6 +41,8 @@ const App: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<Post />} />
                   <Route path="/termo-de-uso" element={<Terms />} />
                   <Route
                     path="/politica-de-privacidade"
