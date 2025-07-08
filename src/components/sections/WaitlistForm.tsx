@@ -10,8 +10,7 @@ const WaitlistForm: React.FC = () => {
     name: "",
     email: "",
     specialty: "",
-    crm: "",
-    message: "",
+    phone_number: "",
     acceptTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +60,11 @@ const WaitlistForm: React.FC = () => {
       return false;
     }
 
+    if (!formData.phone_number) {
+      setError("Por favor, informe um telefone para contato.");
+      return false;
+    }
+
     if (!formData.acceptTerms) {
       setError(
         "Você precisa aceitar os termos de uso e política de privacidade para continuar."
@@ -94,9 +98,7 @@ const WaitlistForm: React.FC = () => {
           name: formData.name,
           email: formData.email,
           specialty: formData.specialty || null,
-          crm: formData.crm || null,
-          message: formData.message || null,
-          terms_accepted: formData.acceptTerms,
+          phone_number: formData.phone_number,
         },
       ]);
 
@@ -113,8 +115,7 @@ const WaitlistForm: React.FC = () => {
         name: "",
         email: "",
         specialty: "",
-        crm: "",
-        message: "",
+        phone_number: "",
         acceptTerms: false,
       });
     } catch (err) {
@@ -141,7 +142,7 @@ const WaitlistForm: React.FC = () => {
   };
 
   return (
-    <section id="waitlist" className="section-spacing">
+    <section id="waitlist" className="section-spacing bg-gray-50">
       <div className="container-ally">
         <div className="max-w-xl mx-auto">
           <div
@@ -204,6 +205,25 @@ const WaitlistForm: React.FC = () => {
 
                 <div>
                   <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-ally-dark mb-1"
+                  >
+                    Telefone
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone_number"
+                    name="phone_number"
+                    required
+                    value={formData.phone_number}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-ally-blue focus:border-ally-blue"
+                    placeholder="(11) 99999-9999"
+                  />
+                </div>
+
+                <div>
+                  <label
                     htmlFor="specialty"
                     className="block text-sm font-medium text-ally-dark mb-1"
                   >
@@ -218,56 +238,28 @@ const WaitlistForm: React.FC = () => {
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-ally-blue focus:border-ally-blue"
                   >
                     <option value="">Selecione sua especialidade</option>
-                    <option value="Clínica Médica">Clínica Médica</option>
+                    <option value="Anestesiologia">Anestesiologia</option>
                     <option value="Cardiologia">Cardiologia</option>
+                    <option value="Cirurgia Plástica">Cirurgia Plástica</option>
+                    <option value="Clínica Médica">Clínica Médica</option>
+                    <option value="Coloproctologia">Coloproctologia</option>
                     <option value="Dermatologia">Dermatologia</option>
                     <option value="Endocrinologia">Endocrinologia</option>
                     <option value="Gastroenterologia">Gastroenterologia</option>
+                    <option value="Geriatria">Geriatria</option>
+                    <option value="Ginecologia">Ginecologia</option>
                     <option value="Neurologia">Neurologia</option>
+                    <option value="Oftalmologia">Oftalmologia</option>
+                    <option value="Otorrinolaringologia">
+                      Otorrinolaringologia
+                    </option>
                     <option value="Pediatria">Pediatria</option>
                     <option value="Psiquiatria">Psiquiatria</option>
-                    <option value="Ginecologia">Ginecologia</option>
                     <option value="Outra">Outra</option>
                   </select>
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="crm"
-                    className="block text-sm font-medium text-ally-dark mb-1"
-                  >
-                    Número de CRM (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    id="crm"
-                    name="crm"
-                    value={formData.crm}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-ally-blue focus:border-ally-blue"
-                    placeholder="Ex: 12345/UF"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-ally-dark mb-1"
-                  >
-                    Mensagem (opcional)
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={3}
-                    value={formData.message}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-ally-blue focus:border-ally-blue"
-                    placeholder="Conte-nos como podemos ajudar na sua prática clínica"
-                  />
-                </div>
-
-                {/* <div className="flex items-start">
+                <div className="flex items-start">
                   <input
                     type="checkbox"
                     id="acceptTerms"
@@ -297,7 +289,7 @@ const WaitlistForm: React.FC = () => {
                     </a>
                     .
                   </label>
-                </div> */}
+                </div>
 
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">

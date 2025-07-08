@@ -17,9 +17,7 @@ const Footer: React.FC = () => {
                 <AllyLogo />
               </Link>
             </div>
-            <p className="text-ally-gray text-sm mt-2">
-              A revolução no registro de prontuários médicos.
-            </p>
+            <p className="text-ally-gray text-sm mt-2">Da voz ao prontuário.</p>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center">
@@ -38,7 +36,7 @@ const Footer: React.FC = () => {
               Benefícios
             </a>
             <a
-              href="#pricing"
+              href="#waitlist"
               className="text-ally-dark hover:text-ally-blue transition-colors"
               onClick={() => trackButtonClick("footer_waitlist")}
             >

@@ -31,7 +31,7 @@ const Index = () => {
         <AboutSection />
         <BenefitsSection />
         <SpecialtiesSection />
-        <PricingSection />
+        {/* <PricingSection /> */}
         <WaitlistForm />
       </main>
 
