@@ -12,7 +12,7 @@ export interface IAnamnese {
   id?: string;
   appointment_id?: string;
   transcription_id?: string;
-  created_at?: string;
+  created_at?: string | Date;
   patient_id?: string;
   insights?: InsightItem[];
   patient?: {

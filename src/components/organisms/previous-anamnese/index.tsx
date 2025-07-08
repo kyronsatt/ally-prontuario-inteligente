@@ -59,7 +59,7 @@ const PreviousAnamnese: React.FC<PreviousAnamneseProps> = ({
   return (
     <Card className="h-2/3 flex flex-col border-ally-blue/30">
       <CardHeader className="py-2">
-        <HeaderWithDate date={anamnese.created_at} />
+        <HeaderWithDate date={anamnese.created_at instanceof Date ? anamnese.created_at.toISOString() : anamnese.created_at} />
       </CardHeader>
 
       <CardContent className="flex-1 overflow-auto px-4 py-6">
